@@ -1,0 +1,56 @@
+# top level (obtain 'p' from the user)
+
+# e.g.: g := graph(p)
+
+graph(p)
+do
+  coords := Coordinates.new
+  add_coords(p, coords)
+end
+
+# Add coordinates, recursively for 'p' to 'coords'.
+add_coords(p, coords)
+  require
+    p /= null and coords /= null
+  do
+    if p.has_spouse then
+      add_spousal_coords(p, coords)
+    else
+      add_single_coords(p, coords)
+    end
+  end
+
+add_spousal_coords(p, coords)
+  require
+    p /= null and coords /= null
+    p.has_spouse
+  do
+    spouse := p.spouse
+    add_couple_coords(p, spouse, coords)
+    foreach c in p.children do add_coords(c, coords) end
+  end
+
+add_single_coords(p, coords)
+  require
+    p /= null and coords /= null
+    not p.has_spouse
+  do
+    add_individual_coords(p, coords)
+    foreach c in p.children do add_coords(c, coords) end
+  end
+
+# Add coordinates for person 'p' to coords
+add_individual_coords(p, coords)
+  require
+    p /= null and coords /= null
+  do
+    # to be implemented
+  end
+
+# Add coordinates for the couple 'spouse' and 'spouse2' to coords
+add_couple_coords(spouse1, spouse2, coords)
+  require
+    spouse1 /= null and spouse2 /= null and coords /= null
+  do
+    # to be implemented
+  end
