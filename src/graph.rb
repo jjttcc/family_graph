@@ -15,7 +15,7 @@ class Graph
   private
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
-  pre '"editing" eixsts' do |p| p != null end
+  pre '"p" exists' do |p| p != null end
   def add_coords(p)
     if p.has_spouse then
       add_spousal_coords(p)
