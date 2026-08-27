@@ -22,7 +22,9 @@ class DataLoader
       spouse_info = person.data[SPOUSE].to_s
       unless spouse_info.empty?
         spouse_id = spouse_info.split(',')[0].strip
-        person.add_spouse(result[spouse_id]) if result.key?(spouse_id)
+        if result.key?(spouse_id) then
+          person.add_spouse(result[spouse_id])
+        end
       end
 
       # Link Parents/Children

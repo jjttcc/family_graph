@@ -1,23 +1,52 @@
-# required libraries/tools
 require 'ruby_contracts'
 
-# Data structure that [tbd - work in progress]
-# Note: Gemini's concept of a Couple class might belong in here - invisible
-# to client objects.
+# Repository of coordinates and spousal pairings used to construct
+# the final genealogical graph.
 class Coordinates
+  include Contracts::DSL
+
   public
 
-  # attr_reader :contents
+  attr_reader :nodes, :couples
+
+  # Initialize coordinates with empty structures.
+  post 'invariant' do invariant end
+  def initialize
+    @nodes = {}
+    @couples = []
+  end
+
+  # Store coordinates for an individual person.
+  pre 'valid_coords' do |id, x, y|
+    id != nil && x.is_a?(Numeric) && y.is_a?(Numeric)
+  end
+  def add_node(id, x, y)
+    @nodes[id] = [x, y]
+  end
+
+  # Register a spousal pairing.
+  pre 'valid_spouses' do |spouse1, spouse2|
+    spouse1 != nil && spouse2 != nil
+  end
+  def add_couple(spouse1, spouse2)
+    # Store sorted pair to avoid duplicating (A, B) and (B, A)
+    pair = [spouse1, spouse2].sort
+    @couples << pair unless @couples.include?(pair)
+  end
+
+  # Retrieve coordinates for a given person.
+  def get_node(id)
+    @nodes[id]
+  end
+
+  # Check if a person has coordinates defined.
+  def has_node?(id)
+    @nodes.key?(id)
+  end
 
   private
 
-  post 'invariant' do invariant end
-  def initialize
-    # tbd
-  end
-
   def invariant
-    # tbd
+    @nodes != nil && @couples != nil
   end
-
 end

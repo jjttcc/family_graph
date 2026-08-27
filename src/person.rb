@@ -36,7 +36,9 @@ class Person
   # Dynamic access for evolving fields
   # MUST be public to work
   def method_missing(method_name, *args, &block)
-    return @data[method_name.to_s] if @data.key?(method_name.to_s)
+    if @data.key?(method_name.to_s) then
+      return @data[method_name.to_s]
+    end
     super
   end
 
