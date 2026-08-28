@@ -15,14 +15,24 @@ options = {
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: main.rb [options]"
 
-  opts.on("-r", "--root ID", "Root person ID") { |v| options[:root] = v }
+  opts.on("-r", "--root ID", "Root person ID (default: john_frost_1680)") { |v| options[:root] = v }
   
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
   end
 
-  opts.on("-o", "--output DIR", "Output directory") { |v| options[:output_dir] = v }
+  opts.on("-o", "--output DIR", "Output directory (default: .)") { |v| options[:output_dir] = v }
+  
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit
+  end
+end
+
+if ARGV.empty?
+  puts parser
+  exit
 end
 
 parser.parse!
