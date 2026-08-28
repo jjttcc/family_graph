@@ -1,27 +1,49 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
 require_relative 'data_loader'
 require_relative 'graph'
 require_relative 'graph_renderer'
 require_relative 'family_constants'
 
-# Main driver to generate the family tree SVG
-data_path = '/home3/development/jtc/relatives/gemini/output-formatting/' \
-            'manual_engine/data/master_tree.yaml'
+options = {
+  root: 'john_frost_1680',
+  direction: :ancestry,
+  output_dir: Dir.pwd
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: main.rb [options]"
+
+  opts.on("-r", "--root ID", "Root person ID") { |v| options[:root] = v }
+  
+  opts.on("-d", "--direction DIR", [:ancestry, :descent, :none], 
+          "Direction (ancestry, descent, none)") do |v|
+    options[:direction] = v
+  end
+
+  opts.on("-o", "--output DIR", "Output directory") { |v| options[:output_dir] = v }
+end
+
+parser.parse!
+
+data_path = File.expand_path('../../../manual_engine/data/master_tree.yaml', 
+                             __FILE__)
 
 puts "Loading data from #{data_path}..."
 people = DataLoader.load(data_path)
 
-# Using john_frost_1680 as the default root
-root_id = 'john_frost_1680'
-root = people[root_id]
-puts "Generating graph for #{root_id}..."
+unless people.key?(options[:root])
+  puts "Error: Root person '#{options[:root]}' not found."
+  exit 1
+end
+
+root = people[options[:root]]
+puts "Generating graph for #{options[:root]}..."
 graph = Graph.new(root)
 
-# Default direction is :ancestry
 puts "Rendering SVG..."
-renderer = GraphRenderer.new(graph.coordinates, people, :ancestry)
-output_dir = '/home3/development/jtc/relatives/gemini/output-formatting/family_graph/output'
-renderer.render(output_dir)
+renderer = GraphRenderer.new(graph.coordinates, people, options[:direction])
+renderer.render(options[:output_dir])
 
-puts "Successfully rendered graph to output/"
+puts "Successfully rendered graph to #{options[:output_dir]}/"
