@@ -9,7 +9,8 @@ require_relative 'family_constants'
 options = {
   root_ids: nil,
   direction: :ancestry,
-  output_dir: Dir.pwd
+  output_dir: Dir.pwd,
+  show_ids: false
 }
 
 parser = OptionParser.new do |opts|
@@ -23,6 +24,10 @@ parser = OptionParser.new do |opts|
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
+  end
+
+  opts.on("-D", "--debug", "Display person IDs for debugging") do
+    options[:show_ids] = true
   end
 
   opts.on("-o", "--output DIR", "Output directory (default: .)") do |v|
@@ -87,7 +92,8 @@ root_ids.each do |root_id|
 
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
-                               options[:direction])
+                               options[:direction],
+                               options[:show_ids])
   
   renderer.render(options[:output_dir], root_id)
 end
