@@ -1,0 +1,18 @@
+# Sample tree for testing
+john_frost_1680:
+  given-name: John
+  surname: Frost
+  spouse: ruth_baker_1684, , ;
+  note: Root ancestor.
+
+ruth_baker_1684:
+  given-name: Ruth
+  surname: Baker
+  spouse: john_frost_1680, , ;
+
+william_frost_1713:
+  given-name: William
+  surname: Frost
+  father: john_frost_1680
+  mother: ruth_baker_1684
+  spouse: sarah_woodrow, , ;
