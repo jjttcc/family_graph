@@ -18,12 +18,18 @@ class DataLoader
 
     # 2. Link relationships
     result.each_value do |person|
-      # Link Spouses - Ensure string before processing
+      # Link Spouses
       spouse_info = person.data[SPOUSE].to_s
       unless spouse_info.empty?
         spouse_id = spouse_info.split(',')[0].strip
         if result.key?(spouse_id) then
-          person.add_spouse(result[spouse_id])
+          spouse = result[spouse_id]
+          person.add_spouse(spouse)
+
+          # Ensure bi-directional link if missing
+          unless spouse.spouse_list.include?(person)
+            spouse.add_spouse(person)
+          end
         end
       end
 
