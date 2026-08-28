@@ -22,7 +22,7 @@ class GraphRenderer
   # Render the SVG to the specified output directory.
   # Filename is auto-generated with a timestamp to prevent overwrites.
   pre 'valid_output_dir' do |output_dir| Dir.exist?(output_dir) end
-  def render(output_dir)
+  def render(output_dir, root_id = "tree")
     nodes = @coordinates.nodes
     if nodes.empty? then
       puts "No nodes to render."
@@ -30,7 +30,8 @@ class GraphRenderer
     end
 
     timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
-    output_path = File.join(output_dir, "family_tree_#{timestamp}.svg")
+    filename = "family_tree_#{root_id}_#{timestamp}.svg"
+    output_path = File.join(output_dir, filename)
 
     # Calculate canvas boundaries with padding
     min_x = nodes.values.map { |coord| coord[0] }.min

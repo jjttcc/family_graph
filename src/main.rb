@@ -15,8 +15,10 @@ options = {
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: main.rb [options]"
 
-  opts.on("-i", "--root ID",
-          "Root person ID (default: john_frost_1680)") { |v| options[:root] = v }
+  opts.on("-i", "--root ID1,ID2", Array,
+          "Comma-separated list of root person IDs") do |v|
+    options[:root_ids] = v
+  end
 
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
@@ -39,11 +41,6 @@ parser = OptionParser.new do |opts|
   end
 end
 
-if ARGV.empty?
-  puts parser
-  exit
-end
-
 parser.parse!
 
 data_path = File.expand_path('../../../manual_engine/data/master_tree.yaml',
@@ -57,25 +54,44 @@ if options[:list_all]
   exit
 end
 
+# Helper to find all roots (those with no parent fields)
+all_roots = people.select do |_id, p|
+  !p.respond_to?(:father) && !p.respond_to?(:mother)
+end
+
 if options[:list_roots]
-  roots = people.select do |_id, p|
-    !p.respond_to?(:father) && !p.respond_to?(:mother)
-  end
-  puts roots.keys.sort
+  puts all_roots.keys.sort
   exit
 end
 
-unless people.key?(options[:root])
-  puts "Error: Root person '#{options[:root]}' not found."
-  exit 1
+# Use provided root IDs, or default to all roots
+root_ids = options[:root_ids] || all_roots.keys
+
+root_ids.each do |root_id|
+  unless people.key?(root_id)
+    puts "Error: Root person '#{root_id}' not found."
+    next
+  end
+
+  puts "Generating graph for #{root_id}..."
+  graph = Graph.new(people[root_id])
+
+  puts "Rendering SVG..."
+  renderer = GraphRenderer.new(graph.coordinates, people,
+                               options[:direction])
+  # Override the filename inside render or pass it as an option.
+  # For now, let's just pass the dir and handle the name in render.
+  # Wait, GraphRenderer uses timestamp, let's update it to include root_id
+  
+  # Temporary fix to render the specific root
+  timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
+  output_path = File.join(options[:output_dir],
+                          "tree_#{root_id}_#{timestamp}.svg")
+  
+  # I need to modify GraphRenderer to support custom filenames or 
+  # pass the root_id to it.
+  
+  # For now, let's just create a quick method or modify GraphRenderer.
+  # Let's modify GraphRenderer for better filename support in next step.
+  renderer.render(options[:output_dir], root_id)
 end
-
-root = people[options[:root]]
-puts "Generating graph for #{options[:root]}..."
-graph = Graph.new(root)
-
-puts "Rendering SVG..."
-renderer = GraphRenderer.new(graph.coordinates, people, options[:direction])
-renderer.render(options[:output_dir])
-
-puts "Successfully rendered graph to #{options[:output_dir]}/"
