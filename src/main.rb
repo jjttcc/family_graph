@@ -13,7 +13,7 @@ options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: main.rb [options]"
+  opts.banner = "Usage: family_graph <data-path1> ... [options]"
 
   opts.on("-i", "--root ID1,ID2", Array,
           "Comma-separated list of root person IDs") do |v|
@@ -41,18 +41,22 @@ parser = OptionParser.new do |opts|
   end
 end
 
+parser.parse!
+
 if ARGV.empty?
   puts parser
   exit
 end
 
-parser.parse!
-
-data_path = File.expand_path('../../../manual_engine/data/master_tree.yaml',
-                             __FILE__)
-
-puts "Loading data from #{data_path}..."
-people = DataLoader.load(data_path)
+people = {}
+ARGV.each do |path|
+  unless File.exist?(path)
+    puts "Error: Data file '#{path}' not found."
+    next
+  end
+  puts "Loading data from #{path}..."
+  people.merge!(DataLoader.load(path))
+end
 
 if options[:list_all]
   puts people.keys.sort
