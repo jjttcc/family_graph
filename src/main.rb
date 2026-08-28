@@ -15,8 +15,9 @@ options = {
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: main.rb [options]"
 
-  opts.on("-r", "--root ID", "Root person ID (default: john_frost_1680)") { |v| options[:root] = v }
-  
+  opts.on("-i", "--root ID",
+          "Root person ID (default: john_frost_1680)") { |v| options[:root] = v }
+
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
@@ -28,7 +29,7 @@ parser = OptionParser.new do |opts|
 
   opts.on("-l", "--list-all", "List all person IDs") { options[:list_all] = true }
 
-  opts.on("-R", "--list-roots", "List all root person IDs") do
+  opts.on("-r", "--list-roots", "List all root person IDs") do
     options[:list_roots] = true
   end
 

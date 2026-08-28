@@ -57,14 +57,16 @@ puts "Running extensive structural assertions..."
 test_cases.each do |id, expected_children|
   person = people[id]
   assert(person != nil, "Person #{id} should exist")
-  assert(person.children.size == expected_children, 
-         "#{id} should have #{expected_children} children, but has #{person.children.size}")
-  
+  assert(person.children.size == expected_children,
+         "#{id} should have #{expected_children} children, but has " \
+         "#{person.children.size}")
+
   # Verify bidirectional linking (child's parent should be this person)
   person.children.each do |child|
     parent_id = child.data[FATHER] || child.data[MOTHER]
-    assert(parent_id == id, 
-           "Child #{child.id} of #{id} should have #{id} as parent, but has #{parent_id}")
+    assert(parent_id == id,
+           "Child #{child.id} of #{id} should have #{id} as parent, " \
+           "but has #{parent_id}")
   end
 end
 
