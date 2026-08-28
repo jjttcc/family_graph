@@ -109,32 +109,22 @@ class GraphRenderer
 
       nx = x + offset_x
       ny = y + offset_y
+# Display name and person ID for debugging
+name_label = "#{person.given_name} #{person.surname}".strip
+id_label = person.id
 
-      # Using clean underscore getters mapped to hyphen keys
-      name_label = "#{person.given_name} #{person.surname}".strip
-
-      birth = person.respond_to?(:birth_date) ? person.birth_date : nil
-      death = person.respond_to?(:death_date) ? person.death_date : nil
-
-      b_str = birth.respond_to?(:year) ? birth.year.to_s : (birth || "").to_s
-      d_str = death.respond_to?(:year) ? death.year.to_s : (death || "").to_s
-
-      years_label = ""
-      if !b_str.empty? || !d_str.empty? then
-        years_label = "#{b_str}-#{d_str}"
-      end
-
-      svg_nodes << "  <rect x=\"#{nx}\" y=\"#{ny}\" width=\"#{NODE_WIDTH}\" " \
-                   "height=\"#{NODE_HEIGHT}\" fill=\"white\" " \
-                   "stroke=\"black\" />"
-      svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" y=\"#{ny + 15}\" " \
-                   "font-family=\"Arial\" font-size=\"#{FONT_SIZE_NAME}\" " \
-                   "text-anchor=\"middle\">#{name_label}</text>"
-      svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" y=\"#{ny + 30}\" " \
-                   "font-family=\"Arial\" font-size=\"#{FONT_SIZE_DATE}\" " \
-                   "text-anchor=\"middle\">#{years_label}</text>"
-    end
-
+svg_nodes << "  <rect x=\"#{nx}\" y=\"#{ny}\" " \
+             "width=\"#{NODE_WIDTH}\" height=\"#{NODE_HEIGHT}\" " \
+             "fill=\"white\" stroke=\"black\" />"
+svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" " \
+             "y=\"#{ny + 15}\" font-family=\"Arial\" " \
+             "font-size=\"#{FONT_SIZE_NAME}\" " \
+             "text-anchor=\"middle\">#{name_label}</text>"
+svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" " \
+             "y=\"#{ny + 30}\" font-family=\"Arial\" " \
+             "font-size=\"#{FONT_SIZE_DATE}\" " \
+             "text-anchor=\"middle\">#{id_label}</text>"
+end
     # SVG Template with arrowhead markers
     svg_template = <<~SVG
       <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
