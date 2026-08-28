@@ -4,6 +4,7 @@ require_relative '../src/data_loader'
 require_relative '../src/family_constants'
 require_relative '../src/coordinates'
 require_relative '../src/graph'
+require_relative '../src/graph_renderer'
 
 def assert(condition, message)
   unless condition
@@ -21,7 +22,7 @@ coords.add_node('person_1', 100, 200)
 coords.add_node('person_2', 150, 200)
 
 assert(coords.has_node?('person_1'), "person_1 should exist in coordinates")
-assert(coords.get_node('person_1') == [100, 200], "person_1 coordinates mismatched")
+assert(coords.node('person_1') == [100, 200], "person_1 coordinates mismatched")
 assert(!coords.has_node?('person_3'), "person_3 should not exist in coordinates")
 
 # Add spouses and check uniqueness/sorting
@@ -79,8 +80,8 @@ layout_coords = graph.coordinates
 assert(layout_coords.has_node?('john_frost_1680'), "Root should have coordinates")
 assert(layout_coords.has_node?('ruth_baker_1684'), "Root spouse should have coordinates")
 
-john_x, john_y = layout_coords.get_node('john_frost_1680')
-ruth_x, ruth_y = layout_coords.get_node('ruth_baker_1684')
+john_x, john_y = layout_coords.node('john_frost_1680')
+ruth_x, ruth_y = layout_coords.node('ruth_baker_1684')
 
 assert(john_y == 0, "Root should be at level 0")
 assert(ruth_y == 0, "Spouse should be at level 0")
@@ -90,7 +91,7 @@ assert((ruth_x - john_x).abs == Graph::COUPLE_SPACING, "Spouses should be separa
 children = root_person.children
 assert(children.size == 3, "Root should have 3 children in layout")
 
-child_xs = children.map { |c| layout_coords.get_node(c.id)[0] }
+child_xs = children.map { |c| layout_coords.node(c.id)[0] }
 midpoint = (child_xs.min + child_xs.max) / 2
 couple_midpoint = (john_x + ruth_x) / 2
 
@@ -103,3 +104,16 @@ layout_coords.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
 end
 
 puts "\nLayout Engine verification passed!"
+
+# 4. Rendering Verification
+puts "Verifying SVG Renderer..."
+output_dir = '/home3/development/jtc/relatives/gemini/output-formatting/' \
+             'family_graph/output'
+renderer = GraphRenderer.new(layout_coords, people)
+renderer.render(output_dir)
+
+# Assert that at least one SVG exists in the directory
+svg_files = Dir.glob(File.join(output_dir, "*.svg"))
+assert(!svg_files.empty?, "SVG output file was not created in #{output_dir}")
+puts "SVG Renderer verification passed!"
+

@@ -34,15 +34,24 @@ class Person
   end
 
   # Dynamic access for evolving fields
-  # MUST be public to work
+  # Maps underscores to hyphens for seamless YAML lookup (e.g. given_name -> given-name)
   def method_missing(method_name, *args, &block)
-    if @data.key?(method_name.to_s) then
-      return @data[method_name.to_s]
+    m_str = method_name.to_s
+    if @data.key?(m_str) then
+      return @data[m_str]
     end
+
+    hyphenated = m_str.gsub('_', '-')
+    if @data.key?(hyphenated) then
+      return @data[hyphenated]
+    end
+
     super
   end
 
   def respond_to_missing?(method_name, include_private = false)
-    @data.key?(method_name.to_s) || super
+    m_str = method_name.to_s
+    hyphenated = m_str.gsub('_', '-')
+    @data.key?(m_str) || @data.key?(hyphenated) || super
   end
 end

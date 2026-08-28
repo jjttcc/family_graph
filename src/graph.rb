@@ -71,7 +71,7 @@ class Graph
       @next_x[y] = x + SIBLING_SPACING
     else
       # Center over children
-      child_xs = p.children.map { |c| @coordinates.get_node(c.id)[0] }
+      child_xs = p.children.map { |c| @coordinates.node(c.id)[0] }
       min_x = child_xs.min
       max_x = child_xs.max
       midpoint = (min_x + max_x) / 2
@@ -104,7 +104,7 @@ class Graph
       @next_x[y] = x2 + SIBLING_SPACING
     else
       # Center over children
-      child_xs = spouse1.children.map { |c| @coordinates.get_node(c.id)[0] }
+      child_xs = spouse1.children.map { |c| @coordinates.node(c.id)[0] }
       min_x = child_xs.min
       max_x = child_xs.max
       midpoint = (min_x + max_x) / 2
@@ -129,7 +129,7 @@ class Graph
   def shift_subtree(person, amount)
     if person != nil then
       if @coordinates.has_node?(person.id) then
-        x, y = @coordinates.get_node(person.id)
+        x, y = @coordinates.node(person.id)
         new_x = x + amount
         @coordinates.add_node(person.id, new_x, y)
         @next_x[y] = [@next_x[y], new_x + SIBLING_SPACING].max
@@ -138,7 +138,7 @@ class Graph
       if person.has_spouse then
         spouse = person.spouse
         if @coordinates.has_node?(spouse.id) then
-          x, y = @coordinates.get_node(spouse.id)
+          x, y = @coordinates.node(spouse.id)
           new_x = x + amount
           @coordinates.add_node(spouse.id, new_x, y)
           @next_x[y] = [@next_x[y], new_x + SIBLING_SPACING].max

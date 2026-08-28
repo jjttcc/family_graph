@@ -35,7 +35,7 @@ class Coordinates
   end
 
   # Retrieve coordinates for a given person.
-  def get_node(id)
+  def node(id)
     @nodes[id]
   end
 
