@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Wrapper script to execute the family_graph driver
+# from any location.
+
+# Find the absolute path of the script directory
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Execute main.rb using absolute path
+ruby "${SCRIPT_DIR}/../src/main.rb" "$@"

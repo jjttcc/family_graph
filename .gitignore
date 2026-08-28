@@ -6,7 +6,6 @@ output/*.svg
 TO_DO
 TO_DO-GEMINI
 cmsg
-bin/
 spec/fields
 spec/notes
 spec/spec1
