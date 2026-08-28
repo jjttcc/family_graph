@@ -7,7 +7,7 @@ require_relative 'graph_renderer'
 require_relative 'family_constants'
 
 options = {
-  root: 'john_frost_1680',
+  root_ids: nil,
   direction: :ancestry,
   output_dir: Dir.pwd
 }
@@ -39,6 +39,11 @@ parser = OptionParser.new do |opts|
     puts opts
     exit
   end
+end
+
+if ARGV.empty?
+  puts parser
+  exit
 end
 
 parser.parse!
@@ -79,19 +84,6 @@ root_ids.each do |root_id|
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
                                options[:direction])
-  # Override the filename inside render or pass it as an option.
-  # For now, let's just pass the dir and handle the name in render.
-  # Wait, GraphRenderer uses timestamp, let's update it to include root_id
   
-  # Temporary fix to render the specific root
-  timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
-  output_path = File.join(options[:output_dir],
-                          "tree_#{root_id}_#{timestamp}.svg")
-  
-  # I need to modify GraphRenderer to support custom filenames or 
-  # pass the root_id to it.
-  
-  # For now, let's just create a quick method or modify GraphRenderer.
-  # Let's modify GraphRenderer for better filename support in next step.
   renderer.render(options[:output_dir], root_id)
 end
