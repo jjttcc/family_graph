@@ -4,7 +4,7 @@ root_ancestor_100:
   surname: Doe
   birth-date: 1850-01-01
   death-date: 1930-05-15
-  spouse: bob_spouse_101, , ;
+  spouse: bob_spouse_101
   note: Root ancestor.
 
 bob_spouse_101:
@@ -12,7 +12,7 @@ bob_spouse_101:
   surname: Doe
   birth-date: 1848-06-20
   death-date: 1925-10-10
-  spouse: root_ancestor_100, , ;
+  spouse: root_ancestor_100
 
 child_gen1_200:
   given-name: Charlie
@@ -21,4 +21,4 @@ child_gen1_200:
   death-date: 1950-12-01
   father: root_ancestor_100
   mother: bob_spouse_101
-  spouse: diana_spouse_201, , ;
+  spouse: diana_spouse_201
