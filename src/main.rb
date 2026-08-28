@@ -17,8 +17,8 @@ parser = OptionParser.new do |opts|
 
   opts.on("-r", "--root ID", "Root person ID") { |v| options[:root] = v }
   
-  opts.on("-d", "--direction DIR", [:ancestry, :descent, :none], 
-          "Direction (ancestry, descent, none)") do |v|
+  opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
+          "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
   end
 
