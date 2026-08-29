@@ -6,7 +6,7 @@ class GraphRenderer
   include Contracts::DSL
 
   NODE_WIDTH = 120
-  NODE_HEIGHT = 40
+  NODE_HEIGHT = 50
   FONT_SIZE_NAME = 9
   FONT_SIZE_DATE = 7
 
@@ -118,9 +118,9 @@ class GraphRenderer
       else
         birth = person.respond_to?(:birth_date) ? person.birth_date : nil
         death = person.respond_to?(:death_date) ? person.death_date : nil
-        b_str = birth.respond_to?(:year) ? birth.year.to_s : (birth || "").to_s
-        d_str = death.respond_to?(:year) ? death.year.to_s : (death || "").to_s
-        line2_label = (!b_str.empty? || !d_str.empty?) ? "#{b_str}-#{d_str}" : ""
+        b_str = (birth || "").to_s
+        d_str = (death || "").to_s
+        line2_label = "#{b_str}, #{d_str}".gsub(/^, |, $/, "")
       end
 
       svg_nodes << "  <rect x=\"#{nx}\" y=\"#{ny}\" " \
