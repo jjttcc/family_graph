@@ -1,3 +1,5 @@
+#!/bin/env ruby
+
 require_relative '../src/data_loader'
 require 'yaml'
 
@@ -20,7 +22,6 @@ begin
     puts "  Has spouse: #{person.has_spouse}"
     puts "  Spouse: #{person.spouse.id if person.has_spouse}"
     puts "  Children count: #{person.children.size}"
-    
     unless person.children.empty?
       puts "  First child: #{person.children.first.id}"
     end

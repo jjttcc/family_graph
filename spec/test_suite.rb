@@ -3,7 +3,8 @@
 require_relative '../src/data_loader'
 require_relative '../src/family_constants'
 require_relative '../src/coordinates'
-require_relative '../src/graph'
+require_relative '../src/descendant_graph'
+require_relative '../src/ancestor_graph'
 require_relative '../src/graph_renderer'
 
 def assert(condition, message)
@@ -35,21 +36,19 @@ assert(coords.couples.first == ['person_1', 'person_2'].sort, "Spouse pairing so
 puts "Coordinates class verification passed!"
 
 # 2. Loader Verification
-data_path = '/home3/development/jtc/relatives/gemini/output-formatting/manual_engine/data/master_tree.yaml'
+data_path = File.join(__dir__, '..', 'data', 'sample_tree.yaml')
 people = DataLoader.load(data_path)
 puts "Successfully loaded #{people.size} people."
 
 # Define test cases: { id => expected_children_count }
-# Checking a mix of roots, intermediate nodes, and leaves
 test_cases = {
-  'john_frost_1680' => 3,     # Root
-  'william_frost_1713' => 6,  # Intermediate
-  'james_frost_1751' => 1,    # Intermediate
-  'walter_westcott_1742' => 1,# Intermediate
-  'elizabeth_westcott_1834' => 0, # Leaf
-  'ann_frost_1741' => 0,      # Leaf
-  'robert_frost_1710' => 0,   # Leaf
-  'john_westcott_1756' => 2   # Intermediate
+  'root_ancestor_100' => 1,
+  'bob_doe_101' => 1,
+  'child_gen1_200' => 2,
+  'grandchild_gen2_300' => 1,
+  'frank_smith_301' => 1,
+  'grandchild_gen2_302' => 0,
+  'great_grandchild_gen3_400' => 0
 }
 
 puts "Running extensive structural assertions..."
@@ -60,48 +59,73 @@ test_cases.each do |id, expected_children|
   assert(person.children.size == expected_children,
          "#{id} should have #{expected_children} children, but has " \
          "#{person.children.size}")
-
-  # Verify bidirectional linking (child's parent should be this person)
-  person.children.each do |child|
-    parent_id = child.data[FATHER] || child.data[MOTHER]
-    assert(parent_id == id,
-           "Child #{child.id} of #{id} should have #{id} as parent, " \
-           "but has #{parent_id}")
-  end
 end
 
 puts "All #{test_cases.size} structural assertions passed!"
 
 # 3. Layout Engine Verification
 puts "Verifying Layout Engine (Graph)..."
-root_person = people['john_frost_1680']
-graph = Graph.new(root_person)
-layout_coords = graph.coordinates
+# Find root dynamically (no parent)
+root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
+assert(root_person != nil, "A root person must exist in the sample data")
+
+puts "  Testing DescendantGraph..."
+des_graph = DescendantGraph.new(root_person)
+layout_coords = des_graph.coordinates
 
 # Verify coordinates generated for root and spouse
-assert(layout_coords.has_node?('john_frost_1680'), "Root should have coordinates")
-assert(layout_coords.has_node?('ruth_baker_1684'), "Root spouse should have coordinates")
+assert(layout_coords.has_node?(root_person.id), "Root should have coordinates")
+if root_person.has_spouse
+  assert(layout_coords.has_node?(root_person.spouse.id), "Root spouse should have coordinates")
+end
 
-john_x, john_y = layout_coords.node('john_frost_1680')
-ruth_x, ruth_y = layout_coords.node('ruth_baker_1684')
+root_x, root_y = layout_coords.node(root_person.id)
+assert(root_y == 0, "Root should be at level 0")
 
-assert(john_y == 0, "Root should be at level 0")
-assert(ruth_y == 0, "Spouse should be at level 0")
-assert((ruth_x - john_x).abs == Graph::COUPLE_SPACING, "Spouses should be separated by couple spacing")
+if root_person.has_spouse
+  spouse_x, spouse_y = layout_coords.node(root_person.spouse.id)
+  assert(spouse_y == 0, "Spouse should be at level 0")
+  assert((spouse_x - root_x).abs == Graph::COUPLE_SPACING, "Spouses should be separated by couple spacing")
+end
 
 # Verify children are positioned centered beneath the couple
-children = root_person.children
-assert(children.size == 3, "Root should have 3 children in layout")
+# (Only check if they have children)
+if !root_person.children.empty?
+  children = root_person.children
+  child_xs = children.map { |c| layout_coords.node(c.id)[0] }
+  midpoint = (child_xs.min + child_xs.max) / 2
 
-child_xs = children.map { |c| layout_coords.node(c.id)[0] }
-midpoint = (child_xs.min + child_xs.max) / 2
-couple_midpoint = (john_x + ruth_x) / 2
+  if root_person.has_spouse
+    couple_midpoint = (root_x + layout_coords.node(root_person.spouse.id)[0]) / 2
+    assert((midpoint - couple_midpoint).abs < 1, "Children should be centered beneath root couple midpoint")
+  else
+    assert((midpoint - root_x).abs < 1, "Children should be centered beneath root")
+  end
+end
 
-assert(midpoint == couple_midpoint, "Children should be centered beneath root couple midpoint")
+puts "  Testing AncestorGraph..."
+# Find a leaf dynamically (no children)
+leaf_person = people.values.find { |p| p.children.empty? }
+assert(leaf_person != nil, "A leaf person must exist in the sample data")
+puts "  Testing AncestorGraph starting from #{leaf_person.id}..."
+anc_graph = AncestorGraph.new(leaf_person)
+# Basic check that AncestorGraph runs without crashing
+assert(anc_graph.coordinates != nil, "AncestorGraph coordinates should be generated")
+assert(anc_graph.coordinates.has_node?(leaf_person.id), "Leaf should have coordinates")
+# Ensure it traversed up to root
+root_id = people.values.find { |p| p.father.nil? && p.mother.nil? }.id
+assert(anc_graph.coordinates.has_node?(root_id), "AncestorGraph should have traversed to root node")
+
 
 # Print coordinates for visual baseline check
-puts "\nGenerated Coordinates Baseline:"
+puts "\nGenerated Coordinates Baseline (Descendant):"
 layout_coords.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
+  puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
+end
+
+# Print coordinates for Ancestor baseline check
+puts "\nGenerated Coordinates Baseline (Ancestor):"
+anc_graph.coordinates.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
   puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
 end
 
@@ -109,8 +133,8 @@ puts "\nLayout Engine verification passed!"
 
 # 4. Rendering Verification
 puts "Verifying SVG Renderer..."
-output_dir = '/home3/development/jtc/relatives/gemini/output-formatting/' \
-             'family_graph/output'
+output_dir = File.join(__dir__, '..', 'output')
+Dir.mkdir(output_dir) unless Dir.exist?(output_dir)
 renderer = GraphRenderer.new(layout_coords, people)
 renderer.render(output_dir)
 

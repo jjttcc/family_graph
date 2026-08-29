@@ -1,4 +1,4 @@
-# Sample tree for testing
+# Sample tree for testing - Expanded Multi-generation
 root_ancestor_100:
   given-name: Alice
   surname: Doe
@@ -20,3 +20,31 @@ child_gen1_200:
   death-date: 1950-12-01
   father: root_ancestor_100
   mother: bob_doe_101
+
+# Branch 1
+grandchild_gen2_300:
+  given-name: Diana
+  surname: Doe
+  birth-date: 1910-05-20
+  father: child_gen1_200
+  spouse: frank_smith_301
+
+frank_smith_301:
+  given-name: Frank
+  surname: Smith
+  birth-date: 1908-01-10
+
+# Branch 2
+grandchild_gen2_302:
+  given-name: Edward
+  surname: Doe
+  birth-date: 1912-02-15
+  father: child_gen1_200
+
+# Great-grandchild
+great_grandchild_gen3_400:
+  given-name: Fiona
+  surname: Doe
+  birth-date: 1940-06-10
+  father: grandchild_gen2_300
+  mother: frank_smith_301

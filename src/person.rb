@@ -2,50 +2,74 @@
 require 'ruby_contracts'
 
 class Person
-  attr_reader :id, :data, :children
-  attr_accessor :spouse_list
+  include Contracts::DSL
+
+  public
+
+  attr_reader :id, :children
+  attr_accessor :spouses, :father, :mother, :father_id, :mother_id
+
+  public  ###  Initialization
 
   def initialize(id, data = {})
     @id = id
     @data = data
-    @spouse_list = [] # Keeping as an array, restricted to 1
+    @spouses = []
     @children = []
   end
 
-  def add_child(child)
-    @children << child
-  end
+  public  ###  Access
 
-  # Queries required by Graph class
-  def has_spouse
-    !@spouse_list.empty?
-  end
-
+  # self's first spouse
   def spouse
-    @spouse_list.first
+    @spouses.first
   end
 
-  def add_spouse(person)
-    if @spouse_list.size < 1
-      @spouse_list << person
-    else
-      raise "Multiple spouses not supported in current version"
+  # Biological mother and father - list: empty if no parents
+  def parents
+    result = []
+    if ! mother.nil? then
+      result << mother
     end
+    if ! father.nil? then
+      result << father
+    end
+    result
   end
+
+  public  ###  Boolean queries
+
+  # Does self have a spouse?
+  def has_spouse
+    !@spouses.empty?
+  end
+
+  public  ###  Element change
+
+  pre do |person| not self.children.include?(person) end
+  def add_child(person)
+    @children << person
+  end
+
+  pre do |person| ! @spouses.include?(person) end
+  def add_spouse(person)
+    @spouses << person
+  end
+
+  public  ###  Dynamic queries
 
   # Dynamic access for evolving fields
-  # Maps underscores to hyphens for seamless YAML lookup (e.g. given_name -> given-name)
+  # Maps underscores to hyphens for seamless YAML lookup
+  # (e.g. given_name -> given-name).
   def method_missing(method_name, *args, &block)
     m_str = method_name.to_s
     if @data.key?(m_str) then
       return @data[m_str]
     end
-
     hyphenated = m_str.gsub('_', '-')
     if @data.key?(hyphenated) then
       return @data[hyphenated]
     end
-
     super
   end
 
@@ -54,4 +78,11 @@ class Person
     hyphenated = m_str.gsub('_', '-')
     @data.key?(m_str) || @data.key?(hyphenated) || super
   end
+
+  public  ###### to-do!!!: make this private:
+
+  attr_reader :data
+
+  private ###  Implementation
+
 end

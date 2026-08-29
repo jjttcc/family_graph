@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
+
+require_relative 'descendant_graph'
+require_relative 'ancestor_graph'
 require_relative 'data_loader'
-require_relative 'graph'
 require_relative 'graph_renderer'
 require_relative 'family_constants'
 
@@ -15,37 +17,30 @@ options = {
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
-
   opts.on("-i", "--root ID1,ID2", Array,
           "Comma-separated list of root person IDs") do |v|
     options[:root_ids] = v
   end
-
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
   end
-
   opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
           "Label mode (dates, ids, both)") do |v|
     options[:label_mode] = v
   end
-
   opts.on("-o", "--output DIR", "Output directory (default: .)") do |v|
     options[:output_dir] = v
   end
-
-  opts.on("-l", "--list-all", "List all person IDs") { options[:list_all] = true }
-
+  opts.on("-l", "--list-all", "List all person IDs") do
+    options[:list_all] = true end
   opts.on("-r", "--list-roots", "List all root person IDs") do
     options[:list_roots] = true
   end
-
   opts.on("-h", "--help", "Show this help message") do
     puts opts
     exit
   end
-
   opts.on("-v", "--version", "Show application version") do
     puts VERSION
     exit
@@ -60,15 +55,14 @@ if options[:list_all] || options[:list_roots]
     puts "Error: Data file path is required for listing."
     exit 1
   end
-
   people = {}
   ARGV.each do |path|
     people.merge!(DataLoader.load(path)) if File.exist?(path)
   end
-
   if options[:list_all]
     puts people.keys.sort
   elsif options[:list_roots]
+#!!!_id not needed
     roots = people.select do |_id, p|
       !p.respond_to?(:father) && !p.respond_to?(:mother)
     end
@@ -93,7 +87,6 @@ ARGV.each do |path|
   people.merge!(DataLoader.load(path))
 end
 
-
 # Use provided root IDs, or default to all roots
 all_roots = people.select do |_id, p|
   !p.respond_to?(:father) && !p.respond_to?(:mother)
@@ -105,14 +98,11 @@ root_ids.each do |root_id|
     puts "Error: Root person '#{root_id}' not found."
     next
   end
-
   puts "Generating graph for #{root_id}..."
-  graph = Graph.new(people[root_id])
-
+  graph = DescendantGraph.new(people[root_id])
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
                                options[:direction],
                                options[:label_mode])
-  
   renderer.render(options[:output_dir], root_id)
 end

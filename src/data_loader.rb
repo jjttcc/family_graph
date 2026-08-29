@@ -8,14 +8,12 @@ class DataLoader
 
   public
 
-  pre 'path_valid' do |yaml_path| yaml_path != nil end
+  pre :path_valid do |yaml_path| yaml_path != nil end
   def self.load(yaml_path)
     data = YAML.unsafe_load_file(yaml_path)
     result = {}
-
     # 1. Create all Person objects
     data.each { |id, person_data| result[id] = Person.new(id, person_data) }
-
     # 2. Link relationships
     result.each_value do |person|
       # Link Spouses
@@ -24,26 +22,32 @@ class DataLoader
         spouse_id = spouse_info.split(',')[0].strip
         if result.key?(spouse_id) then
           spouse = result[spouse_id]
-          # ...
-
           # Ensure links are added only once to prevent errors
-          if person.spouse_list.empty? &&
-             !person.spouse_list.include?(spouse)
+          if
+            person.spouses.empty? && !person.spouses.include?(spouse)
+          then
             person.add_spouse(spouse)
           end
-
-          if spouse.spouse_list.empty? &&
-             !spouse.spouse_list.include?(person)
+          if
+            spouse.spouses.empty? && !spouse.spouses.include?(person)
+          then
             spouse.add_spouse(person)
           end
         end
       end
-
       # Link Parents/Children
       PARENTS.each do |parent_type|
         parent_id = person.data[parent_type]
-        if parent_id && result.key?(parent_id)
-          result[parent_id].add_child(person)
+        if parent_id && result.key?(parent_id) then
+          parent = result[parent_id]
+          parent.add_child(person)
+          if parent_type == FATHER
+            person.father = parent
+            person.father_id = parent_id
+          else
+            person.mother = parent
+            person.mother_id = parent_id
+          end
         end
       end
     end
