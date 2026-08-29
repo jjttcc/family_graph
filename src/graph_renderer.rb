@@ -6,22 +6,22 @@ class GraphRenderer
   include Contracts::DSL
 
   NODE_WIDTH = 120
-  NODE_HEIGHT = 50
+  NODE_HEIGHT = 60
   FONT_SIZE_NAME = 9
   FONT_SIZE_DATE = 7
 
   public
 
-  # Initialize the renderer with coordinates and person details.
-  def initialize(coordinates, people, direction = :ancestry, show_ids = false)
+  # Initialize renderer. Label mode: :dates, :ids, or :both.
+  def initialize(coordinates, people, direction = :ancestry,
+                 label_mode = :dates)
     @coordinates = coordinates
     @people = people
     @direction = direction
-    @show_ids = show_ids
+    @label_mode = label_mode
   end
 
-  # Render the SVG to the specified output directory.
-  # Filename is auto-generated with a timestamp to prevent overwrites.
+  # Render SVG to specified directory.
   pre 'valid_output_dir' do |output_dir| Dir.exist?(output_dir) end
   def render(output_dir, root_id = "tree")
     nodes = @coordinates.nodes
@@ -34,7 +34,6 @@ class GraphRenderer
     filename = "family_tree_#{root_id}_#{timestamp}.svg"
     output_path = File.join(output_dir, filename)
 
-    # Calculate canvas boundaries with padding
     min_x = nodes.values.map { |coord| coord[0] }.min
     min_y = nodes.values.map { |coord| coord[1] }.min
     max_x = nodes.values.map { |coord| coord[0] }.max
@@ -49,15 +48,13 @@ class GraphRenderer
     svg_lines = []
     svg_nodes = []
 
-    # 1. Render Spousal Lines
+    # 1. Spousal Lines
     @coordinates.couples.each do |spouse1_id, spouse2_id|
       if @coordinates.has_node?(spouse1_id) &&
          @coordinates.has_node?(spouse2_id) then
 
         c1 = @coordinates.node(spouse1_id)
         c2 = @coordinates.node(spouse2_id)
-
-        # Sort horizontally to draw line from left to right
         left_c, right_c = [c1, c2].sort_by { |c| c[0] }
 
         x1 = left_c[0] + NODE_WIDTH + offset_x
@@ -71,7 +68,7 @@ class GraphRenderer
       end
     end
 
-    # 2. Render Parent-Child Lines
+    # 2. Parent-Child Lines
     nodes.each do |id, (x, y)|
       person = @people[id]
       next if person.nil?
@@ -103,7 +100,7 @@ class GraphRenderer
       end
     end
 
-    # 3. Render Nodes (Boxes and Text)
+    # 3. Render Nodes
     nodes.each do |id, (x, y)|
       person = @people[id]
       next if person.nil?
@@ -113,30 +110,36 @@ class GraphRenderer
       
       name_label = "#{person.given_name} #{person.surname}".strip
       
-      if @show_ids then
-        line2_label = person.id
-      else
-        birth = person.respond_to?(:birth_date) ? person.birth_date : nil
-        death = person.respond_to?(:death_date) ? person.death_date : nil
-        b_str = (birth || "").to_s
-        d_str = (death || "").to_s
-        line2_label = "#{b_str}, #{d_str}".gsub(/^, |, $/, "")
+      birth = person.respond_to?(:birth_date) ? person.birth_date : nil
+      death = person.respond_to?(:death_date) ? person.death_date : nil
+      b_str = (birth || "").to_s
+      d_str = (death || "").to_s
+      date_label = "#{b_str}, #{d_str}".gsub(/^, |, $/, "")
+
+      texts = []
+      texts << ["#{nx + NODE_WIDTH/2}", "#{ny + 15}", name_label, 9]
+
+      case @label_mode
+      when :dates
+        texts << ["#{nx + NODE_WIDTH/2}", "#{ny + 35}", date_label, 7]
+      when :ids
+        texts << ["#{nx + NODE_WIDTH/2}", "#{ny + 35}", person.id, 7]
+      when :both
+        texts << ["#{nx + NODE_WIDTH/2}", "#{ny + 30}", date_label, 7]
+        texts << ["#{nx + NODE_WIDTH/2}", "#{ny + 42}", person.id, 7]
       end
 
       svg_nodes << "  <rect x=\"#{nx}\" y=\"#{ny}\" " \
                    "width=\"#{NODE_WIDTH}\" height=\"#{NODE_HEIGHT}\" " \
                    "fill=\"white\" stroke=\"black\" />"
-      svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" " \
-                   "y=\"#{ny + 15}\" font-family=\"Arial\" " \
-                   "font-size=\"#{FONT_SIZE_NAME}\" " \
-                   "text-anchor=\"middle\">#{name_label}</text>"
-      svg_nodes << "  <text x=\"#{nx + NODE_WIDTH/2}\" " \
-                   "y=\"#{ny + 30}\" font-family=\"Arial\" " \
-                   "font-size=\"#{FONT_SIZE_DATE}\" " \
-                   "text-anchor=\"middle\">#{line2_label}</text>"
+      texts.each do |x_pos, y_pos, label, size|
+        svg_nodes << "  <text x=\"#{x_pos}\" y=\"#{y_pos}\" " \
+                     "font-family=\"Arial\" font-size=\"#{size}\" " \
+                     "text-anchor=\"middle\">#{label}</text>"
+      end
     end
 
-    # SVG Template with arrowhead markers
+    # SVG Template
     svg_template = <<~SVG
       <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="white"/>

@@ -10,7 +10,7 @@ options = {
   root_ids: nil,
   direction: :ancestry,
   output_dir: Dir.pwd,
-  show_ids: false
+  label_mode: :dates
 }
 
 parser = OptionParser.new do |opts|
@@ -26,8 +26,9 @@ parser = OptionParser.new do |opts|
     options[:direction] = v
   end
 
-  opts.on("-D", "--debug", "Display person IDs for debugging") do
-    options[:show_ids] = true
+  opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
+          "Label mode (dates, ids, both)") do |v|
+    options[:label_mode] = v
   end
 
   opts.on("-o", "--output DIR", "Output directory (default: .)") do |v|
@@ -42,11 +43,6 @@ parser = OptionParser.new do |opts|
 
   opts.on("-h", "--help", "Show this help message") do
     puts opts
-    exit
-  end
-
-  opts.on("-v", "--version", "Show application version") do
-    puts VERSION
     exit
   end
 end
@@ -73,7 +69,7 @@ if options[:list_all]
   exit
 end
 
-# Helper to find all roots (those with no parent fields)
+# Helper to find all roots
 all_roots = people.select do |_id, p|
   !p.respond_to?(:father) && !p.respond_to?(:mother)
 end
@@ -98,7 +94,7 @@ root_ids.each do |root_id|
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
                                options[:direction],
-                               options[:show_ids])
+                               options[:label_mode])
   
   renderer.render(options[:output_dir], root_id)
 end
