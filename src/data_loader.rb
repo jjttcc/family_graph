@@ -26,11 +26,13 @@ class DataLoader
           spouse = result[spouse_id]
 
           # Ensure links are added only once to prevent errors
-          unless person.spouse_list.include?(spouse)
+          if person.spouse_list.empty? &&
+             !person.spouse_list.include?(spouse)
             person.add_spouse(spouse)
           end
 
-          unless spouse.spouse_list.include?(person)
+          if spouse.spouse_list.empty? &&
+             !spouse.spouse_list.include?(person)
             spouse.add_spouse(person)
           end
         end
