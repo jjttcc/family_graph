@@ -54,9 +54,33 @@ end
 
 parser.parse!
 
-if ARGV.empty?
-  puts parser
+# Determine if we are just listing IDs
+if options[:list_all] || options[:list_roots]
+  if ARGV.empty?
+    puts "Error: Data file path is required for listing."
+    exit 1
+  end
+
+  people = {}
+  ARGV.each do |path|
+    people.merge!(DataLoader.load(path)) if File.exist?(path)
+  end
+
+  if options[:list_all]
+    puts people.keys.sort
+  elsif options[:list_roots]
+    roots = people.select do |_id, p|
+      !p.respond_to?(:father) && !p.respond_to?(:mother)
+    end
+    puts roots.keys.sort
+  end
   exit
+end
+
+# Otherwise, positional data paths are mandatory
+if ARGV.empty?
+  puts "Error: Data file path is required."
+  exit 1
 end
 
 people = {}
@@ -69,22 +93,11 @@ ARGV.each do |path|
   people.merge!(DataLoader.load(path))
 end
 
-if options[:list_all]
-  puts people.keys.sort
-  exit
-end
 
-# Helper to find all roots
+# Use provided root IDs, or default to all roots
 all_roots = people.select do |_id, p|
   !p.respond_to?(:father) && !p.respond_to?(:mother)
 end
-
-if options[:list_roots]
-  puts all_roots.keys.sort
-  exit
-end
-
-# Use provided root IDs, or default to all roots
 root_ids = options[:root_ids] || all_roots.keys
 
 root_ids.each do |root_id|
