@@ -76,25 +76,28 @@ class Graph
     add_individual_coords(p, depth)
   end
 
-  public  ### Hook methods
+  protected ### Hook methods
 
   def branches(p)
     raise "virtual method"
   end
 
+  private ###  Implementation
+
   # Add coordinates for person 'p' to 'coordinates'
   pre :p_exists_indiv do |p| p != nil end
-  def old___add_individual_coords(p, depth)
+  def add_individual_coords(p, depth)
     y = depth * LEVEL_HEIGHT
-    if p.children.empty? then
+    b = branches(p)
+    if b.empty? then
       x = @next_x[y]
       @coordinates.add_node(p.id, x, y)
       @next_x[y] = x + SIBLING_SPACING
     else
-      # Center over children
-      child_xs = p.children.map { |c| @coordinates.node(c.id)[0] }
-      min_x = child_xs.min
-      max_x = child_xs.max
+      # Center over branches
+      branch_xs = b.map { |br| @coordinates.node(br.id)[0] }
+      min_x = branch_xs.min
+      max_x = branch_xs.max
       midpoint = (min_x + max_x) / 2
       parent_x = midpoint
       if parent_x < @next_x[y] then
@@ -111,20 +114,20 @@ class Graph
   pre :valid_spouses do |spouse1, spouse2|
     spouse1 != nil && spouse2 != nil
   end
-  def old___add_couple_coords(spouse1, spouse2, depth)
+  def add_couple_coords(spouse1, spouse2, depth)
     y = depth * LEVEL_HEIGHT
     @coordinates.add_couple(spouse1.id, spouse2.id)
-    if spouse1.children.empty? then
+    if branches(spouse1).empty? then
       x1 = @next_x[y]
       x2 = x1 + COUPLE_SPACING
       @coordinates.add_node(spouse1.id, x1, y)
       @coordinates.add_node(spouse2.id, x2, y)
       @next_x[y] = x2 + SIBLING_SPACING
     else
-      # Center over children
-      child_xs = spouse1.children.map { |c| @coordinates.node(c.id)[0] }
-      min_x = child_xs.min
-      max_x = child_xs.max
+      # Center over branches
+      branch_xs = branches(spouse1).map { |b| @coordinates.node(b.id)[0] }
+      min_x = branch_xs.min
+      max_x = branch_xs.max
       midpoint = (min_x + max_x) / 2
       parent_x1 = midpoint - (COUPLE_SPACING / 2)
       parent_x2 = parent_x1 + COUPLE_SPACING
@@ -141,7 +144,7 @@ class Graph
   end
 
   # Recursively shift coordinates of a subtree and update next_x
-  def old___shift_subtree(person, amount)
+  def shift_subtree(person, amount)
     if person != nil then
       if @coordinates.has_node?(person.id) then
         x, y = @coordinates.node(person.id)
@@ -158,8 +161,8 @@ class Graph
           @next_x[y] = [@next_x[y], new_x + SIBLING_SPACING].max
         end
       end
-      person.children.each do |child|
-        shift_subtree(child, amount)
+      branches(person).each do |branch|
+        shift_subtree(branch, amount)
       end
     end
   end
