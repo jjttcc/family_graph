@@ -24,9 +24,12 @@ class DataLoader
         spouse_id = spouse_info.split(',')[0].strip
         if result.key?(spouse_id) then
           spouse = result[spouse_id]
-          person.add_spouse(spouse)
 
-          # Ensure bi-directional link if missing
+          # Ensure links are added only once to prevent errors
+          unless person.spouse_list.include?(spouse)
+            person.add_spouse(spouse)
+          end
+
           unless spouse.spouse_list.include?(person)
             spouse.add_spouse(person)
           end
