@@ -3,4 +3,4 @@ MOTHER = 'mother'
 SPOUSE = 'spouse'
 SPOUSES = 'spouses'
 PARENTS = [FATHER, MOTHER].freeze
-VERSION = '0.2.3.1'
+VERSION = '0.2.4'
