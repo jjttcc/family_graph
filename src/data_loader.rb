@@ -24,6 +24,7 @@ class DataLoader
         spouse_id = spouse_info.split(',')[0].strip
         if result.key?(spouse_id) then
           spouse = result[spouse_id]
+          # ...
 
           # Ensure links are added only once to prevent errors
           if person.spouse_list.empty? &&
