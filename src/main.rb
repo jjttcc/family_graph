@@ -44,6 +44,11 @@ parser = OptionParser.new do |opts|
     puts opts
     exit
   end
+
+  opts.on("-v", "--version", "Show application version") do
+    puts VERSION
+    exit
+  end
 end
 
 parser.parse!
