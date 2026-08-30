@@ -73,29 +73,28 @@ class GraphRenderer
       person = @people[id]
       next if person.nil?
 
-      PARENTS.each do |parent_type|
-        if person.respond_to?(parent_type) then
-          parent_id = person.send(parent_type)
-          if parent_id && @coordinates.has_node?(parent_id) then
-            px, py = @coordinates.node(parent_id)
+      parents = person.parents.compact
+      parents.each do |parent|
+        parent_id = parent.id
+        if parent_id && @coordinates.has_node?(parent_id) then
+          px, py = @coordinates.node(parent_id)
 
-            if @direction == :descent then
-              x1 = px + (NODE_WIDTH / 2) + offset_x
-              y1 = py + NODE_HEIGHT + offset_y
-              x2 = x + (NODE_WIDTH / 2) + offset_x
-              y2 = y + offset_y
-            else
-              x1 = x + (NODE_WIDTH / 2) + offset_x
-              y1 = y + offset_y
-              x2 = px + (NODE_WIDTH / 2) + offset_x
-              y2 = py + NODE_HEIGHT + offset_y
-            end
-
-            marker = (@direction == :none) ? "" : " marker-end=\"url(#arrowhead)\""
-
-            svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
-                         "y2=\"#{y2}\" stroke=\"black\"#{marker} />"
+          if @direction == :descent then
+            x1 = px + (NODE_WIDTH / 2) + offset_x
+            y1 = py + NODE_HEIGHT + offset_y
+            x2 = x + (NODE_WIDTH / 2) + offset_x
+            y2 = y + offset_y
+          else
+            x1 = x + (NODE_WIDTH / 2) + offset_x
+            y1 = y + offset_y
+            x2 = px + (NODE_WIDTH / 2) + offset_x
+            y2 = py + NODE_HEIGHT + offset_y
           end
+
+          marker = (@direction == :none) ? "" : " marker-end=\"url(#arrowhead)\""
+
+          svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
+                       "y2=\"#{y2}\" stroke=\"black\"#{marker} />"
         end
       end
     end

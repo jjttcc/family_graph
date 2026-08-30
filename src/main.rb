@@ -99,7 +99,8 @@ root_ids.each do |root_id|
     next
   end
   puts "Generating graph for #{root_id}..."
-  graph = DescendantGraph.new(people[root_id])
+  graph_class = options[:direction] == :ancestry ? AncestorGraph : DescendantGraph
+  graph = graph_class.new(people[root_id])
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
                                options[:direction],
