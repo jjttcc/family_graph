@@ -8,6 +8,12 @@
    strictly impossible.
 2. **Whitespace**: No lines should end with one or more spaces (no trailing
    whitespace).
+3. Avoid this pattern:
+        y if x
+    Instead, do this:
+        if x then y end
+   Reason: If 'y' is many characters long, it's easy to miss the 'if x'
+   part.
 
 ### Guidelines
 
