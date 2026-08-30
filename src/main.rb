@@ -10,7 +10,8 @@ require_relative 'family_constants'
 
 options = {
   root_ids: nil,
-  direction: :ancestry,
+  direction: :none,
+  traversal: :descendant,
   output_dir: Dir.pwd,
   label_mode: :dates
 }
@@ -24,6 +25,10 @@ parser = OptionParser.new do |opts|
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
           "Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
+  end
+  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant],
+          "Traversal type (ancestor/descendant)") do |v|
+    options[:traversal] = v
   end
   opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
           "Label mode (dates, ids, both)") do |v|
@@ -99,7 +104,7 @@ root_ids.each do |root_id|
     next
   end
   puts "Generating graph for #{root_id}..."
-  graph_class = options[:direction] == :ancestry ? AncestorGraph : DescendantGraph
+  graph_class = options[:traversal] == :ancestor ? AncestorGraph : DescendantGraph
   graph = graph_class.new(people[root_id])
   puts "Rendering SVG..."
   renderer = GraphRenderer.new(graph.coordinates, people,
