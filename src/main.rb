@@ -15,14 +15,14 @@ options = {
   output_dir: Dir.pwd,
   label_mode: :dates
 }
-
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
-  opts.summary_width = 30
+  opts.summary_width = 40
   opts.on("-i", "--root ID1,ID2", Array, "comma-separated list",
           "of Root IDs") do |v|
     options[:root_ids] = v
   end
+
   opts.on("-d", "--direction DIR", "arrow Direction",
           "(ancestry/a, descent/d, none/n)") do |v|
     case v
