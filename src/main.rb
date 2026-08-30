@@ -17,14 +17,12 @@ options = {
 }
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
-  opts.summary_width = 40
-  opts.on("-i", "--root ID1,ID2", Array, "comma-separated list",
-          "of Root IDs") do |v|
+  opts.summary_width = 30
+  opts.on("-i", "--root ID1,ID2", Array, "Comma-separated list of Root IDs") do |v|
     options[:root_ids] = v
   end
-
-  opts.on("-d", "--direction DIR", "arrow Direction",
-          "(ancestry/a, descent/d, none/n)") do |v|
+  opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",
+          "descent/d, none/n)") do |v|
     case v
     when 'a', 'ancestry' then options[:direction] = :ancestry
     when 'd', 'descent'  then options[:direction] = :descent
@@ -34,17 +32,13 @@ parser = OptionParser.new do |opts|
       exit 1
     end
   end
-  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant],
-          "traversal type",
-          "(ancestor/descendant)") do |v|
+  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant], "traversal type (ancestor/descendant)") do |v|
     options[:traversal] = v
   end
-  opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
-          "label mode (dates, ids, both)") do |v|
+  opts.on("-m", "--label-mode MODE", [:dates, :ids, :both], "label mode (dates, ids, both)") do |v|
     options[:label_mode] = v
   end
-  opts.on("-o", "--output DIR", "output directory",
-          "(default: .)") do |v|
+  opts.on("-o", "--output DIR", "output directory (default: .)") do |v|
     options[:output_dir] = v
   end
   opts.on("-l", "--list-all", "list all person IDs") do
@@ -62,6 +56,7 @@ parser = OptionParser.new do |opts|
     exit
   end
 end
+
 
 parser.parse!
 
