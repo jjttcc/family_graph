@@ -44,12 +44,14 @@ puts "Successfully loaded #{people.size} people."
 test_cases = {
   'root_ancestor_100' => 1,
   'bob_doe_101' => 1,
-  'child_gen1_200' => 2,
+  'child_gen1_200' => 3,
   'grandchild_gen2_300' => 1,
   'frank_smith_301' => 1,
   'grandchild_gen2_302' => 0,
-  'great_grandchild_gen3_400' => 0
+  'great_grandchild_gen3_400' => 0,
+  'multi_spouse_400' => 0
 }
+
 
 puts "Running extensive structural assertions..."
 
@@ -141,5 +143,11 @@ renderer.render(output_dir)
 # Assert that at least one SVG exists in the directory
 svg_files = Dir.glob(File.join(output_dir, "*.svg"))
 assert(!svg_files.empty?, "SVG output file was not created in #{output_dir}")
+
+# Verify the '+' indicator for multi_spouse_400
+latest_svg = svg_files.max_by { |f| File.mtime(f) }
+svg_content = File.read(latest_svg)
+assert(svg_content.include?("David Doe +"), "Multi-spouse person 'David Doe' should have '+' indicator")
+
 puts "SVG Renderer verification passed!"
 

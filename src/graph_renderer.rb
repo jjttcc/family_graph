@@ -109,6 +109,9 @@ class GraphRenderer
       ny = y + offset_y
       
       name_label = "#{person.given_name} #{person.surname}".strip
+      if person.spouses.size > 1
+        name_label += " +"
+      end
       
       birth = person.respond_to?(:birth_date) ? person.birth_date : nil
       death = person.respond_to?(:death_date) ? person.death_date : nil

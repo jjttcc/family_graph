@@ -15,7 +15,6 @@ def assert(condition, message)
 end
 
 data_path = 'data/sample_tree.yaml'
-puts "ea: #{ENV['ENABLE_ASSERTION']}"
 
 people = DataLoader.load(data_path)
 
