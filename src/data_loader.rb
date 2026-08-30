@@ -18,20 +18,20 @@ class DataLoader
     result.each_value do |person|
       # Link Spouses
       spouse_info = person.data[SPOUSE].to_s
+      spouse_info = person.data[SPOUSES].to_s if spouse_info.empty?
+      
       unless spouse_info.empty?
-        spouse_id = spouse_info.split(',')[0].strip
-        if result.key?(spouse_id) then
-          spouse = result[spouse_id]
-          # Ensure links are added only once to prevent errors
-          if
-            person.spouses.empty? && !person.spouses.include?(spouse)
-          then
-            person.add_spouse(spouse)
-          end
-          if
-            spouse.spouses.empty? && !spouse.spouses.include?(person)
-          then
-            spouse.add_spouse(person)
+        spouse_ids = spouse_info.split(',').map(&:strip)
+        spouse_ids.each do |spouse_id|
+          if result.key?(spouse_id) then
+            spouse = result[spouse_id]
+            # Ensure links are added only once to prevent errors
+            if !person.spouses.include?(spouse) then
+              person.add_spouse(spouse)
+            end
+            if !spouse.spouses.include?(person) then
+              spouse.add_spouse(person)
+            end
           end
         end
       end
