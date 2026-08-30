@@ -64,7 +64,7 @@ if options[:list_all] || options[:list_roots]
   elsif options[:list_roots]
 #!!!_id not needed
     roots = people.select do |_id, p|
-      !p.respond_to?(:father) && !p.respond_to?(:mother)
+      p.father.nil? && p.mother.nil?
     end
     puts roots.keys.sort
   end
@@ -89,7 +89,7 @@ end
 
 # Use provided root IDs, or default to all roots
 all_roots = people.select do |_id, p|
-  !p.respond_to?(:father) && !p.respond_to?(:mother)
+  p.father.nil? && p.mother.nil?
 end
 root_ids = options[:root_ids] || all_roots.keys
 
