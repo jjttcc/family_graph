@@ -23,7 +23,7 @@ parser = OptionParser.new do |opts|
     options[:root_ids] = v
   end
   opts.on("-d", "--direction DIR", [:ancestry, :descent, :none],
-          "Direction (ancestry/a, descent/d, none/n)") do |v|
+          "arrow Direction (ancestry/a, descent/d, none/n)") do |v|
     options[:direction] = v
   end
   opts.on("-t", "--traversal TYPE", [:ancestor, :descendant],
