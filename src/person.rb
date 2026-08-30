@@ -26,6 +26,14 @@ class Person
   end
 
   # Biological mother and father - list: empty if no parents
+  post :result_good do |result| not result.nil? end
+  post :only_two do |result| result.count <= 2 end
+  post :mother do |result|
+    implies(! self.mother.nil?, result.include?(self.mother))
+  end
+  post :mother do |result|
+    implies(! self.father.nil?, result.include?(self.father))
+  end
   def parents
     result = []
     if ! mother.nil? then

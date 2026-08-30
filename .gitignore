@@ -9,3 +9,6 @@ cmsg
 spec/fields
 spec/notes
 spec/spec1
+.*env
+ts
+*.lock
