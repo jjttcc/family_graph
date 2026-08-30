@@ -21,8 +21,15 @@ parser = OptionParser.new do |opts|
   opts.on("-i", "--root ID1,ID2", Array, "comma-separated list of Root IDs") do |v|
     options[:root_ids] = v
   end
-  opts.on("-d", "--direction DIR", [:ancestry, :descent, :none], "arrow Direction (ancestry/a, descent/d, none/n)") do |v|
-    options[:direction] = v
+  opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a, descent/d, none/n)") do |v|
+    case v
+    when 'a', 'ancestry' then options[:direction] = :ancestry
+    when 'd', 'descent'  then options[:direction] = :descent
+    when 'n', 'none'     then options[:direction] = :none
+    else
+      puts "Error: Invalid direction '#{v}'. Use ancestry/a, descent/d, or none/n."
+      exit 1
+    end
   end
   opts.on("-t", "--traversal TYPE", [:ancestor, :descendant], "traversal type (ancestor/descendant)") do |v|
     options[:traversal] = v
