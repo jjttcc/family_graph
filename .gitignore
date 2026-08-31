@@ -12,3 +12,4 @@ spec/spec1
 .*env
 ts
 *.lock
+/test/

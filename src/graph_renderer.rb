@@ -129,6 +129,13 @@ class GraphRenderer
       birth = person.respond_to?(:birth_date) ? person.birth_date : nil
       death = person.respond_to?(:death_date) ? person.death_date : nil
       b_str = (birth || "").to_s
+      if b_str.empty? then
+        bap = person.respond_to?(:baptism_date) ? person.baptism_date : nil
+        b_str = (bap || "").to_s
+        if !b_str.empty? then
+          b_str += " [bap]"
+        end
+      end
       d_str = (death || "").to_s
       date_label = "#{b_str}, #{d_str}".gsub(/^, |, $/, "")
       texts = []

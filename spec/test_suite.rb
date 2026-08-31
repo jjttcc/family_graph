@@ -42,14 +42,15 @@ puts "Successfully loaded #{people.size} people."
 
 # Define test cases: { id => expected_children_count }
 test_cases = {
-  'root_ancestor_100' => 1,
+  'root_ancestor_100' => 2,
   'bob_doe_101' => 1,
   'child_gen1_200' => 3,
   'grandchild_gen2_300' => 1,
   'frank_smith_301' => 1,
   'grandchild_gen2_302' => 0,
   'great_grandchild_gen3_400' => 0,
-  'multi_spouse_400' => 0
+  'multi_spouse_400' => 0,
+  'baptism_test_person_500' => 0
 }
 
 
@@ -148,6 +149,8 @@ assert(!svg_files.empty?, "SVG output file was not created in #{output_dir}")
 latest_svg = svg_files.max_by { |f| File.mtime(f) }
 svg_content = File.read(latest_svg)
 assert(svg_content.include?("David Doe +"), "Multi-spouse person 'David Doe' should have '+' indicator")
+# Verify the '[bap]' indicator for baptism_test_person_500
+assert(svg_content.include?("1950-01-01 [bap]"), "Baptism person 'Baptism Test' should have '[bap]' indicator")
 
 puts "SVG Renderer verification passed!"
 

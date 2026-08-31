@@ -1,4 +1,4 @@
-# Sample tree for testing - Expanded Multi-generation with Multiple Spouses
+# Sample tree for testing - Expanded Multi-generation with Multiple Spouses and Baptism
 root_ancestor_100:
   given-name: Alice
   surname: Doe
@@ -64,3 +64,10 @@ great_grandchild_gen3_400:
   birth-date: 1940-06-10
   father: grandchild_gen2_300
   mother: frank_smith_301
+
+# Baptism Test Person (Connected)
+baptism_test_person_500:
+  given-name: Baptism
+  surname: Test
+  baptism-date: 1950-01-01
+  father: root_ancestor_100
