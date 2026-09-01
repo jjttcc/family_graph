@@ -1,0 +1,42 @@
+# Sample tree for testing - Normal case with Mother
+root_ancestor_100:
+  given-name: Alice
+  surname: Doe
+  birth-date: 1850-01-01
+  death-date: 1930-05-15
+
+bob_doe_101:
+  given-name: Bob
+  surname: Doe
+  birth-date: 1848-06-20
+  death-date: 1925-10-10
+  spouse: root_ancestor_100
+
+child_gen1_200:
+  given-name: Charlie
+  surname: Doe
+  birth-date: 1880-03-12
+  death-date: 1950-12-01
+  father: root_ancestor_100
+  mother: bob_doe_101
+  spouse: charlie_wife_201
+
+# The Mother added
+charlie_wife_201:
+  given-name: Mary
+  surname: Doe
+  birth-date: 1882-05-20
+
+# Branch 1 - Diana with Father and Mother
+grandchild_gen2_300:
+  given-name: Diana
+  surname: Doe
+  birth-date: 1910-05-20
+  father: child_gen1_200
+  mother: charlie_wife_201
+  spouse: frank_smith_301
+
+frank_smith_301:
+  given-name: Frank
+  surname: Smith
+  birth-date: 1908-01-10

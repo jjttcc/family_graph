@@ -4,6 +4,7 @@ require 'optparse'
 
 require_relative 'descendant_graph'
 require_relative 'ancestor_graph'
+require_relative 'ancestry_dataset'
 require_relative 'data_loader'
 require_relative 'graph_renderer'
 require_relative 'family_constants'
@@ -109,11 +110,28 @@ root_ids.each do |root_id|
     next
   end
   puts "Generating graph for #{root_id}..."
-  graph_class = options[:traversal] == :ancestor ? AncestorGraph : DescendantGraph
-  graph = graph_class.new(people[root_id])
-  puts "Rendering SVG..."
-  renderer = GraphRenderer.new(graph.coordinates, people,
-                               options[:direction],
-                               options[:label_mode])
-  renderer.render(options[:output_dir], root_id)
+  if options[:traversal] == :ancestor
+    dataset = AncestryDataset.new(people[root_id], people)
+    data_to_render = DataLoader.load_subset(ARGV[0], dataset.ancestor_ids)
+
+    # Use the root ancestor found in the subset
+    graph = DescendantGraph.new(data_to_render[dataset.roots.first.id])
+
+    puts "Rendering SVG..."
+    renderer = GraphRenderer.new(graph.coordinates, data_to_render,
+                                 options[:direction],
+                                 options[:label_mode])
+    renderer.render(options[:output_dir], root_id)
+
+  else
+    graph = DescendantGraph.new(people[root_id])
+    data_to_render = people
+    puts "Rendering SVG..."
+    renderer = GraphRenderer.new(graph.coordinates, data_to_render,
+                                 options[:direction],
+                                 options[:label_mode])
+    renderer.render(options[:output_dir], root_id)
+
+  end
+
 end
