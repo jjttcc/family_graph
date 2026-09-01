@@ -21,11 +21,12 @@ class Graph
 
   public  ###  Initialization
 
-  pre :person_exists do |person| person != nil end
+  pre :people_exist do |people| people != nil end
   post 'invariant' do invariant end
-  def initialize(person)
+  def initialize(people)
     init_attributes
-    add_coords(person, 0)
+    people = [people] unless people.is_a?(Array)
+    people.each { |p| add_coords(p, 0) }
   end
 
   private ###  Initialization

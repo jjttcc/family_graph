@@ -1,11 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-
-require_relative 'descendant_graph'
-require_relative 'ancestry_dataset'
-require_relative 'data_loader'
-require_relative 'graph_renderer'
+require_relative 'graph_orchestrator'
 require_relative 'family_constants'
 
 options = {
@@ -91,45 +87,5 @@ if ARGV.empty?
   exit 1
 end
 
-people = {}
-ARGV.each do |path|
-  unless File.exist?(path)
-    puts "Error: Data file '#{path}' not found."
-    next
-  end
-  puts "Loading data from #{path}..."
-  people.merge!(DataLoader.load(path))
-end
-
-# Use provided root IDs, or default to all roots
-all_roots = people.select do |_id, p|
-  p.father.nil? && p.mother.nil?
-end
-root_ids = options[:root_ids] || all_roots.keys
-
-root_ids.each do |root_id|
-  unless people.key?(root_id)
-    puts "Error: Root person '#{root_id}' not found."
-    next
-  end
-  puts "Generating graph for #{root_id}..."
-  if options[:traversal] == :ancestor
-    dataset = AncestryDataset.new(people[root_id], people)
-    data_to_render = DataLoader.load_subset(ARGV[0], dataset.ancestor_ids)
-    # Use the root ancestor found in the subset
-    graph = DescendantGraph.new(data_to_render[dataset.roots.first.id])
-    puts "Rendering SVG..."
-    renderer = GraphRenderer.new(graph.coordinates, data_to_render,
-                                 options[:direction],
-                                 options[:label_mode])
-    renderer.render(options[:output_dir], root_id)
-  else
-    graph = DescendantGraph.new(people[root_id])
-    data_to_render = people
-    puts "Rendering SVG..."
-    renderer = GraphRenderer.new(graph.coordinates, data_to_render,
-                                 options[:direction],
-                                 options[:label_mode])
-    renderer.render(options[:output_dir], root_id)
-  end
-end
+orchestrator = GraphOrchestrator.new(options, ARGV)
+orchestrator.render

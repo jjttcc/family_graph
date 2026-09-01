@@ -52,6 +52,13 @@ Dir.mktmpdir do |tmpdir|
   assert(Dir.glob(File.join(tmpdir, "family_tree_child_gen1_200_*.svg")).any?, "SVG should be generated")
 end
 
+# Test -i / --root (Multiple roots, unified rendering)
+Dir.mktmpdir do |tmpdir|
+  out, status = run_cli("-i child_gen1_200,baptism_test_person_500 data/sample_tree.yaml -o #{tmpdir}")
+  assert(status == 0, "Multiple Root IDs flag should exit with 0")
+  assert(Dir.glob(File.join(tmpdir, "family_tree_unified_*.svg")).any?, "Unified SVG should be generated for multiple roots")
+end
+
 # Test -d / --direction
 Dir.mktmpdir do |tmpdir|
   out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -d descent")
