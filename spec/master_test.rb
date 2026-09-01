@@ -1,8 +1,17 @@
 #!/usr/bin/env ruby
 # Master test script to run all regression and functional tests.
 
-ENV['ENABLE_ASSERTION'] = '1'
-test_scripts = ["regression_test.rb", "test_suite.rb", "cli_regression.rb", "direction_regression.rb", "test_list_roots.rb", "verify_loader.rb"]
+if not ENV.key?('DISABLE_ENABLE_ASSERTION') then
+  puts "setting ENV['ENABLE_ASSERTION']=1"
+  puts "(to prevent this behavior, define env. var. DISABLE_ENABLE_ASSERTION"
+  ENV['ENABLE_ASSERTION'] = '1'
+else
+  puts "removing ENV['ENABLE_ASSERTION']"
+  ENV.delete('ENABLE_ASSERTION')
+end
+test_scripts = ["regression_test.rb", "test_suite.rb", "cli_regression.rb",
+                "direction_regression.rb", "test_list_roots.rb",
+                "verify_loader.rb"]
 
 all_passed = true
 

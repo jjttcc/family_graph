@@ -5,7 +5,6 @@ require_relative '../src/descendant_graph'
 require_relative '../src/graph_renderer'
 require_relative '../src/family_constants'
 require_relative '../src/descendant_graph'
-require_relative '../src/ancestor_graph'
 
 def assert(condition, message)
   unless condition
@@ -32,12 +31,6 @@ puts "Spouse linking passed!"
 # 2. Renderer Options Verification
 puts "Verifying Renderer Options..."
 output_dir = 'output'
-
-# Test :ancestry with AncestorGraph
-puts "Rendering Ancestry graph..."
-anc_graph = AncestorGraph.new(alice)
-renderer = GraphRenderer.new(anc_graph.coordinates, people, :ancestry, :both)
-renderer.render(output_dir, 'ancestry_test')
 
 # Test :descent with DescendantGraph
 puts "Rendering Descent graph..."

@@ -15,8 +15,8 @@ class DataLoader
     subset_data = data.select { |id, _| target_ids.member?(id) }
     result = {}
     # 1. Create Person objects
-    subset_data.each { |id, person_data| result[id] = Person.new(id, person_data) }
-
+    subset_data.each { |id, person_data| result[id] =
+                       Person.new(id, person_data) }
     # 2. Link relationships (only for target IDs)
     result.each_value do |person|
       # Link Spouses
@@ -36,7 +36,6 @@ class DataLoader
           end
         end
       end
-
       # Link Parents/Children
       PARENTS.each do |parent_type|
         parent_id = person.data[parent_type]
@@ -67,7 +66,6 @@ class DataLoader
       # Link Spouses
       spouse_info = person.data[SPOUSE].to_s
       spouse_info = person.data[SPOUSES].to_s if spouse_info.empty?
-      
       unless spouse_info.empty?
         spouse_ids = spouse_info.split(',').map(&:strip)
         spouse_ids.each do |spouse_id|
@@ -99,8 +97,8 @@ class DataLoader
         end
       end
     end
-
     result
   end
+
 end
 

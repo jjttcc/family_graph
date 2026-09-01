@@ -3,7 +3,6 @@
 require 'optparse'
 
 require_relative 'descendant_graph'
-require_relative 'ancestor_graph'
 require_relative 'ancestry_dataset'
 require_relative 'data_loader'
 require_relative 'graph_renderer'
@@ -16,10 +15,12 @@ options = {
   output_dir: Dir.pwd,
   label_mode: :dates
 }
+
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
   opts.summary_width = 30
-  opts.on("-i", "--root ID1,ID2", Array, "Comma-separated list of Root IDs") do |v|
+  opts.on("-i", "--root ID1,ID2", Array,
+          "Comma-separated list of Root IDs") do |v|
     options[:root_ids] = v
   end
   opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",
@@ -29,14 +30,17 @@ parser = OptionParser.new do |opts|
     when 'd', 'descent'  then options[:direction] = :descent
     when 'n', 'none'     then options[:direction] = :none
     else
-      puts "Error: Invalid direction '#{v}'. Use ancestry/a, descent/d, or none/n."
+      puts "Error: Invalid direction '#{v}'. " +
+        "Use ancestry/a, descent/d, or none/n."
       exit 1
     end
   end
-  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant], "traversal type (ancestor/descendant)") do |v|
+  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant],
+          "traversal type (ancestor/descendant)") do |v|
     options[:traversal] = v
   end
-  opts.on("-m", "--label-mode MODE", [:dates, :ids, :both], "label mode (dates, ids, both)") do |v|
+  opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
+          "label mode (dates, ids, both)") do |v|
     options[:label_mode] = v
   end
   opts.on("-o", "--output DIR", "output directory (default: .)") do |v|
@@ -57,7 +61,6 @@ parser = OptionParser.new do |opts|
     exit
   end
 end
-
 
 parser.parse!
 
@@ -113,16 +116,13 @@ root_ids.each do |root_id|
   if options[:traversal] == :ancestor
     dataset = AncestryDataset.new(people[root_id], people)
     data_to_render = DataLoader.load_subset(ARGV[0], dataset.ancestor_ids)
-
     # Use the root ancestor found in the subset
     graph = DescendantGraph.new(data_to_render[dataset.roots.first.id])
-
     puts "Rendering SVG..."
     renderer = GraphRenderer.new(graph.coordinates, data_to_render,
                                  options[:direction],
                                  options[:label_mode])
     renderer.render(options[:output_dir], root_id)
-
   else
     graph = DescendantGraph.new(people[root_id])
     data_to_render = people
@@ -131,7 +131,5 @@ root_ids.each do |root_id|
                                  options[:direction],
                                  options[:label_mode])
     renderer.render(options[:output_dir], root_id)
-
   end
-
 end

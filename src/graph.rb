@@ -39,14 +39,10 @@ class Graph
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
   pre :p_exists do |p| p != nil end
-  def add_coords(p, depth = 0, include_top_spouse = true)
-    if depth > 0 || include_top_spouse then
-      if p.has_spouse then
-        add_spousal_coords(p, depth)
-      else
-        add_single_coords(p, depth)
-      end
-    else  # depth == 0 && include_top_spouse:
+  def add_coords(p, depth = 0)
+    if p.has_spouse then
+      add_spousal_coords(p, depth)
+    else
       add_single_coords(p, depth)
     end
   end
@@ -65,7 +61,7 @@ class Graph
   end
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
-#  pre :p_valid_single do |p| p != nil && !p.has_spouse end
+  pre :p_valid_single do |p| p != nil && ! p.has_spouse end
   def add_single_coords(p, depth)
     # Recursively place branches first
     branches(p).each do |b|

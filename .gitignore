@@ -13,3 +13,4 @@ spec/spec1
 ts
 *.lock
 /test/
+family_tree*

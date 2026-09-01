@@ -13,9 +13,10 @@ class AncestryDataset
   end
 
   def roots
-    @all_people.select { |id, p| @ancestor_ids.member?(id) && p.parents.empty? }.values
+    @all_people.select do
+      |id, p| @ancestor_ids.member?(id) && p.parents.empty?
+    end.values
   end
-
 
   def subset(yaml_path)
     DataLoader.load_subset(yaml_path, @ancestor_ids)

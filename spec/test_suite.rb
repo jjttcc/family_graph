@@ -4,7 +4,6 @@ require_relative '../src/data_loader'
 require_relative '../src/family_constants'
 require_relative '../src/coordinates'
 require_relative '../src/descendant_graph'
-require_relative '../src/ancestor_graph'
 require_relative '../src/graph_renderer'
 
 def assert(condition, message)
@@ -106,29 +105,10 @@ if !root_person.children.empty?
   end
 end
 
-puts "  Testing AncestorGraph..."
-# Find a leaf dynamically (no children)
-leaf_person = people.values.find { |p| p.children.empty? }
-assert(leaf_person != nil, "A leaf person must exist in the sample data")
-puts "  Testing AncestorGraph starting from #{leaf_person.id}..."
-anc_graph = AncestorGraph.new(leaf_person)
-# Basic check that AncestorGraph runs without crashing
-assert(anc_graph.coordinates != nil, "AncestorGraph coordinates should be generated")
-assert(anc_graph.coordinates.has_node?(leaf_person.id), "Leaf should have coordinates")
-# Ensure it traversed up to root
-root_id = people.values.find { |p| p.father.nil? && p.mother.nil? }.id
-assert(anc_graph.coordinates.has_node?(root_id), "AncestorGraph should have traversed to root node")
-
 
 # Print coordinates for visual baseline check
 puts "\nGenerated Coordinates Baseline (Descendant):"
 layout_coords.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
-  puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
-end
-
-# Print coordinates for Ancestor baseline check
-puts "\nGenerated Coordinates Baseline (Ancestor):"
-anc_graph.coordinates.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
   puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
 end
 
