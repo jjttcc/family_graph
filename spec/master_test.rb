@@ -2,7 +2,7 @@
 # Master test script to run all regression and functional tests.
 
 ENV['ENABLE_ASSERTION'] = '1'
-test_scripts = ["regression_test.rb", "test_suite.rb", "cli_regression.rb"]
+test_scripts = ["regression_test.rb", "test_suite.rb", "cli_regression.rb", "direction_regression.rb", "test_list_roots.rb", "verify_loader.rb"]
 
 all_passed = true
 
