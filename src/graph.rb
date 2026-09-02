@@ -25,7 +25,9 @@ class Graph
   post 'invariant' do invariant end
   def initialize(people)
     init_attributes
-    people = [people] unless people.is_a?(Array)
+    if ! people.is_a?(Array) then
+      people = [people]
+    end
     people.each { |p| add_coords(p, 0) }
   end
 
