@@ -9,12 +9,30 @@ class Coordinates
 
   attr_reader :nodes, :couples
 
+  ###  Initialization
+
   # Initialize coordinates with empty structures.
   post 'invariant' do invariant end
   def initialize
     @nodes = {}
     @couples = []
   end
+
+  ###  Access
+
+  # Retrieve coordinates for a given person.
+  def node(id)
+    @nodes[id]
+  end
+
+  ###  Status report
+
+  # Check if a person has coordinates defined.
+  def has_node?(id)
+    @nodes.key?(id)
+  end
+
+  ###  Element change
 
   # Store coordinates for an individual person.
   pre 'valid_coords' do |id, x, y|
@@ -32,16 +50,6 @@ class Coordinates
     # Store sorted pair to avoid duplicating (A, B) and (B, A)
     pair = [spouse1, spouse2].sort
     @couples << pair unless @couples.include?(pair)
-  end
-
-  # Retrieve coordinates for a given person.
-  def node(id)
-    @nodes[id]
-  end
-
-  # Check if a person has coordinates defined.
-  def has_node?(id)
-    @nodes.key?(id)
   end
 
   private

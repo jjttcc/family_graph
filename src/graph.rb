@@ -28,7 +28,7 @@ class Graph
     if ! people.is_a?(Array) then
       people = [people]
     end
-    people.each { |p| add_coords(p, 0) }
+    people.each { |p| add_coords(p) }
   end
 
   private ###  Initialization
@@ -42,37 +42,37 @@ class Graph
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
   pre :p_exists do |p| p != nil end
-  def add_coords(p, depth = 0)
+  def add_coords(p)
     if p.has_spouse then
-      add_spousal_coords(p, depth)
+      add_spousal_coords(p)
     else
-      add_single_coords(p, depth)
+      add_single_coords(p)
     end
   end
 
   # Add coordinates, recursively for 'p' and its spouse to 'coordinates'.
   pre :p_valid_spouse do |p| p != nil && p.has_spouse end
-  def add_spousal_coords(p, depth)
+  def add_spousal_coords(p)
     # Recursively place branches first
     branches(p).each do |b|
       if ! b.nil? then
-        add_coords(b, depth + 1)
+        add_coords(b)
       end
     end
     spouse = p.spouse
-    add_couple_coords(p, spouse, depth)
+    add_couple_coords(p, spouse)
   end
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
   pre :p_valid_single do |p| p != nil && ! p.has_spouse end
-  def add_single_coords(p, depth)
+  def add_single_coords(p)
     # Recursively place branches first
     branches(p).each do |b|
       if ! b.nil? then
-        add_coords(b, depth + 1)
+        add_coords(b)
       end
     end
-    add_individual_coords(p, depth)
+    add_individual_coords(p)
   end
 
   protected ### Hook methods
@@ -85,8 +85,8 @@ class Graph
 
   # Add coordinates for person 'p' to 'coordinates'
   pre :p_exists_indiv do |p| p != nil end
-  def add_individual_coords(p, depth)
-    y = depth * LEVEL_HEIGHT
+  def add_individual_coords(p)
+    y = p.generation * LEVEL_HEIGHT
     b = branches(p)
     if b.empty? then
       x = @next_x[y]
@@ -113,8 +113,8 @@ class Graph
   pre :valid_spouses do |spouse1, spouse2|
     spouse1 != nil && spouse2 != nil
   end
-  def add_couple_coords(spouse1, spouse2, depth)
-    y = depth * LEVEL_HEIGHT
+  def add_couple_coords(spouse1, spouse2)
+    y = spouse1.generation * LEVEL_HEIGHT
     @coordinates.add_couple(spouse1.id, spouse2.id)
     if branches(spouse1).empty? then
       x1 = @next_x[y]
@@ -141,6 +141,7 @@ class Graph
       @next_x[y] = parent_x2 + SIBLING_SPACING
     end
   end
+
 
   # Recursively shift coordinates of a subtree and update next_x
   def shift_subtree(person, amount)

@@ -1,7 +1,7 @@
 # Commit Standards: family_graph
 
-To maintain a clean and readable commit history, all commit messages must adhere 
-to the following standards:
+To maintain a clean and readable commit history, all commit messages must
+adhere to the following standards:
 
 1. Subject Line:
    - Maximum 50 characters.

@@ -22,6 +22,8 @@ as much as practical, small/short, employing "helper" routines for
 lower-level work.
 2. Try to avoid "\n\n" sequences within method bodies. Following 1. will
 generally make this unnecessary.
+3. Avoid mid-method returns. Where possible, structure the method
+   to have a single exit point or a clear, sequential flow.
 
 ## Testing Standards
 3. **Exit Codes**: All executable test scripts MUST exit with a zero value

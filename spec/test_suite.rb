@@ -5,6 +5,7 @@ require_relative '../src/family_constants'
 require_relative '../src/coordinates'
 require_relative '../src/descendant_graph'
 require_relative '../src/graph_renderer'
+require_relative '../src/hierarchy_analyzer'
 
 def assert(condition, message)
   unless condition
@@ -72,7 +73,8 @@ root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
 
 puts "  Testing DescendantGraph..."
-des_graph = DescendantGraph.new(root_person)
+HierarchyAnalyzer.calculate_generations(people)
+des_graph = DescendantGraph.new([root_person])
 layout_coords = des_graph.coordinates
 
 # Verify coordinates generated for root and spouse
