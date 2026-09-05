@@ -1,30 +1,33 @@
-# [please add a description here, Gemini.]
+# Analyzes genealogical data to assign a generational rank to each person
+# based on their longest path from a root ancestor.
 class HierarchyAnalyzer
+
+  public
 
   def self.calculate_generations(people)
     generations = {}
-    # Initial pass: Find all true roots (nodes with no parents)
-    # and all other nodes that need to be linked
-    roots = people.values.select { |p| p.parents.empty? }
-    roots.each { |root| assign_generation(root, 0, generations) }
-    # Assign generations to all objects
+    people.each { |id, person| assign_generation(person, generations) }
     people.each do |id, person|
       person.instance_variable_set(:@generation, generations[id] || 0)
     end
   end
 
-  # depth-first search to assign generations
-  # A person's generation is the maximum generation of their parents + 1
-  # For roots, generation = 0
-  def self.assign_generation(person, gen, generations)
-    if generations.key?(person.id) && generations[person.id] >= gen then
-      # [null-op]
+  private
+
+  # Recursive method to assign generation based on longest ancestor path
+  def self.assign_generation(person, generations)
+    if generations.key?(person.id) then
+      result = generations[person.id]
+    elsif person.parents.empty? then
+      result = 0
+      generations[person.id] = result
     else
-      generations[person.id] = gen
-      person.children.each do |child|
-        assign_generation(child, gen + 1, generations)
-      end
+      max_parent_gen = person.parents.map { |p|
+        assign_generation(p, generations) }.max
+      result = max_parent_gen + 1
+      generations[person.id] = result
     end
+    result
   end
 
 end

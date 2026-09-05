@@ -52,6 +52,11 @@ class Person
     !@spouses.empty?
   end
 
+  # Is self a root node (has no parents)?
+  def is_root
+    parents.empty?
+  end
+
   public  ###  Element change
 
   pre do |person| not self.children.include?(person) end
@@ -87,10 +92,14 @@ class Person
     @data.key?(m_str) || @data.key?(hyphenated) || super
   end
 
-  public  ###### to-do!!!: make this private:
+  private ###  Implementation
 
   attr_reader :data
 
-  private ###  Implementation
+  private ###  Invariant
+
+  def invariant
+    parents.empty? == is_root
+  end
 
 end

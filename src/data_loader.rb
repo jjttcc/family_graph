@@ -19,14 +19,15 @@ class DataLoader
                        Person.new(id, person_data) }
     # 2. Link relationships (only for target IDs)
     result.each_value do |person|
-      # Link Spouses
-      spouse_info = person.data[SPOUSE].to_s
-      spouse_info = person.data[SPOUSES].to_s if spouse_info.empty?
+      # Link Spouses (to-do: "protect" 'data' method!!!:)
+      spouse_info = person.send(:data)[SPOUSE].to_s
+      spouse_info = person.send(:data)[SPOUSES].to_s if spouse_info.empty?
       unless spouse_info.empty?
         spouse_ids = spouse_info.split(',').map(&:strip)
         spouse_ids.each do |spouse_id|
           if result.key?(spouse_id) then
             spouse = result[spouse_id]
+            # Ensure links are added only once to prevent errors
             if !person.spouses.include?(spouse) then
               person.add_spouse(spouse)
             end
@@ -38,7 +39,7 @@ class DataLoader
       end
       # Link Parents/Children
       PARENTS.each do |parent_type|
-        parent_id = person.data[parent_type]
+        parent_id = person.send(:data)[parent_type]
         if parent_id && result.key?(parent_id) then
           parent = result[parent_id]
           parent.add_child(person)
@@ -63,9 +64,9 @@ class DataLoader
     data.each { |id, person_data| result[id] = Person.new(id, person_data) }
     # 2. Link relationships
     result.each_value do |person|
-      # Link Spouses
-      spouse_info = person.data[SPOUSE].to_s
-      spouse_info = person.data[SPOUSES].to_s if spouse_info.empty?
+      # Link Spouses (to-do: "protect" 'data' method!!!:)
+      spouse_info = person.send(:data)[SPOUSE].to_s
+      spouse_info = person.send(:data)[SPOUSES].to_s if spouse_info.empty?
       unless spouse_info.empty?
         spouse_ids = spouse_info.split(',').map(&:strip)
         spouse_ids.each do |spouse_id|
@@ -83,7 +84,7 @@ class DataLoader
       end
       # Link Parents/Children
       PARENTS.each do |parent_type|
-        parent_id = person.data[parent_type]
+        parent_id = person.send(:data)[parent_type]
         if parent_id && result.key?(parent_id) then
           parent = result[parent_id]
           parent.add_child(person)
