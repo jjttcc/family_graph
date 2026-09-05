@@ -3,6 +3,7 @@ require 'ruby_contracts'
 require_relative 'person'
 require_relative 'family_constants'
 
+# Loads genealogical data from YAML files and builds Person object structures.
 class DataLoader
   include Contracts::DSL
 

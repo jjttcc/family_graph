@@ -4,6 +4,7 @@ require_relative 'ancestry_dataset'
 require_relative 'graph_renderer'
 require_relative 'hierarchy_analyzer'
 
+# Orchestrates the data loading, graph construction, and rendering process.
 class GraphOrchestrator
   def initialize(options, data_paths)
     @options = options

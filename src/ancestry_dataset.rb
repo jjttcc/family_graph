@@ -1,5 +1,6 @@
 require 'set'
 
+# Manages the subset of genealogical data required for ancestry rendering.
 class AncestryDataset
   public
 

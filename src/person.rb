@@ -1,6 +1,7 @@
 # required libraries/tools
 require 'ruby_contracts'
 
+# Represents a person in the family tree, storing biographical and genealogical data.
 class Person
   include Contracts::DSL
 

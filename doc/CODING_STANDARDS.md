@@ -14,6 +14,7 @@
         if x then y end
    Reason: If 'y' is many characters long, it's easy to miss the 'if x'
    part.
+4. Every class must have a description comment explaining its purpose.
 
 ### Guidelines
 
