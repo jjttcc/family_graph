@@ -5,8 +5,8 @@ require 'ruby_contracts'
 require_relative 'coordinates'
 require_relative 'family_constants'
 
-# Data structure that extracts genealogical data from a Person,
-# recursively, treating the Person as the root of a tree, and uses
+# Data structure that extracts genealogical data from a list of Person
+# objects, recursively, treating the Person as the root of a tree, and uses
 # this data to create an SVG-based graph.
 class Graph
   include Contracts::DSL

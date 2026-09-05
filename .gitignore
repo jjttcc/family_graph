@@ -14,3 +14,11 @@ ts
 *.lock
 /test/
 family_tree*
+COMMIT_MSG_DRAFT
+GEMINI_*
+/*.md
+/bugs/
+/debug/
+*.rb.*
+bin/cnvrtsvg
+bin/fgr

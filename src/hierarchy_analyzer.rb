@@ -10,6 +10,14 @@ class HierarchyAnalyzer
     people.each do |id, person|
       person.instance_variable_set(:@generation, generations[id] || 0)
     end
+    # Align spouses to the maximum generation of the pair
+    people.each_value do |person|
+      person.spouses.each do |spouse|
+        max_gen = [person.generation, spouse.generation].max
+        person.instance_variable_set(:@generation, max_gen)
+        spouse.instance_variable_set(:@generation, max_gen)
+      end
+    end
   end
 
   private
