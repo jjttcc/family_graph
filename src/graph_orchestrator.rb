@@ -78,7 +78,7 @@ class GraphOrchestrator
 
   def determine_roots(people)
     all_roots = people.select { |_id, p| p.father.nil? && p.mother.nil? }
-    if @options[:root_ids] && @options[:root_ids].include?("all")
+    if @options[:root_ids] && @options[:root_ids].include?("{all}")
       all_roots.keys
     else
       @options[:root_ids] || all_roots.keys

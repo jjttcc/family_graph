@@ -16,7 +16,8 @@ parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
   opts.summary_width = 30
   opts.on("-i", "--root ID1,ID2", Array,
-          "Comma-separated list of Root IDs") do |v|
+          "Comma-separated list of Root IDs",
+          "({all} for all roots)") do |v|
     options[:root_ids] = v
   end
   opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",

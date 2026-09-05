@@ -61,7 +61,7 @@ end
 
 # Test -i / --root (All roots)
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("-i all data/sample_tree.yaml -o #{tmpdir}")
+  out, status = run_cli("-i {all} data/sample_tree.yaml -o #{tmpdir}")
   assert(status == 0, "All root IDs flag should exit with 0")
   assert(Dir.glob(File.join(tmpdir, "family_tree_unified_*.svg")).any?, "Unified SVG should be generated for all roots")
 end
