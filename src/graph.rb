@@ -11,10 +11,6 @@ require_relative 'family_constants'
 class Graph
   include Contracts::DSL
 
-  LEVEL_HEIGHT = 150
-  COUPLE_SPACING = 140
-  SIBLING_SPACING = 150
-
   public
 
   attr_reader :coordinates

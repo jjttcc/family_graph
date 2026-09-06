@@ -89,7 +89,7 @@ assert(root_y == 0, "Root should be at level 0")
 if root_person.has_spouse
   spouse_x, spouse_y = layout_coords.node(root_person.spouse.id)
   assert(spouse_y == 0, "Spouse should be at level 0")
-  assert((spouse_x - root_x).abs == Graph::COUPLE_SPACING, "Spouses should be separated by couple spacing")
+  assert((spouse_x - root_x).abs == COUPLE_SPACING, "Spouses should be separated by couple spacing")
 end
 
 # Verify children are positioned centered beneath the couple
