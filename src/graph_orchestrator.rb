@@ -22,11 +22,6 @@ class GraphOrchestrator
     # Execute graph construction
     @graph.build(@roots)
 
-    # Run compaction if supported by the layout strategy
-    if @graph.instance_variable_get(:@layout).respond_to?(:compact)
-      @graph.instance_variable_get(:@layout).compact(@graph, people)
-    end
-
     # Render
     puts "Rendering SVG..."
     renderer = GraphRenderer.new(@graph.coordinates, people, 

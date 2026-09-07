@@ -64,10 +64,13 @@ class GraphRenderer
     min_y = nodes.values.map { |coord| coord[1] }.min
     max_x = nodes.values.map { |coord| coord[0] }.max
     max_y = nodes.values.map { |coord| coord[1] }.max
+    
     offset_x = -min_x + RENDER_OFFSET_X
     offset_y = -min_y + RENDER_OFFSET_Y
-    width = max_x - min_x + NODE_WIDTH + 100
-    height = max_y - min_y + NODE_HEIGHT + 100
+    
+    width = max_x - min_x + NODE_WIDTH + (2 * RENDER_OFFSET_X)
+    height = max_y - min_y + NODE_HEIGHT + (2 * RENDER_OFFSET_Y)
+    
     [offset_x, offset_y, width, height]
   end
 
