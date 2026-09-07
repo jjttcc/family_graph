@@ -114,9 +114,6 @@ if roots.empty?
   exit 1
 end
 
-require_relative 'compaction_layout_strategy'
-
-# ...
 # Build graph with strategy
 layout_strategy = InitialPlacementStrategy.new
 graph = DescendantGraph.new(layout_strategy)
