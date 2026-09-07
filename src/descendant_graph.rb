@@ -5,7 +5,7 @@ require 'ruby_contracts'
 require_relative 'graph'
 require_relative 'coordinates'
 require_relative 'family_constants'
-require_relative 'simple_layout'
+require_relative 'initial_placement_strategy'
 
 # Graph objects that traverse downward, over descendants
 class DescendantGraph < Graph

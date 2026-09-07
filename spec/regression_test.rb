@@ -6,6 +6,8 @@ require_relative '../src/graph_renderer'
 require_relative '../src/family_constants'
 require_relative '../src/descendant_graph'
 require_relative '../src/hierarchy_analyzer'
+require_relative '../src/composite_layout_strategy'
+require_relative '../src/initial_placement_strategy'
 
 def assert(condition, message)
   unless condition
@@ -36,7 +38,7 @@ output_dir = 'output'
 # Test :descent with DescendantGraph
 puts "Rendering Descent graph..."
 HierarchyAnalyzer.calculate_generations(people)
-des_graph = DescendantGraph.new(SimpleLayout.new)
+des_graph = DescendantGraph.new(CompositeLayoutStrategy.new([InitialPlacementStrategy.new]))
 des_graph.build([alice])
 renderer = GraphRenderer.new(des_graph.coordinates, people, :descent, :ids)
 renderer.render(output_dir, 'descent_test')

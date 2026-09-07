@@ -3,7 +3,7 @@ require_relative 'family_constants'
 
 # Implements the recursive placement strategy, maintaining the original
 # logic for node and spousal coordinate calculation.
-class SimpleLayout < LayoutStrategy
+class InitialPlacementStrategy < LayoutStrategy
   include Contracts::DSL
 
   # Add coordinates for an individual person.

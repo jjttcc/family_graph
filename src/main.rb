@@ -3,6 +3,8 @@
 require 'optparse'
 require_relative 'graph_orchestrator'
 require_relative 'family_constants'
+require_relative 'composite_layout_strategy'
+require_relative 'initial_placement_strategy'
 
 options = {
   root_ids: nil,
@@ -112,8 +114,14 @@ if roots.empty?
   exit 1
 end
 
+require_relative 'compaction_layout_strategy'
+
+# ...
 # Build graph with strategy
-layout_strategy = SimpleLayout.new
+layout_strategy = CompositeLayoutStrategy.new([
+  InitialPlacementStrategy.new,
+  CompactionLayoutStrategy.new
+])
 graph = DescendantGraph.new(layout_strategy)
 
 # Compact is now called in Orchestrator after graph.build(roots)
