@@ -69,6 +69,7 @@ class InitialPlacementStrategy < LayoutStrategy
   def shift_subtree(person, amount, graph)
     if !person.nil? then
       if graph.coordinates.has_node?(person.id) then
+        puts "DEBUG: Shifting node #{person.id} by #{amount}"
         x, y = graph.coordinates.node(person.id)
         new_x = x + amount
         graph.coordinates.add_node(person.id, new_x, y)
@@ -78,6 +79,7 @@ class InitialPlacementStrategy < LayoutStrategy
       if person.has_spouse then
         person.spouses.each do |spouse|
           if graph.coordinates.has_node?(spouse.id) then
+            puts "DEBUG: Shifting spouse #{spouse.id} of #{person.id} by #{amount}"
             x, y = graph.coordinates.node(spouse.id)
             new_x = x + amount
             graph.coordinates.add_node(spouse.id, new_x, y)

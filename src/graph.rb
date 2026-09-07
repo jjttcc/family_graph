@@ -88,8 +88,8 @@ class Graph
   public ### Structural manipulation
 
   # Recursively shift coordinates of a subtree and update next_x
-  def shift_subtree(person, amount)
-    @layout.shift_subtree(person, amount, self)
+  def shift_subtree(person, amount, graph)
+    @layout.shift_subtree(person, amount, graph)
   end
 
   private ###  Class invariant

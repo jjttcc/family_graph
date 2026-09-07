@@ -114,8 +114,14 @@ if roots.empty?
   exit 1
 end
 
+require_relative 'compaction_layout_strategy'
+
+# ...
 # Build graph with strategy
-layout_strategy = InitialPlacementStrategy.new
+layout_strategy = CompositeLayoutStrategy.new([
+  InitialPlacementStrategy.new,
+  CompactionLayoutStrategy.new
+])
 graph = DescendantGraph.new(layout_strategy)
 
 # Compact is now called in Orchestrator after graph.build(roots)
