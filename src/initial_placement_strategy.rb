@@ -76,13 +76,14 @@ class InitialPlacementStrategy < LayoutStrategy
           graph.coordinates.next_x(y), new_x + SIBLING_SPACING].max)
       end
       if person.has_spouse then
-        spouse = person.spouse
-        if graph.coordinates.has_node?(spouse.id) then
-          x, y = graph.coordinates.node(spouse.id)
-          new_x = x + amount
-          graph.coordinates.add_node(spouse.id, new_x, y)
-          graph.coordinates.update_next_x(y, [
-            graph.coordinates.next_x(y), new_x + SIBLING_SPACING].max)
+        person.spouses.each do |spouse|
+          if graph.coordinates.has_node?(spouse.id) then
+            x, y = graph.coordinates.node(spouse.id)
+            new_x = x + amount
+            graph.coordinates.add_node(spouse.id, new_x, y)
+            graph.coordinates.update_next_x(y, [
+              graph.coordinates.next_x(y), new_x + SIBLING_SPACING].max)
+          end
         end
       end
       graph.branches(person).each do |branch|
