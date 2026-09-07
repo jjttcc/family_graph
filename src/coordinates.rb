@@ -16,6 +16,7 @@ class Coordinates
   def initialize
     @nodes = {}
     @couples = []
+    @next_x = Hash.new(0)
   end
 
   ###  Access
@@ -23,6 +24,16 @@ class Coordinates
   # Retrieve coordinates for a given person.
   def node(id)
     @nodes[id]
+  end
+
+  # The next available X position for a given Y level.
+  def next_x(y)
+    @next_x[y]
+  end
+
+  # Update next available X position for a given Y level.
+  def update_next_x(y, value)
+    @next_x[y] = value
   end
 
   ###  Status report

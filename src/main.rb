@@ -88,5 +88,36 @@ if ARGV.empty?
   exit 1
 end
 
-orchestrator = GraphOrchestrator.new(options, ARGV)
+data_paths = ARGV
+people = {}
+data_paths.each do |path|
+  people.merge!(DataLoader.load(path)) if File.exist?(path)
+end
+
+# Calculate generations
+HierarchyAnalyzer.calculate_generations(people)
+
+root_ids = []
+all_roots = people.select { |_id, p| p.father.nil? && p.mother.nil? }
+if options[:root_ids] && options[:root_ids].include?("{all}")
+  root_ids = all_roots.keys
+else
+  root_ids = options[:root_ids] || all_roots.keys
+end
+
+roots = root_ids.map { |id| people[id] }.compact
+
+if roots.empty?
+  puts "Error: No roots to render."
+  exit 1
+end
+
+# Build graph with strategy
+layout_strategy = SimpleLayout.new
+graph = DescendantGraph.new(layout_strategy)
+
+# Compact is now called in Orchestrator after graph.build(roots)
+
+orchestrator = GraphOrchestrator.new(graph, roots, options, data_paths)
 orchestrator.render
+

@@ -36,10 +36,10 @@ output_dir = 'output'
 # Test :descent with DescendantGraph
 puts "Rendering Descent graph..."
 HierarchyAnalyzer.calculate_generations(people)
-des_graph = DescendantGraph.new([alice])
+des_graph = DescendantGraph.new(SimpleLayout.new)
+des_graph.build([alice])
 renderer = GraphRenderer.new(des_graph.coordinates, people, :descent, :ids)
 renderer.render(output_dir, 'descent_test')
-
 # Test :none with DescendantGraph
 puts "Rendering None graph..."
 renderer = GraphRenderer.new(des_graph.coordinates, people, :none, :dates)

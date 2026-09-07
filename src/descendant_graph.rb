@@ -5,13 +5,12 @@ require 'ruby_contracts'
 require_relative 'graph'
 require_relative 'coordinates'
 require_relative 'family_constants'
+require_relative 'simple_layout'
 
 # Graph objects that traverse downward, over descendants
 class DescendantGraph < Graph
 
   public
-
-  private ### Hook method implementations
 
   def branches(p)
     p.children

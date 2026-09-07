@@ -71,10 +71,10 @@ puts "Verifying Layout Engine (Graph)..."
 # Find root dynamically (no parent)
 root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
-
 puts "  Testing DescendantGraph..."
 HierarchyAnalyzer.calculate_generations(people)
-des_graph = DescendantGraph.new([root_person])
+des_graph = DescendantGraph.new(SimpleLayout.new)
+des_graph.build([root_person])
 layout_coords = des_graph.coordinates
 
 # Verify coordinates generated for root and spouse

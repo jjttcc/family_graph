@@ -17,14 +17,22 @@ class Graph
 
   public  ###  Initialization
 
-  pre :people_exist do |people| people != nil end
   post 'invariant' do invariant end
-  def initialize(people)
+  def initialize(layout_strategy)
     init_attributes
-    if ! people.is_a?(Array) then
-      people = [people]
+    @layout = layout_strategy
+  end
+
+  # Perform data traversal and layout execution.
+  pre :people_exist do |people| people != nil end
+  def build(people)
+    target_people = people
+    if !target_people.is_a?(Array) then
+      target_people = [target_people]
     end
-    people.each { |p| add_coords(p) }
+    target_people.each do |p|
+      add_coords(p)
+    end
   end
 
   private ###  Initialization
@@ -56,7 +64,7 @@ class Graph
       end
     end
     spouse = p.spouse
-    add_couple_coords(p, spouse)
+    @layout.add_couple(p, spouse, self)
   end
 
   # Add coordinates, recursively for 'p' to 'coordinates'.
@@ -68,99 +76,20 @@ class Graph
         add_coords(b)
       end
     end
-    add_individual_coords(p)
+    @layout.add_individual(p, self)
   end
 
-  protected ### Hook methods
+  public ### Hook methods
 
   def branches(p)
     raise "virtual method"
   end
 
-  private ###  Implementation
-
-  # Add coordinates for person 'p' to 'coordinates'
-  pre :p_exists_indiv do |p| p != nil end
-  def add_individual_coords(p)
-    y = p.generation * LEVEL_HEIGHT
-    b = branches(p)
-    if b.empty? then
-      x = @next_x[y]
-      @coordinates.add_node(p.id, x, y)
-      @next_x[y] = x + SIBLING_SPACING
-    else
-      # Center over branches
-      branch_xs = b.map { |br| @coordinates.node(br.id)[0] }
-      min_x = branch_xs.min
-      max_x = branch_xs.max
-      midpoint = (min_x + max_x) / 2
-      parent_x = midpoint
-      if parent_x < @next_x[y] then
-        shift_amount = @next_x[y] - parent_x
-        shift_subtree(p, shift_amount)
-        parent_x = @next_x[y]
-      end
-      @coordinates.add_node(p.id, parent_x, y)
-      @next_x[y] = parent_x + SIBLING_SPACING
-    end
-  end
-
-  # Add coordinates for the couple 'spouse1' and 'spouse2'
-  pre :valid_spouses do |spouse1, spouse2|
-    spouse1 != nil && spouse2 != nil
-  end
-  def add_couple_coords(spouse1, spouse2)
-    y = spouse1.generation * LEVEL_HEIGHT
-    @coordinates.add_couple(spouse1.id, spouse2.id)
-    if branches(spouse1).empty? then
-      x1 = @next_x[y]
-      x2 = x1 + COUPLE_SPACING
-      @coordinates.add_node(spouse1.id, x1, y)
-      @coordinates.add_node(spouse2.id, x2, y)
-      @next_x[y] = x2 + SIBLING_SPACING
-    else
-      # Center over branches
-      branch_xs = branches(spouse1).map { |b| @coordinates.node(b.id)[0] }
-      min_x = branch_xs.min
-      max_x = branch_xs.max
-      midpoint = (min_x + max_x) / 2
-      parent_x1 = midpoint - (COUPLE_SPACING / 2)
-      parent_x2 = parent_x1 + COUPLE_SPACING
-      if parent_x1 < @next_x[y] then
-        shift_amount = @next_x[y] - parent_x1
-        shift_subtree(spouse1, shift_amount)
-        parent_x1 = @next_x[y]
-        parent_x2 = parent_x1 + COUPLE_SPACING
-      end
-      @coordinates.add_node(spouse1.id, parent_x1, y)
-      @coordinates.add_node(spouse2.id, parent_x2, y)
-      @next_x[y] = parent_x2 + SIBLING_SPACING
-    end
-  end
-
+  public ### Structural manipulation
 
   # Recursively shift coordinates of a subtree and update next_x
   def shift_subtree(person, amount)
-    if person != nil then
-      if @coordinates.has_node?(person.id) then
-        x, y = @coordinates.node(person.id)
-        new_x = x + amount
-        @coordinates.add_node(person.id, new_x, y)
-        @next_x[y] = [@next_x[y], new_x + SIBLING_SPACING].max
-      end
-      if person.has_spouse then
-        spouse = person.spouse
-        if @coordinates.has_node?(spouse.id) then
-          x, y = @coordinates.node(spouse.id)
-          new_x = x + amount
-          @coordinates.add_node(spouse.id, new_x, y)
-          @next_x[y] = [@next_x[y], new_x + SIBLING_SPACING].max
-        end
-      end
-      branches(person).each do |branch|
-        shift_subtree(branch, amount)
-      end
-    end
+    @layout.shift_subtree(person, amount, self)
   end
 
   private ###  Class invariant
