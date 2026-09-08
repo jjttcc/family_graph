@@ -24,4 +24,8 @@ class CompositeLayoutStrategy < LayoutStrategy
   def compact(graph, people)
     @strategies.each { |s| s.compact(graph, people) if s.respond_to?(:compact) }
   end
+
+  def align(graph, people)
+    @strategies.each { |s| s.align(graph, people) if s.respond_to?(:align) }
+  end
 end

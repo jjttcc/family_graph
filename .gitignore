@@ -22,3 +22,5 @@ GEMINI_*
 *.rb.*
 bin/cnvrtsvg
 bin/fgr
+/*.txt
+/work/

@@ -11,8 +11,12 @@ class InitialPlacementStrategy < LayoutStrategy
   def add_individual(person, graph)
     y = person.generation * LEVEL_HEIGHT
     branches = graph.branches(person)
+    
+    current_next_x = graph.coordinates.next_x(y)
+    
     if branches.empty? then
-      x = graph.coordinates.next_x(y)
+      x = current_next_x
+      puts "DEBUG: Placing #{person.id} at X=#{x}, Y=#{y}. Next_x was #{current_next_x}"
       graph.coordinates.add_node(person.id, x, y)
       graph.coordinates.update_next_x(y, x + SIBLING_SPACING)
     else
@@ -20,10 +24,14 @@ class InitialPlacementStrategy < LayoutStrategy
       branch_xs = branches.map { |br| graph.coordinates.node(br.id)[0] }
       midpoint = (branch_xs.min + branch_xs.max) / 2
       parent_x = midpoint
-      if parent_x < graph.coordinates.next_x(y) then
-        shift_amount = graph.coordinates.next_x(y) - parent_x
+      
+      puts "DEBUG: Placing #{person.id} (parent of #{branches.map(&:id).join(',')}) at X=#{parent_x}, Y=#{y}. Next_x was #{current_next_x}"
+      
+      if parent_x < current_next_x then
+        shift_amount = current_next_x - parent_x
+        puts "DEBUG: Shifting subtree of #{person.id} by #{shift_amount} to account for Next_x"
         shift_subtree(person, shift_amount, graph)
-        parent_x = graph.coordinates.next_x(y)
+        parent_x = current_next_x
       end
       graph.coordinates.add_node(person.id, parent_x, y)
       graph.coordinates.update_next_x(y, parent_x + SIBLING_SPACING)

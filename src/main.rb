@@ -115,11 +115,13 @@ if roots.empty?
 end
 
 require_relative 'compaction_layout_strategy'
+require_relative 'structural_alignment_strategy'
 
 # ...
 # Build graph with strategy
 layout_strategy = CompositeLayoutStrategy.new([
   InitialPlacementStrategy.new,
+  StructuralAlignmentStrategy.new,
   CompactionLayoutStrategy.new
 ])
 graph = DescendantGraph.new(layout_strategy)
