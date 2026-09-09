@@ -27,56 +27,83 @@ class CompactionLayoutStrategy < LayoutStrategy
     block = [person]
     # Add spouses and their subtrees
     person.spouses.each do |spouse|
-puts "DEBUG: Traversing spouse #{spouse.id} of #{person.id}"
       block.concat(get_connected_block(spouse, graph, visited))
     end
     # Add children and their subtrees
     graph.branches(person).each do |child|
-puts "DEBUG: Traversing child #{child.id} of #{person.id}"
       block.concat(get_connected_block(child, graph, visited))
     end
     block.uniq
   end
 
-  # Performs the global compaction pass.
+  # Performs the global compaction pass until no collisions or gaps exist.
   def compact(graph, people)
     coordinates = graph.coordinates
-    # 1. Group nodes by Y-level (generation)
     levels = {}
     coordinates.nodes.each do |id, (x, y)|
       levels[y] ||= []
       levels[y] << id
     end
-puts "DEBUG: Levels grouping: #{levels.inspect}"
-    # 2. Iterate through levels and compact islands
-    levels.each do |y, node_ids|
-      # Sort nodes by X coordinate
-      sorted_ids = node_ids.sort_by { |id| coordinates.node(id)[0] }
-      # 3. Find gaps and shift
-      threshold = SIBLING_SPACING * 2
-      sorted_ids.each_with_index do |id1, i|
-        next if i == sorted_ids.size - 1
-        id2 = sorted_ids[i+1]
-        x1 = coordinates.node(id1)[0]
-        x2 = coordinates.node(id2)[0]
-        gap = x2 - (x1 + SIBLING_SPACING) 
-        if gap > threshold then
-          shift_amount = -(gap - SIBLING_SPACING)
-          p = people[id2]
-puts "DEBUG: Gap detected at Y=#{y}: #{gap} between #{id1} (X=#{x1}) and #{id2} (X=#{x2})"
-puts "DEBUG: Shifting #{p.id}'s subtree (Spouses: #{p.spouses.map(&:id).join(', ')}) by #{shift_amount}"
-          # Shift the entire connected block of person2
-          block = get_connected_block(p, graph)
-          block.each do |node|
-            if graph.coordinates.has_node?(node.id)
-              x, curr_y = graph.coordinates.node(node.id)
-              graph.coordinates.add_node(node.id, x + shift_amount, curr_y)
-            else
-puts "DEBUG: WARNING: Node #{node.id} not found in coordinates during shift!"
+
+    # Keep compacting until a full pass completes with no shifts or we hit safety limit
+    max_passes = 20
+    pass_count = 0
+    
+    loop do
+      pass_count += 1
+      if pass_count > max_passes
+        puts "WARNING: Compaction reached safety limit of #{max_passes} passes. Breaking to prevent infinite loop."
+        break
+      end
+
+      shifted = false
+      levels.each do |y, node_ids|
+        sorted_ids = node_ids.sort_by { |id| coordinates.node(id)[0] }
+        threshold = SIBLING_SPACING * 2
+
+        sorted_ids.each_with_index do |id1, i|
+          next if i == sorted_ids.size - 1
+          id2 = sorted_ids[i+1]
+          x1 = coordinates.node(id1)[0]
+          x2 = coordinates.node(id2)[0]
+
+          # Ensure minimum separation
+          min_separation = NODE_WIDTH + 20
+
+          # 1. Check for Overlaps (Too Close)
+          if (x2 - x1) < min_separation
+            shift_amount = min_separation - (x2 - x1)
+            puts "DEBUG: Overlap detected at Y=#{y}: #{id1} and #{id2}. Shifting #{id2} by #{shift_amount} (Pass #{pass_count})"
+            p2 = people[id2]
+            block = get_connected_block(p2, graph)
+            block.each do |node|
+              if graph.coordinates.has_node?(node.id)
+                x, curr_y = graph.coordinates.node(node.id)
+                graph.coordinates.add_node(node.id, x + shift_amount, curr_y)
+              end
             end
+            shifted = true
+            break 
+          end
+
+          # 2. Check for Excessive Gaps (Too Far)
+          gap = x2 - (x1 + SIBLING_SPACING)
+          if gap > threshold then
+            shift_amount = -(gap - SIBLING_SPACING)
+            p = people[id2]
+            block = get_connected_block(p, graph)
+            block.each do |node|
+              if graph.coordinates.has_node?(node.id)
+                x, curr_y = graph.coordinates.node(node.id)
+                graph.coordinates.add_node(node.id, x + shift_amount, curr_y)
+              end
+            end
+            shifted = true
+            break
           end
         end
       end
+      break unless shifted
     end
   end
 

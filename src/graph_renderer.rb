@@ -5,8 +5,6 @@ require_relative 'family_constants'
 class GraphRenderer
   include Contracts::DSL
 
-  NODE_WIDTH = 120
-  NODE_HEIGHT = 60
   FONT_SIZE_NAME = 9
   FONT_SIZE_DATE = 7
 
