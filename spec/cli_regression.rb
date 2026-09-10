@@ -84,4 +84,4 @@ Dir.mktmpdir do |tmpdir|
   assert(status == 0, "Label-mode flag should exit with 0")
 end
 
-puts "All CLI Regression Tests passed!"
+puts "All CLI Regression Tests PASSED!"

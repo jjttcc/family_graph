@@ -5,6 +5,8 @@ require_relative 'layout_strategy'
 class CompositeLayoutStrategy < LayoutStrategy
   include Contracts::DSL
 
+  public
+
   def initialize(strategies = [])
     @strategies = strategies
   end
@@ -28,4 +30,5 @@ class CompositeLayoutStrategy < LayoutStrategy
   def align(graph, people)
     @strategies.each { |s| s.align(graph, people) if s.respond_to?(:align) }
   end
+
 end

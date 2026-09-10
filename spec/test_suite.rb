@@ -35,7 +35,7 @@ coords.add_couple('person_2', 'person_1') # Duplicate with reversed order
 assert(coords.couples.size == 1, "Should only have 1 spousal couple registered")
 assert(coords.couples.first == ['person_1', 'person_2'].sort, "Spouse pairing sorting failed")
 
-puts "Coordinates class verification passed!"
+puts "Coordinates class verification PASSED!"
 
 # 2. Loader Verification
 data_path = File.join(__dir__, '..', 'data', 'sample_tree.yaml')
@@ -66,7 +66,7 @@ test_cases.each do |id, expected_children|
          "#{person.children.size}")
 end
 
-puts "All #{test_cases.size} structural assertions passed!"
+puts "All #{test_cases.size} structural assertions PASSED!"
 
 # 3. Layout Engine Verification
 puts "Verifying Layout Engine (Graph)..."
@@ -116,7 +116,7 @@ layout_coords.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
   puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
 end
 
-puts "\nLayout Engine verification passed!"
+puts "\nLayout Engine verification PASSED!"
 
 # 4. Rendering Verification
 puts "Verifying SVG Renderer..."
@@ -136,5 +136,5 @@ assert(svg_content.include?("David Doe +"), "Multi-spouse person 'David Doe' sho
 # Verify the '[bap]' indicator for baptism_test_person_500
 assert(svg_content.include?("1950-01-01 [bap]"), "Baptism person 'Baptism Test' should have '[bap]' indicator")
 
-puts "SVG Renderer verification passed!"
+puts "SVG Renderer verification PASSED!"
 

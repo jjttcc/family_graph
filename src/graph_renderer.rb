@@ -1,4 +1,6 @@
+require_relative 'debug_logger'
 require 'ruby_contracts'
+require_relative 'debug_logger'
 require_relative 'family_constants'
 
 # Renders the calculated genealogical coordinates into an SVG diagram.
@@ -62,59 +64,73 @@ class GraphRenderer
     min_y = nodes.values.map { |coord| coord[1] }.min
     max_x = nodes.values.map { |coord| coord[0] }.max
     max_y = nodes.values.map { |coord| coord[1] }.max
-    
     offset_x = -min_x + RENDER_OFFSET_X
     offset_y = -min_y + RENDER_OFFSET_Y
-    
     width = max_x - min_x + NODE_WIDTH + (2 * RENDER_OFFSET_X)
     height = max_y - min_y + NODE_HEIGHT + (2 * RENDER_OFFSET_Y)
-    
     [offset_x, offset_y, width, height]
   end
 
   def render_spousal_lines(svg_lines, offset_x, offset_y)
     @coordinates.couples.each do |spouse1_id, spouse2_id|
-      if
-        @coordinates.has_node?(spouse1_id) &&
-          @coordinates.has_node?(spouse2_id)
-      then
-        c1 = @coordinates.node(spouse1_id)
-        c2 = @coordinates.node(spouse2_id)
-        left_c, right_c = [c1, c2].sort_by { |c| c[0] }
-        x1 = left_c[0] + NODE_WIDTH + offset_x
-        y1 = left_c[1] + (NODE_HEIGHT / 2) + offset_y
-        x2 = right_c[0] + offset_x
-        y2 = right_c[1] + (NODE_HEIGHT / 2) + offset_y
-        svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
-                     "y2=\"#{y2}\" stroke=\"black\" stroke-width=\"1\" " \
-                     "stroke-dasharray=\"4\" />"
+      p1 = @people[spouse1_id]
+      p2 = @people[spouse2_id]
+      if p1 && p2
+        c1 = p1.coordinate_set(nil)
+        c2 = p2.coordinate_set(nil)
+        if c1 && c2
+          left_c, right_c = [c1, c2].sort_by { |c| c[0] }
+          x1 = left_c[0] + NODE_WIDTH + offset_x
+          y1 = left_c[1] + (NODE_HEIGHT / 2) + offset_y
+          x2 = right_c[0] + offset_x
+          y2 = right_c[1] + (NODE_HEIGHT / 2) + offset_y
+          svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
+                       "y2=\"#{y2}\" stroke=\"black\" stroke-width=\"1\" " \
+                       "stroke-dasharray=\"4\" />"
+        end
       end
     end
   end
 
   def render_parent_child_lines(svg_lines, nodes, offset_x, offset_y)
+    DebugLogger.log("DEBUG: render_parent_child_lines called with #{nodes.size} nodes.")
     nodes.each do |id, (x, y)|
       person = @people[id]
       if person.nil? then next end
+      # Use the default context for the person node itself
+      p_coord = person.coordinate_set(nil)
+      x, y = p_coord if p_coord
+      DebugLogger.log("DEBUG: Checking parents for #{person.id} " +
+                      "(at #{x}, #{y}).")
       person.parents.each do |parent|
         parent_id = parent.id
-        if parent_id && @coordinates.has_node?(parent_id) then
-          px, py = @coordinates.node(parent_id)
-          if @direction == :descent then
-            x1 = px + (NODE_WIDTH / 2) + offset_x
-            y1 = py + NODE_HEIGHT + offset_y
-            x2 = x + (NODE_WIDTH / 2) + offset_x
-            y2 = y + offset_y
-          else
-            x1 = x + (NODE_WIDTH / 2) + offset_x
-            y1 = y + offset_y
-            x2 = px + (NODE_WIDTH / 2) + offset_x
-            y2 = py + NODE_HEIGHT + offset_y
+        parent_node = @people[parent_id]
+        DebugLogger.log("DEBUG: Checking parent #{parent_id} (Expected OID: "+
+          "#{parent.object_id}, Got OID: #{parent_node&.object_id}).")
+        if parent_node
+          # Use default context for parent as well
+          parent_coord = parent_node.coordinate_set(nil)
+          DebugLogger.log("DEBUG: Parent #{parent_id} coord: #{parent_coord.inspect}")
+          if parent_coord
+            px, py = parent_coord
+            if @direction == :descent then
+              x1 = px + (NODE_WIDTH / 2) + offset_x
+              y1 = py + NODE_HEIGHT + offset_y
+              x2 = x + (NODE_WIDTH / 2) + offset_x
+              y2 = y + offset_y
+            else
+              x1 = x + (NODE_WIDTH / 2) + offset_x
+              y1 = y + offset_y
+              x2 = px + (NODE_WIDTH / 2) + offset_x
+              y2 = py + NODE_HEIGHT + offset_y
+            end
+            marker =
+              (@direction == :none) ? "" : " marker-end=\"url(#arrowhead)\""
+            line_str = "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
+                         "y2=\"#{y2}\" stroke=\"black\"#{marker} />"
+            DebugLogger.log("DEBUG: Adding line: #{line_str}")
+            svg_lines << line_str
           end
-          marker =
-            (@direction == :none) ? "" : " marker-end=\"url(#arrowhead)\""
-          svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
-                       "y2=\"#{y2}\" stroke=\"black\"#{marker} />"
         end
       end
     end
@@ -124,8 +140,10 @@ class GraphRenderer
     nodes.each do |id, (x, y)|
       person = @people[id]
       if person.nil? then next end
-      nx = x + offset_x
-      ny = y + offset_y
+      # Use default context
+      coord = person.coordinate_set(nil)
+      nx = (coord ? coord[0] : x) + offset_x
+      ny = (coord ? coord[1] : y) + offset_y
       name_label = "#{person.given_name} #{person.surname}".strip
       if person.spouses.size > 1 then
         name_label += " +"

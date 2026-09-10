@@ -31,4 +31,4 @@ Dir.mktmpdir do |tmpdir|
          "Direction :descent should have arrowhead markers on parent-child lines")
 end
 
-puts "Direction (-d) test passed!"
+puts "Direction (-d) test PASSED!"

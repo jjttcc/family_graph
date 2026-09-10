@@ -48,4 +48,4 @@ renderer = GraphRenderer.new(des_graph.coordinates, people, :none, :dates)
 renderer.render(output_dir, 'none_test')
 
 puts "Renderer options passed!"
-puts "All regression tests passed!"
+puts "All regression tests PASSED!"

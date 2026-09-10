@@ -1,7 +1,9 @@
+require_relative 'debug_logger'
 # required libraries/tools
 require 'ruby_contracts'
 
-# Represents a person in the family tree, storing biographical and genealogical data.
+# Represents a person in the family tree, storing biographical and
+# genealogical data.
 class Person
   include Contracts::DSL
 
@@ -14,12 +16,26 @@ class Person
 
   def initialize(id, data = {})
     @id = id
+    DebugLogger.log("DEBUG: Creating Person #{id} (OID: #{self.object_id}")
     @data = data
     @spouses = []
     @children = []
+    @coordinate_sets = {} # Maps spouse_id (or nil) to [x, y]
   end
 
   public  ###  Access
+
+  # The coordinate set for self's relation to the person with person_id
+  def coordinate_set(person_id = nil)
+    result = @coordinate_sets[person_id]
+    if result.nil?
+      DebugLogger.log(
+        "DEBUG: coordinate_set(#{person_id.inspect}) for #{id}" +
+        "(OID: #{self.object_id}) is nil! Available sets: " +
+        "#{@coordinate_sets.keys.inspect}")
+    end
+    result
+  end
 
   # self's first spouse
   def spouse
@@ -68,6 +84,14 @@ class Person
   pre do |person| ! @spouses.include?(person) end
   def add_spouse(person)
     @spouses << person
+  end
+
+  # Add the specified coordinate set with respect to the relation to
+  # the person with person_id.
+  def add_coordinate_set(x, y, person_id = nil)
+    DebugLogger.log("DEBUG: Storing coord for #{id} " +
+      "(OID: #{self.object_id}): (#{x}, #{y}) for #{person_id.inspect}")
+    @coordinate_sets[person_id] = [x, y]
   end
 
   public  ###  Dynamic queries
