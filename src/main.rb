@@ -3,7 +3,7 @@
 require 'optparse'
 require_relative 'graph_orchestrator'
 require_relative 'family_constants'
-require_relative 'composite_layout_strategy'
+require_relative 'layout_pipeline'
 require_relative 'initial_placement_strategy'
 
 options = {
@@ -119,7 +119,7 @@ require_relative 'structural_alignment_strategy'
 
 # ...
 # Build graph with strategy
-layout_strategy = CompositeLayoutStrategy.new([
+layout_strategy = LayoutPipeline.new([
   InitialPlacementStrategy.new,
   StructuralAlignmentStrategy.new,
   CompactionLayoutStrategy.new

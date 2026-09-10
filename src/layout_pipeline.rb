@@ -1,12 +1,8 @@
 require_relative 'layout_strategy'
 
-# A composite strategy that delegates layout operations to a sequence of 
-# individual layout strategy components.
-class CompositeLayoutStrategy < LayoutStrategy
-  include Contracts::DSL
-
-  public
-
+# A simple, flat pipeline that delegates layout operations to a sequence
+# of individual layout strategy components.
+class LayoutPipeline < LayoutStrategy
   def initialize(strategies = [])
     @strategies = strategies
   end
@@ -23,6 +19,7 @@ class CompositeLayoutStrategy < LayoutStrategy
     @strategies.each { |s| s.shift_subtree(person, amount, graph) }
   end
 
+  # Pipeline passes for post-processing
   def compact(graph, people)
     @strategies.each { |s| s.compact(graph, people) if s.respond_to?(:compact) }
   end
@@ -30,5 +27,4 @@ class CompositeLayoutStrategy < LayoutStrategy
   def align(graph, people)
     @strategies.each { |s| s.align(graph, people) if s.respond_to?(:align) }
   end
-
 end
