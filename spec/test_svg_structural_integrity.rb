@@ -41,4 +41,4 @@ assert(
   "Expected at least 2 spousal lines, found #{spousal_lines}"
 )
 
-puts "Structural integrity test passed!"
+puts "Structural integrity test PASSED!"

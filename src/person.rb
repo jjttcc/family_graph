@@ -10,7 +10,7 @@ class Person
   public
 
   attr_reader :id, :children, :generation
-  attr_accessor :spouses, :father, :mother, :father_id, :mother_id
+  attr_accessor :spouses, :father, :mother
 
   public  ###  Initialization
 
@@ -71,9 +71,6 @@ class Person
 
   # Is self a root node (has no parents)?
   def is_root
-#    if parents.empty? then
-#binding.break
-#    end
     parents.empty?
   end
 
