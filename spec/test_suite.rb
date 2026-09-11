@@ -6,7 +6,7 @@ require_relative '../src/coordinates'
 require_relative '../src/descendant_graph'
 require_relative '../src/graph_renderer'
 require_relative '../src/hierarchy_analyzer'
-require_relative '../src/composite_layout_strategy'
+require_relative '../src/layout_pipeline'
 require_relative '../src/initial_placement_strategy'
 
 def assert(condition, message)
@@ -75,7 +75,7 @@ root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
 puts "  Testing DescendantGraph..."
 HierarchyAnalyzer.calculate_generations(people)
-des_graph = DescendantGraph.new(CompositeLayoutStrategy.new([InitialPlacementStrategy.new]))
+des_graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
 des_graph.build([root_person])
 layout_coords = des_graph.coordinates
 

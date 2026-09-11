@@ -6,7 +6,7 @@ require_relative '../src/data_loader'
 require_relative '../src/descendant_graph'
 require_relative '../src/graph_renderer'
 require_relative '../src/initial_placement_strategy'
-require_relative '../src/composite_layout_strategy'
+require_relative '../src/layout_pipeline'
 require_relative '../src/hierarchy_analyzer'
 
 def assert(condition, message)
@@ -26,8 +26,7 @@ expected_node_count = people.size
 
 HierarchyAnalyzer.calculate_generations(people)
 roots = people.select { |_id, p| p.father.nil? && p.mother.nil? }.values
-graph = DescendantGraph.new(CompositeLayoutStrategy.new(
-          [InitialPlacementStrategy.new]))
+graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
 graph.build(roots)
 
 renderer = GraphRenderer.new(graph.coordinates, people, :descent, :ids)

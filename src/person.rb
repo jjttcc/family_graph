@@ -71,6 +71,9 @@ class Person
 
   # Is self a root node (has no parents)?
   def is_root
+#    if parents.empty? then
+#binding.break
+#    end
     parents.empty?
   end
 

@@ -42,8 +42,8 @@ class CompactionLayoutStrategy < LayoutStrategy
     loop do
       pass_count += 1
       if pass_count > max_passes
-        log "WARNING: Compaction reached safety limit of #{max_passes} " +
-          "passes. Breaking to prevent infinite loop."
+        DebugLogger.log("WARNING: Compaction reached safety limit of " +
+            "#{max_passes} passes. Breaking to prevent infinite loop.")
         break
       end
       shifted = false

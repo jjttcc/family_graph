@@ -1,10 +1,14 @@
 #!/usr/bin/env ruby
 
+require 'debug'
 require 'optparse'
+require_relative 'data_loader'
 require_relative 'graph_orchestrator'
 require_relative 'family_constants'
 require_relative 'layout_pipeline'
 require_relative 'initial_placement_strategy'
+require_relative 'compaction_layout_strategy'
+require_relative 'structural_alignment_strategy'
 
 options = {
   root_ids: nil,
@@ -99,25 +103,19 @@ end
 # Calculate generations
 HierarchyAnalyzer.calculate_generations(people)
 
-root_ids = []
-all_roots = people.select { |_id, p| p.father.nil? && p.mother.nil? }
-if options[:root_ids] && options[:root_ids].include?("{all}")
-  root_ids = all_roots.keys
+if options[:root_ids] then
+  root_ids = options[:root_ids]
 else
-  root_ids = options[:root_ids] || all_roots.keys
+  root_ids = people.values.select { |p| p.is_root }.map { |p| p.id }
 end
 
-roots = root_ids.map { |id| people[id] }.compact
+roots = root_ids.map { |id| people[id] }
 
 if roots.empty?
   puts "Error: No roots to render."
   exit 1
 end
 
-require_relative 'compaction_layout_strategy'
-require_relative 'structural_alignment_strategy'
-
-# ...
 # Build graph with strategy
 layout_strategy = LayoutPipeline.new([
   InitialPlacementStrategy.new,
@@ -128,6 +126,6 @@ graph = DescendantGraph.new(layout_strategy)
 
 # Compact is now called in Orchestrator after graph.build(roots)
 
-orchestrator = GraphOrchestrator.new(graph, roots, options, data_paths)
+orchestrator = GraphOrchestrator.new(graph, roots, people, options)
 orchestrator.render
 
