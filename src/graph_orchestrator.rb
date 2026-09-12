@@ -12,6 +12,9 @@ class GraphOrchestrator
     @roots = roots
     @people = people
     @options = options
+    # Inject roots and people into graph so strategies can access them
+    @graph.instance_variable_set(:@roots, roots)
+    @graph.instance_variable_set(:@people, people)
   end
 
   def render

@@ -39,6 +39,7 @@ output_dir = 'output'
 puts "Rendering Descent graph..."
 HierarchyAnalyzer.calculate_generations(people)
 des_graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
+des_graph.instance_variable_set(:@roots, [alice])
 des_graph.build([alice])
 renderer = GraphRenderer.new(des_graph.coordinates, people, :descent, :ids)
 renderer.render(output_dir, 'descent_test')

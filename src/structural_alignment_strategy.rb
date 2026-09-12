@@ -10,19 +10,8 @@ require_relative 'family_constants'
 class StructuralAlignmentStrategy < LayoutStrategy
   include Contracts::DSL
 
-  def add_individual(person, graph)
-    # Alignment is a post-process pass
-  end
-
-  def add_couple(spouse1, spouse2, graph)
-    # Alignment is a post-process pass
-  end
-
-  def shift_subtree(person, amount, graph)
-    # Alignment is a post-process pass
-  end
-
-  def align(graph, people)
+  def apply(graph)
+    people = graph.instance_variable_get(:@people)
     people.each do |_, person|
       align_spouses(person, graph)
     end

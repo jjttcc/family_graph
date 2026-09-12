@@ -6,25 +6,15 @@ require_relative 'family_constants'
 # and compacts them horizontally to minimize wasted space.
 class CompactionLayoutStrategy < LayoutStrategy
   include Contracts::DSL
+# Performs the global compaction pass until no collisions or gaps exist.
+def apply(graph)
+  people = graph.instance_variable_get(:@people)
+  compact(graph, people)
+end
 
-  public  ###  Element change
+def compact(graph, people)
+  # ... rest of the method
 
-  def add_individual(person, graph)
-    # Compaction is a post-process pass, so it does nothing here
-  end
-
-  def add_couple(spouse1, spouse2, graph)
-    # Compaction is a post-process pass, so it does nothing here
-  end
-
-  # Shifts coordinate of a subtree based on compaction logic.
-  def shift_subtree(person, amount, graph)
-    # Compaction is a post-process pass that needs to be triggered after
-    # initial placement.
-  end
-
-  # Performs the global compaction pass until no collisions or gaps exist.
-  def compact(graph, people)
     # Extract nodes from people instead of global coordinates hash
     levels = {}
     people.each do |id, person|

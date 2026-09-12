@@ -76,6 +76,7 @@ assert(root_person != nil, "A root person must exist in the sample data")
 puts "  Testing DescendantGraph..."
 HierarchyAnalyzer.calculate_generations(people)
 des_graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
+des_graph.instance_variable_set(:@roots, [root_person])
 des_graph.build([root_person])
 layout_coords = des_graph.coordinates
 

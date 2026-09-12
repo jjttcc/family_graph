@@ -1,0 +1,109 @@
+That is a great use case. In genealogy charts, visual distinction is
+critical, and SVG's `stroke-dasharray` combined with line properties gives
+you complete freedom to map every relationship type to a distinct style.
+
+Here are standard pattern strategies you can use in SVG to represent
+different relationship tiers:
+
+### Relationship Style Mapping
+
+| Relationship Type | Visual Style | SVG Implementation |
+| --- | --- | --- |
+| **Biological Parents / Full Siblings** | Solid Line | Default (no `stroke-dasharray`) |
+| **Spouses / Partners** | Standard Dash | `stroke-dasharray="8, 4"` |
+| **Adoptive Parents** | Dense Fine Dots | `stroke-dasharray="1, 4"` `stroke-linecap="round"` |
+| **Step Parents / Step Siblings** | Long Dash, Short Gap | `stroke-dasharray="12, 3, 3, 3"` |
+| **Half Siblings** | Alternating Dash-Dot | `stroke-dasharray="10, 4, 2, 4"` |
+| **Foster / Guardianship** | Wide Spaced Dots | `stroke-dasharray="2, 8"` `stroke-linecap="round"` |
+| **Divorced / Separated** | Slash/Dotted Pattern | Custom dasharray or line offset |
+
+---
+
+### Code Examples
+
+```xml
+<!-- Spouses: Classic Dashed Line -->
+<line x1="50" y1="50" x2="250" y2="50" 
+      stroke="#333" stroke-width="2" 
+      stroke-dasharray="8, 4" />
+
+<!-- Adoptive: Smooth Circular Dots -->
+<line x1="50" y1="90" x2="250" y2="90" 
+      stroke="#0066cc" stroke-width="3" 
+      stroke-dasharray="0, 8" stroke-linecap="round" />
+
+<!-- Step Relationship: Dash-Dot Combo -->
+<line x1="50" y1="130" x2="250" y2="130" 
+      stroke="#666" stroke-width="2" 
+      stroke-dasharray="12, 4, 3, 4" />
+
+```
+
+### Pro-Tip for Dotted Lines
+
+To get true, round circular dots instead of small squarish rectangles,
+set `stroke-dasharray="0, [gap_size]"` (or `1, [gap_size]`) and add `stroke-
+linecap="round"`. The `round` cap expands the 0-length dash into a
+perfect circle!
+
+-------------------------------------------------------
+Are these somewhat standardized, and/or conventions?
+
+While there is **no single governing global standard** for genealogy chart
+lines, there are widely accepted **industry conventions** used by
+professional genealogists, software tools (like Family Tree Maker or
+Gramps), and academic genograms.
+
+---
+
+### Standard Industry Conventions
+
+1. **Biological / Direct Lines: Solid Line (`—`)**
+* **Universal Standard:** Solid, continuous lines represent direct
+  biological lineage and active marriages/unions across virtually all
+  platforms and genograms.
+
+
+2. **Divorce / Separation: Solid Line with Hash Marks (`—//—`)**
+* **Universal Standard:** A solid spouse line interrupted by one slash (`/`)
+  for separation or two slashes (`//`) for divorce.
+
+
+3. **Adoption: Double Line or Dotted (`::` or `==`)**
+* **Genogram Standard:** In clinical/medical genograms (McGoldrick-Gerson
+  standard), adoption is drawn as a **double solid line** or a
+  **bracketed/dotted line** connecting the adoptive parent to the child.
+* **Family History Standard:** A **finely dotted line** (`stroke-
+  dasharray="2, 4"`) is the most common digital fallback.
+
+
+4. **Foster / Guardianship: Dotted / Short Dash (`...`)**
+* **Standard:** Dotted lines almost universally denote temporary, non-
+  biological, or legal-only parenting relationships to distinguish them
+  visually from biological ties.
+
+
+5. **Step-Relationships: Long Dashes (`– – –`)**
+* **Standard:** Dashed lines denote affinity (relationships by marriage
+  rather than blood).
+
+
+
+---
+
+### Key Design Principles for Your App
+
+Because users may come from different genealogy software backgrounds,
+following these best practices keeps your SVG charts clear:
+
+* **Rely on Legend Keys:** Because conventions vary slightly between medical
+  genograms and general family trees, **always provide a dynamic SVG chart
+  legend** that defines what each line pattern means in your application.
+* **Combine Dash Patterns with Color/Opacity:** Don't rely *only* on `stroke-
+  dasharray`. Pair your dash patterns with distinct stroke colors or line
+  weights (e.g., solid gray for biological, dashed blue for step, dotted
+  amber for adoptive) to ensure accessibility for colorblind users and clear
+  contrast when zoomed out.
+* **Keep `stroke-width` Consistent:** Keep your line thicknesses uniform
+  across line types so a dotted or dashed line doesn't look visually
+  "heavier" or "lighter" than a solid line.

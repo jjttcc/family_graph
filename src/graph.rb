@@ -47,36 +47,14 @@ class Graph
   # Add coordinates, recursively for 'p' to 'coordinates'.
   pre :p_exists do |p| p != nil end
   def add_coords(p)
-    if p.has_spouse then
-      add_spousal_coords(p)
-    else
-      add_single_coords(p)
-    end
+    # The layout strategy now handles the entire placement pass.
+    # We call it once at the top level of traversal.
+    @layout.apply(self)
   end
 
-  # Add coordinates, recursively for 'p' and its spouse to 'coordinates'.
-  pre :p_valid_spouse do |p| p != nil && p.has_spouse end
-  def add_spousal_coords(p)
-    # Recursively place branches first
-    branches(p).each do |b|
-      if ! b.nil? then
-        add_coords(b)
-      end
-    end
-    spouse = p.spouse
-    @layout.add_couple(p, spouse, self)
-  end
-
-  # Add coordinates, recursively for 'p' to 'coordinates'.
-  pre :p_valid_single do |p| p != nil && ! p.has_spouse end
-  def add_single_coords(p)
-    # Recursively place branches first
-    branches(p).each do |b|
-      if ! b.nil? then
-        add_coords(b)
-      end
-    end
-    @layout.add_individual(p, self)
+  # Orchestration method for the layout pipeline.
+  def perform_layout
+    @layout.apply(self)
   end
 
   public ### Hook methods

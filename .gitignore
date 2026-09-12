@@ -24,3 +24,13 @@ bin/cnvrtsvg
 bin/fgr
 /*.txt
 /work/
+/artifacts
+/*NOTES
+/*.log
+*jtc
+master_tree*
+spec/data
+test*run*
+/notes
+for_gemini
+*dialog*

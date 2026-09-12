@@ -27,6 +27,7 @@ expected_node_count = people.size
 HierarchyAnalyzer.calculate_generations(people)
 roots = people.select { |_id, p| p.father.nil? && p.mother.nil? }.values
 graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
+graph.instance_variable_set(:@roots, roots)
 graph.build(roots)
 
 renderer = GraphRenderer.new(graph.coordinates, people, :descent, :ids)

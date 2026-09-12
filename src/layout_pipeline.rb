@@ -7,24 +7,11 @@ class LayoutPipeline < LayoutStrategy
     @strategies = strategies
   end
 
-  def add_individual(person, graph)
-    @strategies.each { |s| s.add_individual(person, graph) }
-  end
-
-  def add_couple(spouse1, spouse2, graph)
-    @strategies.each { |s| s.add_couple(spouse1, spouse2, graph) }
+  def apply(graph)
+    @strategies.each { |s| s.apply(graph) }
   end
 
   def shift_subtree(person, amount, graph)
-    @strategies.each { |s| s.shift_subtree(person, amount, graph) }
-  end
-
-  # Pipeline passes for post-processing
-  def compact(graph, people)
-    @strategies.each { |s| s.compact(graph, people) if s.respond_to?(:compact) }
-  end
-
-  def align(graph, people)
-    @strategies.each { |s| s.align(graph, people) if s.respond_to?(:align) }
+    @strategies.each { |s| s.shift_subtree(person, amount, graph) if s.respond_to?(:shift_subtree) }
   end
 end
