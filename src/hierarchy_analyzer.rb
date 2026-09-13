@@ -1,29 +1,40 @@
+require 'ruby_contracts'
+
 # Analyzes genealogical data to assign a generational rank to each person
 # based on their longest path from a root ancestor.
 class HierarchyAnalyzer
+  include Contracts::DSL
 
   public
 
-  def self.calculate_generations(people)
+  # Calculate and assign the generational rank of each person in the
+  # provided people collection. Ensures spouses are aligned to the same
+  # generation level.
+  def calculate_and_assign_generations(people)
     generations = {}
-    people.each { |id, person| assign_generation(person, generations) }
-    people.each do |id, person|
-      person.instance_variable_set(:@generation, generations[id] || 0)
-    end
-    # Align spouses to the maximum generation of the pair
+    people.each_value { |person| assign_generation(person, generations) }
     people.each_value do |person|
-      person.spouses.each do |spouse|
-        max_gen = [person.generation, spouse.generation].max
-        person.instance_variable_set(:@generation, max_gen)
-        spouse.instance_variable_set(:@generation, max_gen)
-      end
+      person.instance_variable_set(:@generation, generations[person.id] || 0)
     end
+    align_spouses(people)
   end
 
   private
 
-  # Recursive method to assign generation based on longest ancestor path
-  def self.assign_generation(person, generations)
+  # Assign a generation value to the specified person and store it in the
+  # generations mapping, if it has not already been assigned.
+  def assign_generation(person, generations)
+    if !generations.key?(person.id) then
+      generations[person.id] = calculate_generation(person, generations)
+    end
+  end
+
+  # Calculate and return the generation value of the specified person
+  # recursively, tracing parents back to root ancestors. Caches and
+  # returns the calculated value in the generations mapping.
+  post :not_nil do |result| result != nil end
+  def calculate_generation(person, generations)
+    result = nil
     if generations.key?(person.id) then
       result = generations[person.id]
     elsif person.parents.empty? then
@@ -31,11 +42,33 @@ class HierarchyAnalyzer
       generations[person.id] = result
     else
       max_parent_gen = person.parents.map { |p|
-        assign_generation(p, generations) }.max
+        calculate_generation(p, generations)
+      }.max
       result = max_parent_gen + 1
       generations[person.id] = result
     end
     result
+  end
+
+  # Align spouses until all generational differences within spouse
+  # groups have propagated to a stable state.
+  def align_spouses(people)
+    loop do
+      changed = false
+      people.each_value do |person|
+        person.spouses.each do |spouse|
+          max_gen = [person.generation, spouse.generation].max
+          if person.generation != max_gen || spouse.generation != max_gen then
+            person.instance_variable_set(:@generation, max_gen)
+            spouse.instance_variable_set(:@generation, max_gen)
+            changed = true
+          end
+        end
+      end
+      if !changed then
+        break
+      end
+    end
   end
 
 end

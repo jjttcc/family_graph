@@ -10,7 +10,6 @@ require_relative 'hierarchical_placement_step'
 require_relative 'compaction_layout_step'
 require_relative 'structural_alignment_step'
 require_relative 'yaml_oracle_step'
-require_relative 'descendant_graph'
 require_relative 'hierarchy_analyzer'
 
 options = {
@@ -104,7 +103,8 @@ data_paths.each do |path|
 end
 
 # Calculate generations
-HierarchyAnalyzer.calculate_generations(people)
+ha = HierarchyAnalyzer.new
+ha.calculate_and_assign_generations(people)
 
 if options[:root_ids] then
   root_ids = options[:root_ids]

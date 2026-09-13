@@ -36,8 +36,7 @@ class HierarchicalPlacementStep < LayoutStep
     if branches.empty?
       x = current_next_x
       DebugLogger.log("DEBUG: Placing #{person.id} (OID: #{person.object_id}) at X=#{x}, Y=#{y}. Next_x was #{current_next_x}")
-      person.add_coordinate_set(x, y, nil)
-      coordinates.add_node(person.id, x, y)
+      context.update_person(person, x, y)
       coordinates.update_next_x(y, x + SIBLING_SPACING)
     else
       # Center over branches
@@ -51,8 +50,7 @@ class HierarchicalPlacementStep < LayoutStep
         shift_subtree(person, shift_amount, context)
         parent_x = current_next_x
       end
-      person.add_coordinate_set(parent_x, y, nil)
-      coordinates.add_node(person.id, parent_x, y)
+      context.update_person(person, parent_x, y)
       coordinates.update_next_x(y, parent_x + SIBLING_SPACING)
     end
   end
@@ -65,10 +63,8 @@ class HierarchicalPlacementStep < LayoutStep
     if branches.empty?
       x1 = coordinates.next_x(y)
       x2 = x1 + COUPLE_SPACING
-      spouse1.add_coordinate_set(x1, y, nil)
-      spouse2.add_coordinate_set(x2, y, nil)
-      coordinates.add_node(spouse1.id, x1, y)
-      coordinates.add_node(spouse2.id, x2, y)
+      context.update_person(spouse1, x1, y)
+      context.update_person(spouse2, x2, y)
       coordinates.update_next_x(y, x2 + SIBLING_SPACING)
     else
       # Center over branches
@@ -82,10 +78,8 @@ class HierarchicalPlacementStep < LayoutStep
         parent_x1 = coordinates.next_x(y)
         parent_x2 = parent_x1 + COUPLE_SPACING
       end
-      spouse1.add_coordinate_set(parent_x1, y, nil)
-      spouse2.add_coordinate_set(parent_x2, y, nil)
-      coordinates.add_node(spouse1.id, parent_x1, y)
-      coordinates.add_node(spouse2.id, parent_x2, y)
+      context.update_person(spouse1, parent_x1, y)
+      context.update_person(spouse2, parent_x2, y)
       coordinates.update_next_x(y, parent_x2 + SIBLING_SPACING)
     end
   end

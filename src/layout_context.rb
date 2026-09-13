@@ -16,9 +16,28 @@ class LayoutContext
     @traversal_direction == :ancestor ? person.parents : person.children
   end
 
-  def shift_subtree(person, amount)
-    # This needs implementation, probably delegating to InitialPlacementStep? 
-    # Or moving the implementation from InitialPlacementStep here?
-    # Let's start with a stub.
+  def update_person(person, x, y)
+    person.add_coordinate_set(x, y, nil)
+    @coordinates.add_node(person.id, x, y)
+  end
+
+  def shift_person(person, dx, dy)
+    coord = person.coordinate_set(nil)
+    return unless coord
+    update_person(person, coord[0] + dx, coord[1] + dy)
+  end
+
+  def shift_subtree(person, dx, dy = 0)
+    return unless person
+    shift_person(person, dx, dy)
+    if person.has_spouse
+      person.spouses.each { |spouse| shift_person(spouse, dx, dy) }
+    end
+    branches(person).each { |child| shift_subtree(child, dx, dy) }
+  end
+
+  # Expose coordinates for next_x manipulation
+  def coordinates
+    @coordinates
   end
 end

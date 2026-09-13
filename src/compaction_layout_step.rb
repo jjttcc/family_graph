@@ -58,7 +58,7 @@ class CompactionLayoutStep < LayoutStep
             block.each do |node|
               coord = node.coordinate_set(nil)
               if coord
-                node.add_coordinate_set(coord[0] + shift_amount, coord[1], nil)
+                context.update_person(node, coord[0] + shift_amount, coord[1])
               end
             end
             shifted = true
@@ -73,7 +73,7 @@ class CompactionLayoutStep < LayoutStep
             block.each do |node|
               coord = node.coordinate_set(nil)
               if coord
-                node.add_coordinate_set(coord[0] + shift_amount, coord[1], nil)
+                context.update_person(node, coord[0] + shift_amount, coord[1])
               end
             end
             shifted = true

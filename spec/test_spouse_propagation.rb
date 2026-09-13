@@ -1,0 +1,31 @@
+require_relative '../src/data_loader'
+require_relative '../src/hierarchy_analyzer'
+
+def assert(condition, message)
+  unless condition
+    puts "Assertion Failed: #{message}"
+    exit 1
+  end
+end
+
+data_path = File.join(__dir__, '..', 'data', 'spouse_propagation_test.yaml')
+people = DataLoader.load(data_path)
+puts "Successfully loaded #{people.size} people."
+
+# Calculate generations
+ha = HierarchyAnalyzer.new
+ha.calculate_and_assign_generations(people)
+
+# Expectations:
+# wife1 (child of root) -> Gen 1
+# david (child of wife1) -> Gen 2
+# wife2 (child of david) -> Gen 3
+# Alignment: All must be Gen 3.
+
+puts "Verifying generations..."
+
+assert(people['wife1'].generation == 3, "wife1 should be Gen 3, is #{people['wife1'].generation}")
+assert(people['david'].generation == 3, "david should be Gen 3, is #{people['david'].generation}")
+assert(people['wife2'].generation == 3, "wife2 should be Gen 3, is #{people['wife2'].generation}")
+
+puts "All assertions PASSED!"
