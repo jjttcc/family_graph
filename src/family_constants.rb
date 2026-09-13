@@ -3,7 +3,7 @@ MOTHER = 'mother'
 SPOUSE = 'spouse'
 SPOUSES = 'spouses'
 PARENTS = [FATHER, MOTHER].freeze
-VERSION = '0.2.4.13.6'
+VERSION = '0.2.4.13.7'
 
 LEVEL_HEIGHT = 200
 COUPLE_SPACING = 140

@@ -124,7 +124,7 @@ layout_pipeline = [
   HierarchicalPlacementStep.new,
 #  StructuralAlignmentStep.new,
 #  CompactionLayoutStep.new,
-  YamlOracleStep.new(1)
+  YamlOracleStep.new("oracle_stage_1.yaml")
 ]
 
 orchestrator = LayoutOrchestrator.new(roots, people, layout_pipeline, options)

@@ -1,0 +1,21 @@
+# Test data for multi-spouse generation convergence
+# wife1 (Gen 1) - david (Gen 2) - wife2 (Gen 3)
+# Expected result: All become Gen 3.
+
+root_ancestor:
+  given-name: Root
+
+wife1:
+  given-name: WifeOne
+  father: root_ancestor
+  spouse: david
+
+david:
+  given-name: David
+  father: wife1
+  spouse: wife1, wife2
+
+wife2:
+  given-name: WifeTwo
+  father: david
+  spouse: david
