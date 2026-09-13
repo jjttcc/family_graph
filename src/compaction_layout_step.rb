@@ -1,28 +1,28 @@
+# vim: ts=2 sw=2 expandtab
 require_relative 'debug_logger'
-require_relative 'layout_strategy'
+require_relative 'layout_step'
 require_relative 'family_constants'
 
 # Identifies disconnected node islands at the same generation level
 # and compacts them horizontally to minimize wasted space.
-class CompactionLayoutStrategy < LayoutStrategy
+class CompactionLayoutStep < LayoutStep
   include Contracts::DSL
-# Performs the global compaction pass until no collisions or gaps exist.
-def apply(graph)
-  people = graph.instance_variable_get(:@people)
-  compact(graph, people)
-end
 
-def compact(graph, people)
-  # ... rest of the method
+  # Performs the global compaction pass until no collisions or gaps exist.
+  def execute(context)
+    people = context.people
+    compact(context, people)
+  end
 
+  def compact(context, people)
     # Extract nodes from people instead of global coordinates hash
     levels = {}
-    people.each do |id, person|
+    people.each_value do |person|
       coord = person.coordinate_set(nil)
       if coord
         y = coord[1]
         levels[y] ||= []
-        levels[y] << id
+        levels[y] << person.id
       end
     end
     # Keep compacting until a full pass completes with no shifts or we hit
@@ -54,7 +54,7 @@ def compact(graph, people)
               "and #{id2}. Shifting #{id2} by #{shift_amount} " +
               "(Pass #{pass_count})")
             p2 = people[id2]
-            block = connected_block(p2, graph)
+            block = connected_block(p2, context)
             block.each do |node|
               coord = node.coordinate_set(nil)
               if coord
@@ -69,7 +69,7 @@ def compact(graph, people)
           if gap > threshold then
             shift_amount = -(gap - SIBLING_SPACING)
             p = people[id2]
-            block = connected_block(p, graph)
+            block = connected_block(p, context)
             block.each do |node|
               coord = node.coordinate_set(nil)
               if coord
@@ -88,17 +88,17 @@ def compact(graph, people)
   private
 
   # All nodes connected to a person (spouses, children, descendants)
-  def connected_block(person, graph, visited = [])
+  def connected_block(person, context, visited = [])
     return [] if visited.include?(person.id)
     visited << person.id
     block = [person]
     # Add spouses and their subtrees
     person.spouses.each do |spouse|
-      block.concat(connected_block(spouse, graph, visited))
+      block.concat(connected_block(spouse, context, visited))
     end
     # Add children and their subtrees
-    graph.branches(person).each do |child|
-      block.concat(connected_block(child, graph, visited))
+    context.branches(person).each do |child|
+      block.concat(connected_block(child, context, visited))
     end
     block.uniq
   end

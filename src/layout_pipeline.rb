@@ -7,11 +7,16 @@ class LayoutPipeline < LayoutStrategy
     @strategies = strategies
   end
 
-  def apply(graph)
-    @strategies.each { |s| s.apply(graph) }
+  def execute(contxt)
+    @strategies.each { |s| s.execute(contxt) }
   end
 
-  def shift_subtree(person, amount, graph)
-    @strategies.each { |s| s.shift_subtree(person, amount, graph) if s.respond_to?(:shift_subtree) }
+  def shift_subtree(person, amount)
+    @strategies.each do |s|
+      if s.respond_to?(:shift_subtree) then
+        s.shift_subtree(person, amount)
+      end
+    end
   end
+
 end

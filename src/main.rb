@@ -3,12 +3,15 @@
 require 'debug'
 require 'optparse'
 require_relative 'data_loader'
-require_relative 'graph_orchestrator'
+require_relative 'layout_orchestrator'
 require_relative 'family_constants'
 require_relative 'layout_pipeline'
-require_relative 'initial_placement_strategy'
-require_relative 'compaction_layout_strategy'
-require_relative 'structural_alignment_strategy'
+require_relative 'hierarchical_placement_step'
+require_relative 'compaction_layout_step'
+require_relative 'structural_alignment_step'
+require_relative 'yaml_oracle_step'
+require_relative 'descendant_graph'
+require_relative 'hierarchy_analyzer'
 
 options = {
   root_ids: nil,
@@ -116,16 +119,13 @@ if roots.empty?
   exit 1
 end
 
-# Build graph with strategy
-layout_strategy = LayoutPipeline.new([
-  InitialPlacementStrategy.new,
-  StructuralAlignmentStrategy.new,
-  CompactionLayoutStrategy.new
-])
-graph = DescendantGraph.new(layout_strategy)
+# Build pipeline
+layout_pipeline = [
+  HierarchicalPlacementStep.new,
+#  StructuralAlignmentStep.new,
+#  CompactionLayoutStep.new,
+  YamlOracleStep.new(1)
+]
 
-# Compact is now called in Orchestrator after graph.build(roots)
-
-orchestrator = GraphOrchestrator.new(graph, roots, people, options)
+orchestrator = LayoutOrchestrator.new(roots, people, layout_pipeline, options)
 orchestrator.render
-

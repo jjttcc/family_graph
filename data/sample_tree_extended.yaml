@@ -1,0 +1,119 @@
+# Sample tree for testing - Expanded Multi-generation with Multiple Spouses and Baptism
+# Structure: 5 Generations (0-4), with Gen 4 (5th generation) having 4 individuals.
+
+root_ancestor_100:
+  given-name: Alice
+  surname: Doe
+  birth-date: 1850-01-01
+  death-date: 1930-05-15
+  note: Root ancestor.
+
+bob_doe_101:
+  given-name: Bob
+  surname: Doe
+  birth-date: 1848-06-20
+  death-date: 1925-10-10
+  spouse: root_ancestor_100
+
+# Original child (Gen 1)
+child_gen1_200:
+  given-name: Charlie
+  surname: Doe
+  birth-date: 1880-03-12
+  death-date: 1950-12-01
+  father: root_ancestor_100
+  mother: bob_doe_101
+
+# NEW Sibling (Gen 1)
+child_gen1_201:
+  given-name: Catherine
+  surname: Doe
+  birth-date: 1882-05-20
+  father: root_ancestor_100
+  mother: bob_doe_101
+
+# Multi-spouse person (Gen 2 - child of Gen 1)
+multi_spouse_400:
+  given-name: David
+  surname: Doe
+  birth-date: 1900-01-01
+  father: child_gen1_200
+  spouse: spouse_1, spouse_2
+
+spouse_1:
+  given-name: WifeOne
+  surname: Doe
+
+spouse_2:
+  given-name: WifeTwo
+  surname: Doe
+
+# Branch 1 (Gen 2)
+grandchild_gen2_300:
+  given-name: Diana
+  surname: Doe
+  birth-date: 1910-05-20
+  father: child_gen1_200
+  spouse: frank_smith_301
+
+frank_smith_301:
+  given-name: Frank
+  surname: Smith
+  birth-date: 1908-01-10
+
+# Branch 2 (Gen 2)
+grandchild_gen2_302:
+  given-name: Edward
+  surname: Doe
+  birth-date: 1912-02-15
+  father: child_gen1_200
+
+# Branch 3 (Gen 2 - child of Catherine)
+niece_gen2_600:
+  given-name: Grace
+  surname: Doe
+  birth-date: 1910-01-01
+  father: child_gen1_201
+
+# --- Gen 3 ---
+# Child of Diana (Branch 1)
+great_grandchild_gen3_400:
+  given-name: Fiona
+  surname: Doe
+  birth-date: 1940-06-10
+  father: grandchild_gen2_300
+  mother: frank_smith_301
+
+# Child of Edward (Branch 2)
+great_grandchild_b_303:
+  given-name: Earl
+  surname: Doe
+  birth-date: 1942-01-01
+  father: grandchild_gen2_302
+
+# --- Gen 4 (5th Generation) ---
+# Children of Fiona (Gen 3)
+gen4_child_1:
+  given-name: Gen4-One
+  surname: Doe
+  birth-date: 1970-01-01
+  mother: great_grandchild_gen3_400
+
+gen4_child_2:
+  given-name: Gen4-Two
+  surname: Doe
+  birth-date: 1972-01-01
+  mother: great_grandchild_gen3_400
+
+# Children of Earl (Gen 3)
+gen4_child_3:
+  given-name: Gen4-Three
+  surname: Doe
+  birth-date: 1974-01-01
+  father: great_grandchild_b_303
+
+gen4_child_4:
+  given-name: Gen4-Four
+  surname: Doe
+  birth-date: 1976-01-01
+  father: great_grandchild_b_303

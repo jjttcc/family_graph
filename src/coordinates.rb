@@ -1,7 +1,7 @@
 require 'ruby_contracts'
 
 # Repository of coordinates and spousal pairings used to construct
-# the final genealogical graph.
+# the graphic layout
 class Coordinates
   include Contracts::DSL
 
