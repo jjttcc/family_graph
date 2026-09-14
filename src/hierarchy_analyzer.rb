@@ -25,15 +25,15 @@ class HierarchyAnalyzer
   # generations mapping, if it has not already been assigned.
   def assign_generation(person, generations)
     if !generations.key?(person.id) then
-      generations[person.id] = calculate_generation(person, generations)
+      generations[person.id] = calculated_generation(person, generations)
     end
   end
 
-  # Calculate and return the generation value of the specified person
-  # recursively, tracing parents back to root ancestors. Caches and
-  # returns the calculated value in the generations mapping.
+  # The generation value of the specified person, "calculated" recursively -
+  # tracing parents back to root ancestors.
+  # Side effect: Caches the calculated value in the generations mapping.
   post :not_nil do |result| result != nil end
-  def calculate_generation(person, generations)
+  def calculated_generation(person, generations)
     result = nil
     if generations.key?(person.id) then
       result = generations[person.id]
@@ -42,7 +42,7 @@ class HierarchyAnalyzer
       generations[person.id] = result
     else
       max_parent_gen = person.parents.map { |p|
-        calculate_generation(p, generations)
+        calculated_generation(p, generations)
       }.max
       result = max_parent_gen + 1
       generations[person.id] = result

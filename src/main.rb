@@ -17,7 +17,8 @@ options = {
   direction: :none,
   traversal: :descendant,
   output_dir: Dir.pwd,
-  label_mode: :dates
+  label_mode: :dates,
+  stop_at_stage: 3 # Default to running full pipeline
 }
 
 parser = OptionParser.new do |opts|
@@ -50,6 +51,10 @@ parser = OptionParser.new do |opts|
   end
   opts.on("-o", "--output DIR", "output directory (default: .)") do |v|
     options[:output_dir] = v
+  end
+  opts.on("-s", "--stop-at-stage STAGE", Integer,
+          "Stop after the specified stage number") do |v|
+    options[:stop_at_stage] = v
   end
   opts.on("-l", "--list-all", "list all person IDs") do
     options[:list_all] = true
@@ -115,17 +120,33 @@ end
 roots = root_ids.map { |id| people[id] }
 
 if roots.empty?
-  puts "Error: No roots to render."
-  exit 1
+  puts "Warning: No roots to render."
+  exit 0
 end
 
 # Build pipeline
-layout_pipeline = [
+full_pipeline = [
   HierarchicalPlacementStep.new,
-#  StructuralAlignmentStep.new,
-#  CompactionLayoutStep.new,
-  YamlOracleStep.new("oracle_stage_1.yaml")
+  YamlOracleStep.new("oracle_stage_1.yaml"),
+  StructuralAlignmentStep.new,
+  YamlOracleStep.new("oracle_stage_2.yaml"),
+  CompactionLayoutStep.new,
+  YamlOracleStep.new("oracle_stage_3.yaml"),
 ]
+
+# Truncate pipeline based on stop_at_stage
+# Map stages to pipeline indices:
+# Stage 1: Index 0, 1
+# Stage 2: Index 2
+# Stage 3: Index 3
+stop_index = case options[:stop_at_stage]
+             when 1 then 1
+             when 2 then 3
+             when 3 then 5
+             else 3
+             end
+
+layout_pipeline = full_pipeline[0..stop_index]
 
 orchestrator = LayoutOrchestrator.new(roots, people, layout_pipeline, options)
 orchestrator.render
