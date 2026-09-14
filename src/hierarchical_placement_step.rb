@@ -20,7 +20,7 @@ class HierarchicalPlacementStep < LayoutStep
     # Recursively traverse branches first
     context.branches(person).each { |child| traverse_and_place(child, context) }
 
-    if person.has_spouse
+    if person.has_spouse then
       place_couple(person, person.spouse, context)
     else
       place_individual(person, context)
@@ -33,7 +33,7 @@ class HierarchicalPlacementStep < LayoutStep
     branches = context.branches(person)
     current_next_x = coordinates.next_x(y)
     
-    if branches.empty?
+    if branches.empty? then
       x = current_next_x
       DebugLogger.log("DEBUG: Placing #{person.id} (OID: #{person.object_id}) at X=#{x}, Y=#{y}. Next_x was #{current_next_x}")
       context.update_person(person, x, y)
@@ -44,7 +44,7 @@ class HierarchicalPlacementStep < LayoutStep
       midpoint = (branch_xs.min + branch_xs.max) / 2
       parent_x = midpoint
       DebugLogger.log("DEBUG: Placing #{person.id} (parent of #{branches.map(&:id).join(',')}) at X=#{parent_x}, Y=#{y}. Next_x was #{current_next_x}")
-      if parent_x < current_next_x
+      if parent_x < current_next_x then
         shift_amount = current_next_x - parent_x
         DebugLogger.log("DEBUG: Shifting subtree of #{person.id} by #{shift_amount} to account for Next_x")
         shift_subtree(person, shift_amount, context)
@@ -60,7 +60,7 @@ class HierarchicalPlacementStep < LayoutStep
     y = spouse1.generation * LEVEL_HEIGHT
     branches = context.branches(spouse1)
     coordinates.add_couple(spouse1.id, spouse2.id)
-    if branches.empty?
+    if branches.empty? then
       x1 = coordinates.next_x(y)
       x2 = x1 + COUPLE_SPACING
       context.update_person(spouse1, x1, y)
@@ -72,7 +72,7 @@ class HierarchicalPlacementStep < LayoutStep
       midpoint = (branch_xs.min + branch_xs.max) / 2
       parent_x1 = midpoint - (COUPLE_SPACING / 2)
       parent_x2 = parent_x1 + COUPLE_SPACING
-      if parent_x1 < coordinates.next_x(y)
+      if parent_x1 < coordinates.next_x(y) then
         shift_amount = coordinates.next_x(y) - parent_x1
         shift_subtree(spouse1, shift_amount, context)
         parent_x1 = coordinates.next_x(y)
@@ -86,9 +86,9 @@ class HierarchicalPlacementStep < LayoutStep
 
   def shift_subtree(person, amount, context)
     coordinates = context.coordinates
-    if !person.nil?
+    if !person.nil? then
       coord = person.coordinate_set(nil)
-      if coord
+      if coord then
         DebugLogger.log("DEBUG: Shifting node #{person.id} by #{amount}")
         x, y = coord
         new_x = x + amount
@@ -97,14 +97,15 @@ class HierarchicalPlacementStep < LayoutStep
         coordinates.update_next_x(y, [
           coordinates.next_x(y), new_x + SIBLING_SPACING].max)
       end
-      if person.has_spouse
+      if person.has_spouse then
         person.spouses.each do |spouse|
           coord = spouse.coordinate_set(nil)
-          if coord
-            DebugLogger.log("DEBUG: Shifting spouse #{spouse.id} of #{person.id} by #{amount}")
+          if coord then
+            DebugLogger.log("DEBUG: Shifting spouse #{spouse.id} of " +
+                            "#{person.id} by #{amount}")
             x, y = coord
             new_x = x + amount
-            spouse.add_coordinate_set(new_x, y, nil)
+            spouse.add_coordinate_set(new_x, y, person.id)
             coordinates.add_node(spouse.id, new_x, y)
             coordinates.update_next_x(y, [
               coordinates.next_x(y), new_x + SIBLING_SPACING].max)

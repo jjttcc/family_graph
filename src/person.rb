@@ -26,6 +26,8 @@ class Person
   public  ###  Access
 
   # The coordinate set for self's relation to the person with person_id
+  #   - person.coordinate_set(nil) is the coordinate set for 'person'.
+  #   - person.coordinate_set(spouse.id) is the coordinate set for 'spouse'.
   def coordinate_set(person_id = nil)
     result = @coordinate_sets[person_id]
     if result.nil?
@@ -64,7 +66,7 @@ class Person
 
   public  ###  Boolean queries
 
-  # Does self have a spouse?
+  # Does self have one or more spouses?
   def has_spouse
     !@spouses.empty?
   end
@@ -87,7 +89,7 @@ class Person
   end
 
   # Add the specified coordinate set with respect to the relation to
-  # the person with person_id.
+  # the person with person_id (who could be, for example, a spouse).
   def add_coordinate_set(x, y, person_id = nil)
     DebugLogger.log("DEBUG: Storing coord for #{id} " +
       "(OID: #{self.object_id}): (#{x}, #{y}) for #{person_id.inspect}")
