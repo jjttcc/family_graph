@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require_relative '../src/data_loader'
 require_relative '../src/hierarchy_analyzer'
 
@@ -24,8 +26,11 @@ ha.calculate_and_assign_generations(people)
 
 puts "Verifying generations..."
 
-assert(people['wife1'].generation == 3, "wife1 should be Gen 3, is #{people['wife1'].generation}")
-assert(people['david'].generation == 3, "david should be Gen 3, is #{people['david'].generation}")
-assert(people['wife2'].generation == 3, "wife2 should be Gen 3, is #{people['wife2'].generation}")
+assert(people['wife1'].generation == 3,
+       "wife1 should be Gen 3, is #{people['wife1'].generation}")
+assert(people['david'].generation == 3,
+       "david should be Gen 3, is #{people['david'].generation}")
+assert(people['wife2'].generation == 3,
+       "wife2 should be Gen 3, is #{people['wife2'].generation}")
 
 puts "All assertions PASSED!"

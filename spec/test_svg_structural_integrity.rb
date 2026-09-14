@@ -23,7 +23,9 @@ svg_file = svg_files.max_by { |f| File.mtime(f) }
 svg_content = File.read(svg_file)
 
 # Count parent-child lines (those without stroke-dasharray)
-parent_child_lines = svg_content.scan(/<line[^>]*stroke="black"[^>]*>/).reject { |l| l.include?('stroke-dasharray') }.size
+parent_child_lines = svg_content.scan(
+  /<line[^>]*stroke="black"[^>]*>/).reject {
+    |l| l.include?('stroke-dasharray') }.size
 
 # Count spousal lines (those with stroke-dasharray="4")
 spousal_lines = svg_content.scan(/stroke-dasharray="4"/).size

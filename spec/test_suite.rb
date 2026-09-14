@@ -1,16 +1,16 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
 
 require_relative '../src/data_loader'
 require_relative '../src/family_constants'
 require_relative '../src/coordinates'
-require_relative '../src/descendant_graph'
 require_relative '../src/graph_renderer'
 require_relative '../src/hierarchy_analyzer'
 require_relative '../src/layout_pipeline'
-require_relative '../src/initial_placement_strategy'
+require_relative '../src/hierarchical_placement_step'
+require_relative '../src/layout_context'
 
 def assert(condition, message)
-  unless condition
+  if !condition then
     puts "Assertion Failed: #{message}"
     exit 1
   end
@@ -24,16 +24,21 @@ coords = Coordinates.new
 coords.add_node('person_1', 100, 200)
 coords.add_node('person_2', 150, 200)
 
-assert(coords.has_node?('person_1'), "person_1 should exist in coordinates")
-assert(coords.node('person_1') == [100, 200], "person_1 coordinates mismatched")
-assert(!coords.has_node?('person_3'), "person_3 should not exist in coordinates")
+assert(coords.has_node?('person_1'),
+       "person_1 should exist in coordinates")
+assert(coords.node('person_1') == [100, 200],
+       "person_1 coordinates mismatched")
+assert(!coords.has_node?('person_3'),
+       "person_3 should not exist in coordinates")
 
 # Add spouses and check uniqueness/sorting
 coords.add_couple('person_1', 'person_2')
 coords.add_couple('person_2', 'person_1') # Duplicate with reversed order
 
-assert(coords.couples.size == 1, "Should only have 1 spousal couple registered")
-assert(coords.couples.first == ['person_1', 'person_2'].sort, "Spouse pairing sorting failed")
+assert(coords.couples.size == 1,
+       "Should only have 1 spousal couple registered")
+assert(coords.couples.first == ['person_1', 'person_2'].sort,
+       "Spouse pairing sorting failed")
 
 puts "Coordinates class verification PASSED!"
 
@@ -42,7 +47,6 @@ data_path = File.join(__dir__, '..', 'data', 'sample_tree.yaml')
 people = DataLoader.load(data_path)
 puts "Successfully loaded #{people.size} people."
 
-# Define test cases: { id => expected_children_count }
 test_cases = {
   'root_ancestor_100' => 2,
   'bob_doe_101' => 1,
@@ -54,7 +58,6 @@ test_cases = {
   'multi_spouse_400' => 0,
   'baptism_test_person_500' => 0
 }
-
 
 puts "Running extensive structural assertions..."
 
@@ -69,52 +72,53 @@ end
 puts "All #{test_cases.size} structural assertions PASSED!"
 
 # 3. Layout Engine Verification
-puts "Verifying Layout Engine (Graph)..."
-# Find root dynamically (no parent)
+puts "Verifying Layout Engine (Modern Pipeline)..."
 root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
-puts "  Testing DescendantGraph..."
-HierarchyAnalyzer.calculate_generations(people)
-des_graph = DescendantGraph.new(LayoutPipeline.new([InitialPlacementStrategy.new]))
-des_graph.instance_variable_set(:@roots, [root_person])
-des_graph.build([root_person])
-layout_coords = des_graph.coordinates
+
+HierarchyAnalyzer.new.calculate_and_assign_generations(people)
+context = LayoutContext.new(people,
+                            [root_person],
+                            Coordinates.new,
+                            :descendant)
+pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
+pipeline.execute(context)
+layout_coords = context.coordinates
 
 # Verify coordinates generated for root and spouse
-assert(layout_coords.has_node?(root_person.id), "Root should have coordinates")
-if root_person.has_spouse
-  assert(layout_coords.has_node?(root_person.spouse.id), "Root spouse should have coordinates")
+assert(layout_coords.has_node?(root_person.id),
+       "Root should have coordinates")
+if root_person.has_spouse then
+  assert(layout_coords.has_node?(root_person.spouse.id),
+         "Root spouse should have coordinates")
 end
 
 root_x, root_y = layout_coords.node(root_person.id)
 assert(root_y == 0, "Root should be at level 0")
 
-if root_person.has_spouse
+if root_person.has_spouse then
   spouse_x, spouse_y = layout_coords.node(root_person.spouse.id)
   assert(spouse_y == 0, "Spouse should be at level 0")
-  assert((spouse_x - root_x).abs == COUPLE_SPACING, "Spouses should be separated by couple spacing")
+  assert((spouse_x - root_x).abs == COUPLE_SPACING,
+         "Spouses should be separated by couple spacing")
 end
 
 # Verify children are positioned centered beneath the couple
-# (Only check if they have children)
-if !root_person.children.empty?
+if !root_person.children.empty? then
   children = root_person.children
   child_xs = children.map { |c| layout_coords.node(c.id)[0] }
   midpoint = (child_xs.min + child_xs.max) / 2
 
-  if root_person.has_spouse
-    couple_midpoint = (root_x + layout_coords.node(root_person.spouse.id)[0]) / 2
-    assert((midpoint - couple_midpoint).abs < 1, "Children should be centered beneath root couple midpoint")
+  if root_person.has_spouse then
+    spouse_id = root_person.spouse.id
+    spouse_x = layout_coords.node(spouse_id)[0]
+    couple_midpoint = (root_x + spouse_x) / 2
+    assert((midpoint - couple_midpoint).abs < 1,
+           "Children should be centered beneath root couple midpoint")
   else
-    assert((midpoint - root_x).abs < 1, "Children should be centered beneath root")
+    assert((midpoint - root_x).abs < 1,
+           "Children should be centered beneath root")
   end
-end
-
-
-# Print coordinates for visual baseline check
-puts "\nGenerated Coordinates Baseline (Descendant):"
-layout_coords.nodes.sort_by { |k, v| [v[1], v[0]] }.each do |id, (x, y)|
-  puts "  #{id.ljust(25)}: (#{x.to_s.rjust(4)}, #{y.to_s.rjust(3)})"
 end
 
 puts "\nLayout Engine verification PASSED!"
@@ -124,18 +128,17 @@ puts "Verifying SVG Renderer..."
 output_dir = File.join(__dir__, '..', 'output')
 Dir.mkdir(output_dir) unless Dir.exist?(output_dir)
 renderer = GraphRenderer.new(layout_coords, people)
-renderer.render(output_dir)
+renderer.render(output_dir, 'suite_test')
 
-# Assert that at least one SVG exists in the directory
-svg_files = Dir.glob(File.join(output_dir, "*.svg"))
-assert(!svg_files.empty?, "SVG output file was not created in #{output_dir}")
+svg_files = Dir.glob(File.join(output_dir, "family_tree_suite_test_*.svg"))
+assert(!svg_files.empty?,
+       "SVG output file was not created in #{output_dir}")
 
-# Verify the '+' indicator for multi_spouse_400
 latest_svg = svg_files.max_by { |f| File.mtime(f) }
 svg_content = File.read(latest_svg)
-assert(svg_content.include?("David Doe +"), "Multi-spouse person 'David Doe' should have '+' indicator")
-# Verify the '[bap]' indicator for baptism_test_person_500
-assert(svg_content.include?("1950-01-01 [bap]"), "Baptism person 'Baptism Test' should have '[bap]' indicator")
+assert(svg_content.include?("David Doe +"),
+       "Multi-spouse person 'David Doe' should have '+' indicator")
+assert(svg_content.include?("1950-01-01 [bap]"),
+       "Baptism person 'Baptism Test' should have '[bap]' indicator")
 
 puts "SVG Renderer verification PASSED!"
-

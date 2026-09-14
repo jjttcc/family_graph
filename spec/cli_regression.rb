@@ -5,7 +5,7 @@ require 'fileutils'
 require 'tmpdir'
 
 def assert(condition, message)
-  unless condition
+  if !condition then
     puts "Assertion Failed: #{message}"
     exit 1
   end
@@ -49,21 +49,25 @@ assert(out.include?("root_ancestor_100"), "List-roots should contain root ID")
 Dir.mktmpdir do |tmpdir|
   out, status = run_cli("-i child_gen1_200 data/sample_tree.yaml -o #{tmpdir}")
   assert(status == 0, "Root ID flag should exit with 0")
-  assert(Dir.glob(File.join(tmpdir, "family_tree_child_gen1_200_*.svg")).any?, "SVG should be generated")
+  glob_pattern = File.join(tmpdir, "family_tree_child_gen1_200_*.svg")
+  assert(Dir.glob(glob_pattern).any?, "SVG should be generated")
 end
 
 # Test -i / --root (Multiple roots, unified rendering)
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("-i child_gen1_200,baptism_test_person_500 data/sample_tree.yaml -o #{tmpdir}")
+  out, status = run_cli("-i child_gen1_200,baptism_test_person_500 " \
+                        "data/sample_tree.yaml -o #{tmpdir}")
   assert(status == 0, "Multiple Root IDs flag should exit with 0")
-  assert(Dir.glob(File.join(tmpdir, "family_tree_unified_*.svg")).any?, "Unified SVG should be generated for multiple roots")
+  glob_pattern = File.join(tmpdir, "family_tree_unified_*.svg")
+  assert(Dir.glob(glob_pattern).any?, "Unified SVG should be generated")
 end
 
-# Test -i / --root (All roots)
+# Test -i / --root (All roots) - Now implicitly handled
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("-i {all} data/sample_tree.yaml -o #{tmpdir}")
-  assert(status == 0, "All root IDs flag should exit with 0")
-  assert(Dir.glob(File.join(tmpdir, "family_tree_unified_*.svg")).any?, "Unified SVG should be generated for all roots")
+  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir}")
+  assert(status == 0, "Default root (all) should exit with 0")
+  glob_pattern = File.join(tmpdir, "family_tree_unified_*.svg")
+  assert(Dir.glob(glob_pattern).any?, "Unified SVG should be generated")
 end
 
 # Test -d / --direction

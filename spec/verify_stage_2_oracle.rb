@@ -15,7 +15,8 @@ FileUtils.mkdir_p('test/candidates')
 
 # 1. Run the pipeline
 puts "Running pipeline on #{DATA_PATH} up to Stage 2..."
-system("./bin/family_graph -m ids #{DATA_PATH} -s 2 -o /tmp/test_dir -d ancestry -t descendant > /dev/null")
+system("./bin/family_graph -m ids #{DATA_PATH} -s 2 -o " +
+       "/tmp/test_dir -d ancestry -t descendant > /dev/null")
 
 # Move the generated candidate to the test/candidates location
 # Note: YamlOracleStep currently writes to hardcoded files based on name.

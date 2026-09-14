@@ -25,8 +25,7 @@ parser = OptionParser.new do |opts|
   opts.banner = "Usage: family_graph <data-path1> ... [options]"
   opts.summary_width = 30
   opts.on("-i", "--root ID1,ID2", Array,
-          "Comma-separated list of Root IDs",
-          "({all} for all roots)") do |v|
+          "Comma-separated list of Root IDs") do |v|
     options[:root_ids] = v
   end
   opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",
@@ -137,13 +136,13 @@ full_pipeline = [
 # Truncate pipeline based on stop_at_stage
 # Map stages to pipeline indices:
 # Stage 1: Index 0, 1
-# Stage 2: Index 2
-# Stage 3: Index 3
+# Stage 2: Index 2, 3
+# Stage 3: Index 4, 5
 stop_index = case options[:stop_at_stage]
              when 1 then 1
              when 2 then 3
              when 3 then 5
-             else 3
+             else 5
              end
 
 layout_pipeline = full_pipeline[0..stop_index]

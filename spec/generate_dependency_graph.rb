@@ -9,7 +9,6 @@ puts "  node [shape=box];"
 Dir.glob("src/*.rb").each do |file|
   filename = File.basename(file, '.rb')
   puts "  #{filename};"
-  
   File.readlines(file).each do |line|
     if line =~ /require_relative\s+['"](.+)['"]/
       dependency = $1

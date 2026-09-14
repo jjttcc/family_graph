@@ -28,7 +28,7 @@ Dir.mktmpdir do |tmpdir|
   svg_files = Dir.glob(File.join(tmpdir, "*.svg"))
   svg_content = File.read(svg_files.first)
   assert(svg_content.include?("marker-end=\"url(#arrowhead)\""), 
-         "Direction :descent should have arrowhead markers on parent-child lines")
+    "Direction :descent should have arrowhead markers on parent-child lines")
 end
 
 puts "Direction (-d) test PASSED!"

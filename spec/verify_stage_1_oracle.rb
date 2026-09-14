@@ -21,7 +21,8 @@ FileUtils.mkdir_p('test/candidates')
 # For now, let's run the CLI and move the result.
 
 puts "Running pipeline on #{DATA_PATH}..."
-system("./bin/family_graph -m ids #{DATA_PATH} -o /tmp/test_dir -d ancestry -t descendant > /dev/null")
+system("./bin/family_graph -m ids #{DATA_PATH} -o " +
+       "/tmp/test_dir -d ancestry -t descendant > /dev/null")
 
 # Move the generated oracle_stage_1.yaml to the candidate location
 if File.exist?('oracle_stage_1.yaml')
