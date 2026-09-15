@@ -13,16 +13,22 @@ class LayoutContext
   end
 
   def branches(person)
-    @traversal_direction == :ancestor ? person.parents : person.children
+    @traversal_direction == ANCESTOR ? person.parents : person.children
   end
 
-  def update_person(person, x, y)
+  #!!!TO-DO: explain what 'other_person_id = nil' means!!!
+  def update_person(person, x, y, other_person_id = nil)
+    person.send(:add_coordinate_set, x, y, other_person_id)
+    @coordinates.add_node(person.id, x, y)
+  end
+
+  def old__update_person(person, x, y)
     person.add_coordinate_set(x, y, nil)
     @coordinates.add_node(person.id, x, y)
   end
 
   def shift_person(person, dx, dy)
-    coord = person.coordinate_set(nil)
+    coord = person.self_coordinates
     return unless coord
     update_person(person, coord[0] + dx, coord[1] + dy)
   end
@@ -40,4 +46,5 @@ class LayoutContext
   def coordinates
     @coordinates
   end
+
 end

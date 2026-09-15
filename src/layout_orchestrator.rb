@@ -16,7 +16,7 @@ class LayoutOrchestrator
     @options = options
     @coordinates = Coordinates.new # Local coordinate management
     @context = LayoutContext.new(people, roots, @coordinates,
-                                 options[:traversal])
+                                 options[TRAVERSAL])
   end
 
   # Runs the layout pipeline and renders the graph.
@@ -29,7 +29,7 @@ class LayoutOrchestrator
     puts "Rendering SVG..."
     people = context.people
     renderer = GraphRenderer.new(context.coordinates, people,
-                                 options[:direction],
+                                 options[DIRECTION],
                                  options[:label_mode])
     # Use the pre-determined roots
     root_ids = context.roots.map(&:id)

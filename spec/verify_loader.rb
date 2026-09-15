@@ -32,7 +32,9 @@ begin
     puts "Verification for: #{person_id}"
     puts "  Given name: #{person.send('given-name')}"
     puts "  Has spouse: #{person.has_spouse}"
-    puts "  Spouse: #{person.spouse.id if person.has_spouse}"
+    person.spouses.each do |spouse|
+      puts "  Spouse: #{spouse.id}"
+    end
   else
     puts "Person #{person_id} not found."
   end

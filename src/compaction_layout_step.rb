@@ -18,7 +18,7 @@ class CompactionLayoutStep < LayoutStep
     # Extract nodes from people instead of global coordinates hash
     levels = {}
     people.each_value do |person|
-      coord = person.coordinate_set(nil)
+      coord = person.self_coordinates
       if coord
         y = coord[1]
         levels[y] ||= []
@@ -38,13 +38,13 @@ class CompactionLayoutStep < LayoutStep
       end
       shifted = false
       levels.each do |y, node_ids|
-        sorted_ids = node_ids.sort_by { |id| people[id].coordinate_set(nil)[0] }
+        sorted_ids = node_ids.sort_by { |id| people[id].self_coordinates[0] }
         threshold = SIBLING_SPACING * 2
         sorted_ids.each_with_index do |id1, i|
           next if i == sorted_ids.size - 1
           id2 = sorted_ids[i+1]
-          x1 = people[id1].coordinate_set(nil)[0]
-          x2 = people[id2].coordinate_set(nil)[0]
+          x1 = people[id1].self_coordinates[0]
+          x2 = people[id2].self_coordinates[0]
           # Ensure minimum separation
           min_separation = NODE_WIDTH + 20
           # 1. Check for Overlaps (Too Close)
@@ -56,7 +56,7 @@ class CompactionLayoutStep < LayoutStep
             p2 = people[id2]
             block = connected_block(p2, context)
             block.each do |node|
-              coord = node.coordinate_set(nil)
+              coord = node.self_coordinates
               if coord
                 context.update_person(node, coord[0] + shift_amount, coord[1])
               end
@@ -71,7 +71,7 @@ class CompactionLayoutStep < LayoutStep
             p = people[id2]
             block = connected_block(p, context)
             block.each do |node|
-              coord = node.coordinate_set(nil)
+              coord = node.self_coordinates
               if coord
                 context.update_person(node, coord[0] + shift_amount, coord[1])
               end

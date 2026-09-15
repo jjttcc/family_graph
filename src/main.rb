@@ -14,8 +14,8 @@ require_relative 'hierarchy_analyzer'
 
 options = {
   root_ids: nil,
-  direction: :none,
-  traversal: :descendant,
+  DIRECTION: NONE,
+  TRAVERSAL: DESCENDANT,
   output_dir: Dir.pwd,
   label_mode: :dates,
   stop_at_stage: 3 # Default to running full pipeline
@@ -31,18 +31,18 @@ parser = OptionParser.new do |opts|
   opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",
           "descent/d, none/n)") do |v|
     case v
-    when 'a', 'ancestry' then options[:direction] = :ancestry
-    when 'd', 'descent'  then options[:direction] = :descent
-    when 'n', 'none'     then options[:direction] = :none
+    when 'a', 'ancestry' then options[DIRECTION] = ANCESTRY
+    when 'd', 'descent'  then options[DIRECTION] = DESCENT
+    when 'n', 'none'     then options[DIRECTION] = NONE
     else
       puts "Error: Invalid direction '#{v}'. " +
         "Use ancestry/a, descent/d, or none/n."
       exit 1
     end
   end
-  opts.on("-t", "--traversal TYPE", [:ancestor, :descendant],
+  opts.on("-t", "--traversal TYPE", [ANCESTOR, DESCENDANT],
           "traversal type (ancestor/descendant)") do |v|
-    options[:traversal] = v
+    options[TRAVERSAL] = v
   end
   opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
           "label mode (dates, ids, both)") do |v|

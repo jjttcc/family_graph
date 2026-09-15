@@ -18,10 +18,13 @@ class HierarchicalPlacementStep < LayoutStep
 
   def traverse_and_place(person, context)
     # Recursively traverse branches first
-    context.branches(person).each { |child| traverse_and_place(child, context) }
-
+    context.branches(person).each do |child|
+      traverse_and_place(child, context)
+    end
     if person.has_spouse then
-      place_couple(person, person.spouse, context)
+      person.spouses.each do |spouse|
+        place_couple(person, spouse, context)
+      end
     else
       place_individual(person, context)
     end
@@ -32,21 +35,19 @@ class HierarchicalPlacementStep < LayoutStep
     y = person.generation * LEVEL_HEIGHT
     branches = context.branches(person)
     current_next_x = coordinates.next_x(y)
-    
     if branches.empty? then
       x = current_next_x
-      DebugLogger.log("DEBUG: Placing #{person.id} (OID: #{person.object_id}) at X=#{x}, Y=#{y}. Next_x was #{current_next_x}")
+      DebugLogger.log("DEBUG: Placing #{person.id} at X=#{x}, Y=#{y}.")
       context.update_person(person, x, y)
       coordinates.update_next_x(y, x + SIBLING_SPACING)
     else
       # Center over branches
-      branch_xs = branches.map { |br| br.coordinate_set(nil)[0] }
+      branch_xs = branches.map { |br| br.self_coordinates[0] }
       midpoint = (branch_xs.min + branch_xs.max) / 2
       parent_x = midpoint
-      DebugLogger.log("DEBUG: Placing #{person.id} (parent of #{branches.map(&:id).join(',')}) at X=#{parent_x}, Y=#{y}. Next_x was #{current_next_x}")
+      DebugLogger.log("DEBUG: Placing #{person.id} at X=#{parent_x}, Y=#{y}.")
       if parent_x < current_next_x then
         shift_amount = current_next_x - parent_x
-        DebugLogger.log("DEBUG: Shifting subtree of #{person.id} by #{shift_amount} to account for Next_x")
         shift_subtree(person, shift_amount, context)
         parent_x = current_next_x
       end
@@ -63,12 +64,12 @@ class HierarchicalPlacementStep < LayoutStep
     if branches.empty? then
       x1 = coordinates.next_x(y)
       x2 = x1 + COUPLE_SPACING
-      context.update_person(spouse1, x1, y)
-      context.update_person(spouse2, x2, y)
+      context.update_person(spouse1, x1, y, spouse2.id)
+      context.update_person(spouse2, x2, y, spouse1.id)
       coordinates.update_next_x(y, x2 + SIBLING_SPACING)
     else
       # Center over branches
-      branch_xs = branches.map { |b| b.coordinate_set(nil)[0] }
+      branch_xs = branches.map { |b| b.self_coordinates[0] }
       midpoint = (branch_xs.min + branch_xs.max) / 2
       parent_x1 = midpoint - (COUPLE_SPACING / 2)
       parent_x2 = parent_x1 + COUPLE_SPACING
@@ -78,43 +79,27 @@ class HierarchicalPlacementStep < LayoutStep
         parent_x1 = coordinates.next_x(y)
         parent_x2 = parent_x1 + COUPLE_SPACING
       end
-      context.update_person(spouse1, parent_x1, y)
-      context.update_person(spouse2, parent_x2, y)
+      context.update_person(spouse1, parent_x1, y, spouse2.id)
+      context.update_person(spouse2, parent_x2, y, spouse1.id)
       coordinates.update_next_x(y, parent_x2 + SIBLING_SPACING)
     end
   end
 
   def shift_subtree(person, amount, context)
     coordinates = context.coordinates
-    if !person.nil? then
-      coord = person.coordinate_set(nil)
-      if coord then
-        DebugLogger.log("DEBUG: Shifting node #{person.id} by #{amount}")
-        x, y = coord
+    if ! person.nil? then
+      # Update all existing coordinate sets for this person
+      person.coordinate_sets.each do |context_id, (x, y)|
         new_x = x + amount
-        person.add_coordinate_set(new_x, y, nil)
+        context.update_person(person, new_x, y, context_id)
         coordinates.add_node(person.id, new_x, y)
         coordinates.update_next_x(y, [
           coordinates.next_x(y), new_x + SIBLING_SPACING].max)
-      end
-      if person.has_spouse then
-        person.spouses.each do |spouse|
-          coord = spouse.coordinate_set(nil)
-          if coord then
-            DebugLogger.log("DEBUG: Shifting spouse #{spouse.id} of " +
-                            "#{person.id} by #{amount}")
-            x, y = coord
-            new_x = x + amount
-            spouse.add_coordinate_set(new_x, y, person.id)
-            coordinates.add_node(spouse.id, new_x, y)
-            coordinates.update_next_x(y, [
-              coordinates.next_x(y), new_x + SIBLING_SPACING].max)
-          end
-        end
       end
       context.branches(person).each do |branch|
         shift_subtree(branch, amount, context)
       end
     end
   end
+
 end

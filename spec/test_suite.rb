@@ -89,18 +89,22 @@ layout_coords = context.coordinates
 assert(layout_coords.has_node?(root_person.id),
        "Root should have coordinates")
 if root_person.has_spouse then
-  assert(layout_coords.has_node?(root_person.spouse.id),
-         "Root spouse should have coordinates")
+  root_person.spouses.each do |spouse|
+    assert(layout_coords.has_node?(spouse.id),
+           "Root spouse should have coordinates")
+  end
 end
 
 root_x, root_y = layout_coords.node(root_person.id)
 assert(root_y == 0, "Root should be at level 0")
 
 if root_person.has_spouse then
-  spouse_x, spouse_y = layout_coords.node(root_person.spouse.id)
-  assert(spouse_y == 0, "Spouse should be at level 0")
-  assert((spouse_x - root_x).abs == COUPLE_SPACING,
-         "Spouses should be separated by couple spacing")
+  root_person.spouses.each do |spouse|
+    spouse_x, spouse_y = layout_coords.node(spouse.id)
+    assert(spouse_y == 0, "Spouse should be at level 0")
+    assert((spouse_x - root_x).abs == COUPLE_SPACING,
+           "Spouses should be separated by couple spacing")
+  end
 end
 
 # Verify children are positioned centered beneath the couple
@@ -110,11 +114,13 @@ if !root_person.children.empty? then
   midpoint = (child_xs.min + child_xs.max) / 2
 
   if root_person.has_spouse then
-    spouse_id = root_person.spouse.id
-    spouse_x = layout_coords.node(spouse_id)[0]
-    couple_midpoint = (root_x + spouse_x) / 2
-    assert((midpoint - couple_midpoint).abs < 1,
-           "Children should be centered beneath root couple midpoint")
+    root_person.spouses.each do |spouse|
+      spouse_id = spouse.id
+      spouse_x = layout_coords.node(spouse_id)[0]
+      couple_midpoint = (root_x + spouse_x) / 2
+      assert((midpoint - couple_midpoint).abs < 1,
+             "Children should be centered beneath root couple midpoint")
+    end
   else
     assert((midpoint - root_x).abs < 1,
            "Children should be centered beneath root")

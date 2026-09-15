@@ -9,11 +9,12 @@ class Person
 
   public
 
-  attr_reader :id, :children, :generation
+  attr_reader :id, :children, :generation, :coordinate_sets
   attr_accessor :spouses, :father, :mother
 
   public  ###  Initialization
 
+  post :invariant do invariant end
   def initialize(id, data = {})
     @id = id
     DebugLogger.log("DEBUG: Creating Person #{id} (OID: #{self.object_id}")
@@ -21,14 +22,30 @@ class Person
     @spouses = []
     @children = []
     @coordinate_sets = {} # Maps spouse_id (or nil) to [x, y]
+    @coordinate_sets[SELF] = [0, 0]
   end
 
   public  ###  Access
 
+  def given_name
+    @data[GNAME]
+  end
+
+  def surname
+    @data[SURNAME]
+  end
+
+  public  ### Retrieval
+
   # The coordinate set for self's relation to the person with person_id
-  #   - person.coordinate_set(nil) is the coordinate set for 'person'.
-  #   - person.coordinate_set(spouse.id) is the coordinate set for 'spouse'.
+  #   - person.coordinate_set [no args] is the coordinate set for the
+  #     person itself.
+  #   - person.coordinate_set(spousex.id) is the coordinate set for
+  #     the person's 'spousex' spouse.
   def coordinate_set(person_id = nil)
+    if person_id == nil then
+      person_id = SELF
+    end
     result = @coordinate_sets[person_id]
     if result.nil?
       DebugLogger.log(
@@ -39,9 +56,9 @@ class Person
     result
   end
 
-  # self's first spouse
-  def spouse
-    @spouses.first
+  # The element of 'coordinate_sets' that represents 'self'
+  def self_coordinates
+    @coordinate_sets[SELF]
   end
 
   # Biological mother and father - list: empty if no parents
@@ -88,15 +105,20 @@ class Person
     @spouses << person
   end
 
+  protected ###  Restricted interface
+
   # Add the specified coordinate set with respect to the relation to
   # the person with person_id (who could be, for example, a spouse).
   def add_coordinate_set(x, y, person_id = nil)
-    DebugLogger.log("DEBUG: Storing coord for #{id} " +
+    DebugLogger.log("DEBUG: Storing coord for #{id} ",
       "(OID: #{self.object_id}): (#{x}, #{y}) for #{person_id.inspect}")
+    if person_id == nil then
+      person_id = SELF
+    end
     @coordinate_sets[person_id] = [x, y]
   end
 
-  public  ###  Dynamic queries
+  private ###  Implementation
 
   # Dynamic access for evolving fields
   # Maps underscores to hyphens for seamless YAML lookup
@@ -121,12 +143,13 @@ class Person
 
   private ###  Implementation
 
+  SELF = '<self>'
   attr_reader :data
 
   private ###  Invariant
 
   def invariant
-    parents.empty? == is_root
+    parents.empty? == is_root && self_coordinates != nil
   end
 
 end
