@@ -9,6 +9,8 @@ require_relative 'family_constants'
 class StructuralAlignmentStep < LayoutStep
   include Contracts::DSL
 
+  public
+
   def execute(context)
     people = context.people
     people.each_value do |person|

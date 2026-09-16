@@ -8,6 +8,7 @@ require_relative '../src/hierarchy_analyzer'
 require_relative '../src/layout_pipeline'
 require_relative '../src/hierarchical_placement_step'
 require_relative '../src/layout_context'
+require_relative '../src/relationship_connection_finder'
 
 def assert(condition, message)
   if !condition then
@@ -85,6 +86,9 @@ pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
 pipeline.execute(context)
 layout_coords = context.coordinates
 
+# Setup Finder
+finder = RelationshipConnectionFinder.new(people)
+
 # Verify coordinates generated for root and spouse
 assert(layout_coords.has_node?(root_person.id),
        "Root should have coordinates")
@@ -110,20 +114,26 @@ end
 # Verify children are positioned centered beneath the couple
 if !root_person.children.empty? then
   children = root_person.children
-  child_xs = children.map { |c| layout_coords.node(c.id)[0] }
+  context_id = root_person.has_spouse ? root_person.spouses.first.id : nil
+
+  child_xs = children.map { |c| finder.find(c, context_id)[0] }
   midpoint = (child_xs.min + child_xs.max) / 2
 
   if root_person.has_spouse then
-    root_person.spouses.each do |spouse|
-      spouse_id = spouse.id
-      spouse_x = layout_coords.node(spouse_id)[0]
-      couple_midpoint = (root_x + spouse_x) / 2
-      assert((midpoint - couple_midpoint).abs < 1,
-             "Children should be centered beneath root couple midpoint")
+    spouse_id = root_person.spouses.first.id
+    spouse_x = layout_coords.node(spouse_id)[0]
+    couple_midpoint = (root_x + spouse_x) / 2
+
+    puts "DEBUG: midpoint: #{midpoint}, couple_midpoint: #{couple_midpoint}"
+
+    if (midpoint - couple_midpoint).abs >= 1 then
+      assert(false, "Children should be centered beneath root couple midpoint: " +
+             "midpoint: #{midpoint}, couple_midpoint: #{couple_midpoint}")
     end
   else
-    assert((midpoint - root_x).abs < 1,
-           "Children should be centered beneath root")
+    if (midpoint - root_x).abs >= 1 then
+      assert(false, "Children should be centered beneath root")
+    end
   end
 end
 

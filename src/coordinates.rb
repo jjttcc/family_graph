@@ -9,7 +9,7 @@ class Coordinates
 
   attr_reader :nodes, :couples
 
-  ###  Initialization
+  public  ###  Initialization
 
   # Initialize coordinates with empty structures.
   post 'invariant' do invariant end
@@ -19,7 +19,7 @@ class Coordinates
     @next_x = Hash.new(0)
   end
 
-  ###  Access
+  public  ###  Access
 
   # Retrieve coordinates for a given person.
   def node(id)
@@ -36,14 +36,14 @@ class Coordinates
     @next_x[y] = value
   end
 
-  ###  Status report
+  public  ###  Status report
 
   # Check if a person has coordinates defined.
   def has_node?(id)
     @nodes.key?(id)
   end
 
-  ###  Element change
+  public  ###  Element change
 
   # Store coordinates for an individual person.
   pre 'valid_coords' do |id, x, y|
@@ -68,4 +68,5 @@ class Coordinates
   def invariant
     @nodes != nil && @couples != nil
   end
+
 end

@@ -12,6 +12,8 @@ class Person
   attr_reader :id, :children, :generation, :coordinate_sets
   attr_accessor :spouses, :father, :mother
 
+  SELF = '<self>'
+
   public  ###  Initialization
 
   post :invariant do invariant end
@@ -38,14 +40,23 @@ class Person
   public  ### Retrieval
 
   # The coordinate set for self's relation to the person with person_id
-  #   - person.coordinate_set [no args] is the coordinate set for the
-  #     person itself.
+  #   - person.coordinate_set [no args] (or person.coordinate_set(SELF))
+  #     is the coordinate set for the person itself.
   #   - person.coordinate_set(spousex.id) is the coordinate set for
   #     the person's 'spousex' spouse.
-  def coordinate_set(person_id = nil)
-    if person_id == nil then
+  pre :invariant do invariant end   ## !!to-do: Comment out for performance
+  post :valid_for_pid_self do |result, person_id|
+    implies(person_id == SELF || person_id.nil?, result != nil)
+  end
+  def coordinate_set(person_id = SELF)
+    if person_id.nil? then
       person_id = SELF
     end
+=begin # for debugging:
+if person_id == SELF and coordinate_sets.count > 1 then
+  raise "accessing coord set for SELF instead of for a spouse?"
+end
+=end
     result = @coordinate_sets[person_id]
     if result.nil?
       DebugLogger.log(
@@ -109,12 +120,15 @@ class Person
 
   # Add the specified coordinate set with respect to the relation to
   # the person with person_id (who could be, for example, a spouse).
-  def add_coordinate_set(x, y, person_id = nil)
-    DebugLogger.log("DEBUG: Storing coord for #{id} ",
-      "(OID: #{self.object_id}): (#{x}, #{y}) for #{person_id.inspect}")
-    if person_id == nil then
+  post :valid_for_pid_self do |result, person_id|
+    implies(person_id == SELF || person_id.nil?, result != nil)
+  end
+  def add_coordinate_set(x, y, person_id = SELF)
+    if person_id.nil? then
       person_id = SELF
     end
+    DebugLogger.log("DEBUG: Storing coord for #{id} ",
+      "(OID: #{self.object_id}): (#{x}, #{y}) for #{person_id.inspect}")
     @coordinate_sets[person_id] = [x, y]
   end
 
@@ -143,13 +157,12 @@ class Person
 
   private ###  Implementation
 
-  SELF = '<self>'
   attr_reader :data
 
   private ###  Invariant
 
   def invariant
-    parents.empty? == is_root && self_coordinates != nil
+    parents.empty? == is_root && coordinate_sets.all? { |e| e != nil }
   end
 
 end

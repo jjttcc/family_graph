@@ -3,6 +3,7 @@ require_relative 'layout_strategy'
 # A simple, flat pipeline that delegates layout operations to a sequence
 # of individual layout strategy components.
 class LayoutPipeline < LayoutStrategy
+
   def initialize(strategies = [])
     @strategies = strategies
   end
