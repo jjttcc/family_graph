@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 # Comprehensive CLI regression test suite for main.rb
 
+root = 'FG_ROOT'
+root_path = ENV[root]
+setup_path = "#{root_path}/setup.rb"
+if ! ENV[root] then
+  $stderr.puts "environment variable #{root} must be set."
+  exit 2
+end
+require setup_path
 require 'fileutils'
 require 'tmpdir'
 
@@ -15,10 +23,18 @@ end
 Dir.chdir(File.join(__dir__, '..'))
 
 def run_cli(args)
-  cmd = "ruby src/main.rb #{args}"
-  output = `#{cmd} 2>&1`
-  exit_status = $?.exitstatus
-  return output, exit_status
+  reader, writer = IO.pipe
+  pid = fork do
+    reader.close
+    $stdout.reopen(writer)
+    $stderr.reopen(writer)
+    # Split args safely
+    exec("ruby", "src/main/main.rb", *args.split)
+  end
+  writer.close
+  output = reader.read
+  _, status = Process.wait2(pid)
+  return output, status.exitstatus
 end
 
 puts "Starting CLI Regression Tests..."
@@ -32,7 +48,8 @@ assert(out.include?("Usage:"), "Help should display usage")
 out, status = run_cli("-v")
 assert(status == 0, "Version should exit with 0")
 # Version is defined in family_constants.rb
-require_relative '../src/family_constants'
+#require_relative '../src/family_constants'
+require 'family_constants'
 assert(out.include?(VERSION), "Version should display #{VERSION}")
 
 # Test -l / --list-all

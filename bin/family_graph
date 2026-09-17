@@ -4,7 +4,7 @@
 # from any location.
 
 # Find the absolute path of the script directory
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SRC_DIR=$FG_ROOT
 
 # Execute main.rb using absolute path
-ruby "${SCRIPT_DIR}/../src/main.rb" "$@"
+ruby "${SRC_DIR}/main/main.rb" "$@"

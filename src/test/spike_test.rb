@@ -4,7 +4,7 @@ root = 'FG_ROOT'
 root_path = ENV[root]
 setup_path = "#{root_path}/setup.rb"
 if ! ENV[root] then
-  stderr.puts "environment variable #{root} must be set."
+  $stderr.puts "environment variable #{root} must be set."
   exit 2
 end
 require setup_path

@@ -1,7 +1,15 @@
 #!/usr/bin/env ruby
 
-require_relative '../src/data_loader'
-require_relative '../src/hierarchy_analyzer'
+root = 'FG_ROOT'
+root_path = ENV[root]
+setup_path = "#{root_path}/setup.rb"
+if ! ENV[root] then
+  $stderr.puts "environment variable #{root} must be set."
+  exit 2
+end
+require setup_path
+require 'data_loader'
+require 'hierarchy_analyzer'
 
 def assert(condition, message)
   unless condition

@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 # Master test script to run all regression and functional tests.
 
+root = 'FG_ROOT'
+root_path = ENV[root]
+setup_path = "#{root_path}/setup.rb"
+if ! ENV[root] then
+  $stderr.puts "environment variable #{root} must be set."
+  exit 2
+end
+require setup_path
 if not ENV.key?('DISABLE_ENABLE_ASSERTION') then
   puts "setting ENV['ENABLE_ASSERTION']=1"
   puts "(to prevent this behavior, define env. var. DISABLE_ENABLE_ASSERTION"

@@ -1,14 +1,22 @@
 #!/usr/bin/env ruby
 
-require_relative '../src/data_loader'
-require_relative '../src/family_constants'
-require_relative '../src/coordinates'
-require_relative '../src/graph_renderer'
-require_relative '../src/hierarchy_analyzer'
-require_relative '../src/layout_pipeline'
-require_relative '../src/hierarchical_placement_step'
-require_relative '../src/layout_context'
-require_relative '../src/relationship_connection_finder'
+root = 'FG_ROOT'
+root_path = ENV[root]
+setup_path = "#{root_path}/setup.rb"
+if ! ENV[root] then
+  $stderr.puts "environment variable #{root} must be set."
+  exit 2
+end
+require setup_path
+require 'data_loader'
+require 'family_constants'
+require 'coordinates'
+require 'graph_renderer'
+require 'hierarchy_analyzer'
+require 'layout_pipeline'
+require 'hierarchical_placement_step'
+require 'layout_context'
+require 'relationship_connection_finder'
 
 def assert(condition, message)
   if !condition then
