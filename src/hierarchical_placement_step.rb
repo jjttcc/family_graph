@@ -7,6 +7,8 @@ require_relative 'family_constants'
 class HierarchicalPlacementStep < LayoutStep
   include Contracts::DSL
 
+  public
+
   def execute(context)
     # The context holds the roots
     context.roots.each do |root|

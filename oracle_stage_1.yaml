@@ -1,0 +1,68 @@
+---
+:nodes:
+  multi_spouse_400:
+  - 3088
+  - 400
+  spouse_1:
+  - 2658
+  - 400
+  spouse_2:
+  - 2948
+  - 400
+  gen4_child_1:
+  - 3233
+  - 800
+  gen4_child_2:
+  - 3383
+  - 800
+  great_grandchild_gen3_400:
+  - 3308
+  - 600
+  grandchild_gen2_300:
+  - 3378
+  - 400
+  frank_smith_301:
+  - 3238
+  - 400
+  gen4_child_3:
+  - 2283
+  - 800
+  gen4_child_4:
+  - 2433
+  - 800
+  great_grandchild_b_303:
+  - 2358
+  - 600
+  grandchild_gen2_302:
+  - 2358
+  - 400
+  child_gen1_200:
+  - 1258
+  - 200
+  niece_gen2_600:
+  - 2508
+  - 400
+  child_gen1_201:
+  - 2508
+  - 200
+  root_ancestor_100:
+  - 1953
+  - 0
+  bob_doe_101:
+  - 1813
+  - 0
+:couples:
+- - multi_spouse_400
+  - spouse_1
+- - multi_spouse_400
+  - spouse_2
+- - frank_smith_301
+  - grandchild_gen2_300
+- - bob_doe_101
+  - root_ancestor_100
+:next_x:
+  400: 3528
+  800: 3533
+  600: 3458
+  0: 2103
+  200: 2658

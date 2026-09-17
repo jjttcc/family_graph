@@ -1,0 +1,5 @@
+YAML Field,Relationship Meaning,SVG Connector Class,Recommended Line Style
+father:,Confirmed biological parent,.line-biological,Solid Line
+adoptive-father:,Legal or informal adoptive parent,.line-adoptive,"Fine Dotted Line (stroke-dasharray=""0, 6"")"
+assumed-father:,Hypothesized or unproven link,.line-assumed,"Medium Dashed Line (stroke-dasharray=""8, 4"")"
+step-father:,Parent by marriage (if used),.line-step,"Dash-Dot Line (stroke-dasharray=""12, 4, 3, 4"")"

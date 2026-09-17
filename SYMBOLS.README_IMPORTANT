@@ -1,0 +1,7 @@
+Develop a system of symbols - which will be "drawn" inside specific person
+boxes. At the bottom of the diagram, display a "legend/glossary" that
+defines each symbol:
+
+  o # of spouses the person has, in upper left corner
+  o nature of relationship to parent(s) - e.g., adopted, foster, etc.
+  o etc.

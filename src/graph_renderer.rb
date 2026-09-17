@@ -1,12 +1,12 @@
-require_relative 'debug_logger'
 require 'ruby_contracts'
 require_relative 'debug_logger'
 require_relative 'family_constants'
 require_relative 'relationship_connection_finder'
+require_relative 'svg_utility'
 
 # Renders the calculated genealogical coordinates into an SVG diagram.
 class GraphRenderer
-  include Contracts::DSL
+  include Contracts::DSL, SVGUtility
 
   public
 
@@ -21,8 +21,6 @@ class GraphRenderer
     validate_coordinates
   end
 
-  public  ###  API
-
   # Render SVG to specified directory.
   pre :valid_output_dir do |output_dir| Dir.exist?(output_dir) end
   def render(output_dir, root_id = "tree")
@@ -33,16 +31,13 @@ class GraphRenderer
     timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
     filename = "family_tree_#{root_id}_#{timestamp}.svg"
     output_path = File.join(output_dir, filename)
-    # Use a broader dimension calculation that considers ALL coordinate sets
     offset_x, offset_y, width, height = calculate_dimensions_all_sets
     svg_lines = []
     svg_nodes = []
-    # 1. Render all Persons and their representations
     @people.each do |id, person|
       if person.coordinate_sets.empty? then
         next
       end
-      # For singletons, render once using SELF context
       if !person.has_spouse then
         coord = person.self_coordinates
         if coord then
@@ -50,7 +45,6 @@ class GraphRenderer
                         offset_x, offset_y)
         end
       else
-        # For multi-spouse, render once per spouse context
         person.coordinate_sets.each do |context_id, (x, y)|
           if context_id && context_id != Person::SELF then
             render_person(person, x, y, svg_nodes, offset_x, offset_y)
@@ -58,7 +52,6 @@ class GraphRenderer
         end
       end
     end
-    # 2. Render Spousal Lines (Canonicalized)
     rendered_couples = Set.new
     @coordinates.couples.each do |s1_id, s2_id|
       couple_id = [s1_id, s2_id].sort
@@ -68,23 +61,8 @@ class GraphRenderer
       render_spousal_line(s1_id, s2_id, svg_lines, offset_x, offset_y)
       rendered_couples.add(couple_id)
     end
-    # 3. Render Parent-Child Lines
     render_parent_child_lines(svg_lines, offset_x, offset_y)
-    svg_template = <<~SVG
-      <svg width="#{width}" height="#{height}"
-        xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="white"/>
-        <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="7"
-                  refX="#{MARKER_ARROW_REF_X}"
-                  refY="#{MARKER_ARROW_REF_Y}" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" />
-          </marker>
-        </defs>
-      #{svg_lines.join("\n")}
-      #{svg_nodes.join("\n")}
-      </svg>
-    SVG
+    svg_template = template(width, height, svg_lines, svg_nodes)
     File.write(output_path, svg_template)
     puts "Successfully rendered SVG to #{output_path}"
   end
@@ -102,7 +80,6 @@ class GraphRenderer
   def calculate_dimensions_all_sets
     all_coords = []
     @people.each do |id, person|
-      # Collect all coords from all representations
       person.instance_variable_get(:@coordinate_sets).values.each do |(x, y)|
         all_coords << [x, y]
       end
@@ -124,21 +101,17 @@ class GraphRenderer
     if !p1 || !p2 then
       return
     end
-    # Retrieve context-aware coordinates
     c1 = p1.coordinate_set(s2_id)
     c2 = p2.coordinate_set(s1_id)
     if !c1 || !c2 then
       return
     end
-    # Render dashed spousal line
     left_c, right_c = [c1, c2].sort_by { |c| c[0] }
     x1 = left_c[0] + NODE_WIDTH + offset_x
     y1 = left_c[1] + (NODE_HEIGHT / 2) + offset_y
     x2 = right_c[0] + offset_x
     y2 = right_c[1] + (NODE_HEIGHT / 2) + offset_y
-    svg_lines << "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
-                 "y2=\"#{y2}\" stroke=\"black\" stroke-width=\"1\" " \
-                 "stroke-dasharray=\"4\" />"
+    svg_lines << line(x1, y1, x2, y2, 'black', 1, '4')
   end
 
   def render_person(person, x, y, svg_nodes, offset_x, offset_y)
@@ -176,22 +149,16 @@ class GraphRenderer
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_ID_BOTH_Y_OFFSET}",
                 person.id, 7]
     end
-    svg_nodes << "  <rect x=\"#{nx}\" y=\"#{ny}\" " \
-                 "width=\"#{NODE_WIDTH}\" height=\"#{NODE_HEIGHT}\" " \
-                 "fill=\"white\" stroke=\"black\" />"
+    svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each do |x_pos, y_pos, label, size|
-      svg_nodes << "  <text x=\"#{x_pos}\" y=\"#{y_pos}\" " \
-                   "font-family=\"Arial\" font-size=\"#{size}\" " \
-                   "text-anchor=\"middle\">#{label}</text>"
+      svg_nodes << text(x_pos, y_pos, label, size)
     end
   end
 
   def render_parent_child_lines(svg_lines, offset_x, offset_y)
     DebugLogger.log("DEBUG: render_parent_child_lines called.")
     @people.each do |id, person|
-      # Get all coordinate representations for this child
       person.coordinate_sets.each do |context_id, (cx, cy)|
-        # Determine the parent's coordinates for this context
         person.parents.each do |parent|
           parent_coord = @coordinate_finder.find(parent, context_id)
           DebugLogger.log(["DEBUG: Rendering line for child #{person.id}",
@@ -214,9 +181,7 @@ class GraphRenderer
             y2 = py + NODE_HEIGHT + offset_y
           end
           marker = (@direction == NONE) ? "" : " marker-end=\"url(#arrowhead)\""
-          line_str = "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" " \
-                     "y2=\"#{y2}\" stroke=\"black\"#{marker} />"
-          svg_lines << line_str
+          svg_lines << line(x1, y1, x2, y2, 'black', 1, nil, marker != "")
         end
       end
     end
