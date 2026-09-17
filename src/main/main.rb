@@ -1,16 +1,23 @@
 #!/usr/bin/env ruby
 
+root = 'FG_ROOT'
+setup_path = ENV[root] + '/setup.rb'
+if ! ENV[root] then
+  stderr.puts "environment variable #{root} must be set."
+  exit 2
+end
+require setup_path
 require 'debug'
 require 'optparse'
-require_relative 'data_loader'
-require_relative 'layout_orchestrator'
-require_relative 'family_constants'
-require_relative 'layout_pipeline'
-require_relative 'hierarchical_placement_step'
-require_relative 'compaction_layout_step'
-require_relative 'structural_alignment_step'
-require_relative 'yaml_oracle_step'
-require_relative 'hierarchy_analyzer'
+require 'data_loader'
+require 'layout_orchestrator'
+require 'family_constants'
+require 'layout_pipeline'
+require 'hierarchical_placement_step'
+require 'compaction_layout_step'
+require 'structural_alignment_step'
+require 'yaml_oracle_step'
+require 'hierarchy_analyzer'
 
 options = {
   root_ids: nil,

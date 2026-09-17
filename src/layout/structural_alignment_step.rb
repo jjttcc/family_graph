@@ -1,7 +1,7 @@
 # vim: ts=2 sw=2 expandtab
-require_relative 'debug_logger'
-require_relative 'layout_step'
-require_relative 'family_constants'
+require 'debug_logger'
+require 'layout_step'
+require 'family_constants'
 
 # Enforces genealogical structural constraints:
 # 1. Spousal Adjacency: Ensures spouses are placed adjacent to each other.

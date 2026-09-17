@@ -1,4 +1,4 @@
-require_relative 'debug_logger'
+require 'debug_logger'
 # required libraries/tools
 require 'ruby_contracts'
 

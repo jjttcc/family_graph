@@ -1,8 +1,8 @@
 require 'ruby_contracts'
-require_relative 'debug_logger'
-require_relative 'family_constants'
-require_relative 'relationship_connection_finder'
-require_relative 'svg_utility'
+require 'debug_logger'
+require 'family_constants'
+require 'relationship_connection_finder'
+require 'svg_utility'
 
 # Renders the calculated genealogical coordinates into an SVG diagram.
 class GraphRenderer

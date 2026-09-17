@@ -1,5 +1,5 @@
 require 'yaml'
-require_relative 'layout_step'
+require 'layout_step'
 
 # A debug/verification step that serializes the current state
 # of the coordinate registry to a YAML file.

@@ -1,8 +1,8 @@
 # vim: ts=2 sw=2 expandtab
-require_relative 'layout_context'
-require_relative 'graph_renderer'
-require_relative 'family_constants'
-require_relative 'coordinates'
+require 'layout_context'
+require 'graph_renderer'
+require 'family_constants'
+require 'coordinates'
 
 # Orchestrates the layout pipeline and rendering process.
 class LayoutOrchestrator
