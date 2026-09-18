@@ -1,6 +1,12 @@
+require 'ruby_contracts'
 require 'graph_primitives'
+
 # Builds the graph of representations from the Person tree.
 class GraphBuilder
+  include Contracts::DSL
+
+  private #!!!forcing an exception - for a reason
+
   def self.build(people)
     nodes = []
     edges = []
@@ -14,4 +20,5 @@ class GraphBuilder
     end
     [nodes, edges]
   end
+
 end

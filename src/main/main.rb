@@ -42,7 +42,7 @@ parser = OptionParser.new do |opts|
     when 'd', 'descent'  then options[DIRECTION] = DESCENT
     when 'n', 'none'     then options[DIRECTION] = NONE
     else
-      puts "Error: Invalid direction '#{v}'. " +
+      $stderr.puts "Error: Invalid direction '#{v}'. " +
         "Use ancestry/a, descent/d, or none/n."
       exit 1
     end
@@ -81,18 +81,22 @@ end
 parser.parse!
 
 # Determine if we are just listing IDs
-if options[:list_all] || options[:list_roots]
-  if ARGV.empty?
-    puts "Error: Data file path is required for listing."
+if options[:list_all] || options[:list_roots] then
+  if ARGV.empty? then
+    $stderr.puts "Error: Data file path is required for listing."
     exit 1
   end
   people = {}
   ARGV.each do |path|
-    people.merge!(DataLoader.load(path)) if File.exist?(path)
+    if File.exist?(path) then
+      people.merge!(DataLoader.load(path))
+    else
+      $stderr.puts "Warning: #{path} does not exist."
+    end
   end
-  if options[:list_all]
+  if options[:list_all] then
     puts people.keys.sort
-  elsif options[:list_roots]
+  elsif options[:list_roots] then
     roots = people.select do |_id, p|
       p.father.nil? && p.mother.nil?
     end
@@ -102,15 +106,19 @@ if options[:list_all] || options[:list_roots]
 end
 
 # Otherwise, positional data paths are mandatory
-if ARGV.empty?
-  puts "Error: Data file path is required."
+if ARGV.empty? then
+  $stderr.puts "Error: Data file path is required."
   exit 1
 end
 
 data_paths = ARGV
 people = {}
 data_paths.each do |path|
-  people.merge!(DataLoader.load(path)) if File.exist?(path)
+  if File.exist?(path) then
+    people.merge!(DataLoader.load(path))
+  else
+    $stderr.puts "Warning: #{path} does not exist."
+  end
 end
 
 # Calculate generations

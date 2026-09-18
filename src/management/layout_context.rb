@@ -1,8 +1,13 @@
 # vim: ts=2 sw=2 expandtab
+require 'ruby_contracts'
 
 # Provides the context necessary for a layout step to perform its work.
 # It acts as a read-only provider for the people and roots.
 class LayoutContext
+  include Contracts::DSL
+
+  public
+
   attr_reader :people, :roots, :coordinates
 
   def initialize(people, roots, coordinates, traversal_direction)
@@ -16,14 +21,8 @@ class LayoutContext
     @traversal_direction == ANCESTOR ? person.parents : person.children
   end
 
-  #!!!TO-DO: explain what 'other_person_id = nil' means!!!
   def update_person(person, x, y, other_person_id = nil)
     person.send(:add_coordinate_set, x, y, other_person_id)
-    @coordinates.add_node(person.id, x, y)
-  end
-
-  def old__update_person(person, x, y)
-    person.add_coordinate_set(x, y, nil)
     @coordinates.add_node(person.id, x, y)
   end
 
@@ -42,9 +41,14 @@ class LayoutContext
     branches(person).each { |child| shift_subtree(child, dx, dy) }
   end
 
+=begin
+  # Note: 'attr_reader :coordinates' will already allow the contents of
+  # @coordinates to be changed. Therefore, this method is not needed and
+  # should be removed.
   # Expose coordinates for next_x manipulation
   def coordinates
     @coordinates
   end
+=end
 
 end

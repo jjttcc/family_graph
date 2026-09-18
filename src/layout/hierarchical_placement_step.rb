@@ -1,105 +1,48 @@
-# vim: ts=2 sw=2 expandtab
-require 'debug_logger'
 require 'layout_step'
-require 'family_constants'
+require 'graph_primitives'
 
-# Implements the recursive placement strategy.
+# New HierarchicalPlacementStep using the Representation-based architecture.
 class HierarchicalPlacementStep < LayoutStep
   include Contracts::DSL
 
   public
 
   def execute(context)
-    # The context holds the roots
-    context.roots.each do |root|
-      traverse_and_place(root, context)
+    # This implementation is a stub to demonstrate the design
+    # It assumes LayoutContext will be updated to support add_node
+    # which will store the PersonNode/CoupleNode instances.
+    roots = context.roots
+    roots.each do |root|
+      place_node(root, context, 0, 0)
     end
   end
 
   private
 
-  def traverse_and_place(person, context)
-    # Recursively traverse branches first
-    context.branches(person).each do |child|
-      traverse_and_place(child, context)
-    end
+  # Recursively places a person and their descendants in the coordinate registry.
+  # This is a procedural traversal that populates coordinate_sets.
+  def place_node(person, context, x, y, processed_couples = Set.new)
     if person.has_spouse then
       person.spouses.each do |spouse|
-        place_couple(person, spouse, context)
+        couple_id = [person.id, spouse.id].sort
+        if processed_couples.include?(couple_id) then
+          next
+        end
+        p1 = PersonNode.new(person, spouse.id, x, y)
+        p2 = PersonNode.new(spouse, person.id, x + 100, y)
+        couple = CoupleNode.new(p1, p2, x + 50, y)
+        context.update_person(p1.person, p1.x, p1.y, p1.context_id)
+        context.update_person(p2.person, p2.x, p2.y, p2.context_id)
+        context.branches(person).each do |child|
+          place_node(child, context, couple.x, couple.y + 100, processed_couples)
+        end
+        processed_couples.add(couple_id)
       end
     else
-      place_individual(person, context)
-    end
-  end
-
-  def place_individual(person, context)
-    coordinates = context.coordinates
-    y = person.generation * LEVEL_HEIGHT
-    branches = context.branches(person)
-    current_next_x = coordinates.next_x(y)
-    if branches.empty? then
-      x = current_next_x
-      DebugLogger.log("DEBUG: Placing #{person.id} at X=#{x}, Y=#{y}.")
-      context.update_person(person, x, y)
-      coordinates.update_next_x(y, x + SIBLING_SPACING)
-    else
-      # Center over branches
-      branch_xs = branches.map { |br| br.self_coordinates[0] }
-      midpoint = (branch_xs.min + branch_xs.max) / 2
-      parent_x = midpoint
-      DebugLogger.log("DEBUG: Placing #{person.id} at X=#{parent_x}, Y=#{y}.")
-      if parent_x < current_next_x then
-        shift_amount = current_next_x - parent_x
-        shift_subtree(person, shift_amount, context)
-        parent_x = current_next_x
-      end
-      context.update_person(person, parent_x, y)
-      coordinates.update_next_x(y, parent_x + SIBLING_SPACING)
-    end
-  end
-
-  def place_couple(spouse1, spouse2, context)
-    coordinates = context.coordinates
-    y = spouse1.generation * LEVEL_HEIGHT
-    branches = context.branches(spouse1)
-    coordinates.add_couple(spouse1.id, spouse2.id)
-    if branches.empty? then
-      x1 = coordinates.next_x(y)
-      x2 = x1 + COUPLE_SPACING
-      context.update_person(spouse1, x1, y, spouse2.id)
-      context.update_person(spouse2, x2, y, spouse1.id)
-      coordinates.update_next_x(y, x2 + SIBLING_SPACING)
-    else
-      # Center over branches
-      branch_xs = branches.map { |b| b.self_coordinates[0] }
-      midpoint = (branch_xs.min + branch_xs.max) / 2
-      parent_x1 = midpoint - (COUPLE_SPACING / 2)
-      parent_x2 = parent_x1 + COUPLE_SPACING
-      if parent_x1 < coordinates.next_x(y) then
-        shift_amount = coordinates.next_x(y) - parent_x1
-        shift_subtree(spouse1, shift_amount, context)
-        parent_x1 = coordinates.next_x(y)
-        parent_x2 = parent_x1 + COUPLE_SPACING
-      end
-      context.update_person(spouse1, parent_x1, y, spouse2.id)
-      context.update_person(spouse2, parent_x2, y, spouse1.id)
-      coordinates.update_next_x(y, parent_x2 + SIBLING_SPACING)
-    end
-  end
-
-  def shift_subtree(person, amount, context)
-    coordinates = context.coordinates
-    if ! person.nil? then
-      # Update all existing coordinate sets for this person
-      person.coordinate_sets.each do |context_id, (x, y)|
-        new_x = x + amount
-        context.update_person(person, new_x, y, context_id)
-        coordinates.add_node(person.id, new_x, y)
-        coordinates.update_next_x(y, [
-          coordinates.next_x(y), new_x + SIBLING_SPACING].max)
-      end
-      context.branches(person).each do |branch|
-        shift_subtree(branch, amount, context)
+      node = PersonNode.new(person, Person::SELF, x, y)
+      context.update_person(node.person, node.x, node.y, node.context_id)
+      context.branches(person).each do |child|
+        place_node(child, context, node.x, node.y + 100, processed_couples)
       end
     end
   end
