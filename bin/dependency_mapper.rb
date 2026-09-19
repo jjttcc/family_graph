@@ -1,23 +1,37 @@
 #!/usr/bin/env ruby
 # Dependency Mapper: Maps directory/file dependencies and checks rank violations.
+
 require 'find'
 require 'set'
+
+# Dynamically determine the project root (assuming script is in bin/)
+ROOT = File.expand_path('..', __dir__)
+
+# Helper to get path relative to current working directory
+def relative_path(full_path)
+  Pathname.new(full_path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+end
+
 # 1. Load Dependency Specification
 RANK_MAP = {}
-File.readlines('src/dependency-specification').each do |line|
+spec_path = File.join(ROOT, 'src', 'dependency-specification')
+File.readlines(spec_path).each do |line|
   next if line.strip.empty? || line.start_with?('#') || line.start_with?('[')
   parts = line.split
   next if parts.size < 2
   RANK_MAP[parts[0]] = parts[1].to_i
 end
+
 # Map class names to the file they reside in
 CLASS_FILE_MAP = {}
 FILE_CLUSTER_MAP = {}
 FILE_DEPENDENCIES = Hash.new { |h, k| h[k] = Set.new }
+
 # 2. First Pass: Map classes to files and directories
 RANK_MAP.keys.each do |dir|
-  path = File.join('src', dir)
+  path = File.join(ROOT, 'src', dir)
   next unless Dir.exist?(path)
+
   Find.find(path) do |file|
     next unless file.end_with?('.rb')
     FILE_CLUSTER_MAP[file] = dir
@@ -28,6 +42,7 @@ RANK_MAP.keys.each do |dir|
     end
   end
 end
+
 # 3. Second Pass: Analyze dependencies
 FILE_CLUSTER_MAP.keys.each do |file|
   content = File.read(file)
@@ -38,6 +53,7 @@ FILE_CLUSTER_MAP.keys.each do |file|
     end
   end
 end
+
 # 4. Reporting Logic
 def report_violations
   puts "--- Directory Dependency Violation Report ---"
@@ -59,7 +75,7 @@ def report_violations
           next unless FILE_CLUSTER_MAP[file] == dir
           file_deps.each do |dep_file|
             if FILE_CLUSTER_MAP[dep_file] == dep
-              puts "  -> #{file} depends on #{dep_file}"
+              puts "  -> #{relative_path(file)} depends on #{relative_path(dep_file)}"
             end
           end
         end
@@ -67,8 +83,28 @@ def report_violations
     end
   end
 end
-target = ARGV[0]
-if target.nil?
+
+# Find absolute file path
+def find_absolute_file(target)
+  # Check if it's already an absolute path
+  return target if File.exist?(target) && Pathname.new(target).absolute?
+  
+  # Try relative to CWD
+  abs = File.expand_path(target, Dir.pwd)
+  return abs if File.exist?(abs)
+
+  # Try relative to project root
+  abs = File.join(ROOT, target)
+  return abs if File.exist?(abs)
+
+  # Fallback: fuzzy match
+  FILE_CLUSTER_MAP.keys.find { |f| f.end_with?(target) }
+end
+
+require 'pathname'
+
+target_arg = ARGV[0]
+if target_arg.nil?
   report_violations
   puts "\n--- Directory Dependency Report ---"
   dir_deps = Hash.new { |h, k| h[k] = Set.new }
@@ -83,26 +119,29 @@ if target.nil?
     puts "#{dir} depends on:"
     deps.each { |dep| puts "  -> #{dep}" }
   end
-elsif RANK_MAP.key?(target)
-  puts "#{target} depends on:"
+elsif RANK_MAP.key?(target_arg)
+  puts "#{target_arg} depends on:"
   dir_deps = Hash.new { |h, k| h[k] = Set.new }
   FILE_DEPENDENCIES.each do |file, deps|
     file_dir = FILE_CLUSTER_MAP[file]
-    next unless file_dir == target
+    next unless file_dir == target_arg
     deps.each do |dep|
       dep_dir = FILE_CLUSTER_MAP[dep]
-      dir_deps[target] << dep_dir if dep_dir && dep_dir != target
+      dir_deps[target_arg] << dep_dir if dep_dir && dep_dir != target_arg
     end
   end
-  dir_deps[target].each { |dep| puts "  -> #{dep}" }
-elsif FILE_CLUSTER_MAP.key?(target)
-  puts "Dependencies of #{target} on other clusters:"
-  FILE_DEPENDENCIES[target].each do |dep|
-    dep_dir = FILE_CLUSTER_MAP[dep]
-    if dep_dir && dep_dir != FILE_CLUSTER_MAP[target]
-      puts "  -> #{dep}"
-    end
-  end
+  dir_deps[target_arg].each { |dep| puts "  -> #{dep}" }
 else
-  puts "Error: Target '#{target}' not found."
+  found_file = find_absolute_file(target_arg)
+  if found_file
+    puts "Dependencies of #{relative_path(found_file)} on other clusters:"
+    FILE_DEPENDENCIES[found_file].each do |dep|
+      dep_dir = FILE_CLUSTER_MAP[dep]
+      if dep_dir && dep_dir != FILE_CLUSTER_MAP[found_file]
+        puts "  -> #{relative_path(dep)}"
+      end
+    end
+  else
+    puts "Error: Target '#{target_arg}' not found."
+  end
 end

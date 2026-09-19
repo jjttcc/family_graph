@@ -8,12 +8,13 @@ class Coordinates
 
   public
 
-  attr_reader :nodes, :couples
+  attr_reader :nodes    # "PersonNode"s containing single persons
+  attr_reader :couples  # "CoupleNode"s - married couples
 
   public  ###  Initialization
 
   # Initialize registry with empty structures.
-  post 'invariant' do invariant end
+  post :invariant do invariant end
   def initialize
     @nodes = {}
     @couples = {}
@@ -30,16 +31,25 @@ class Coordinates
     self.nodes[id]
   end
 
-  # The node associated with 'person'
+  # The node (PersonNode) associated with 'person'
   pre 'valid_person' do |person| person.is_a?(Person) end
   post :nil_or_node do |result|
-    result == nil || result.is_a?(Node)
+    result == nil || result.is_a?(PersonNode)
   end
   def node_for_person(person)
+    # Look in the "singles" list:
     result = @nodes.values.find { |n| n.person.id == person.id }
     if result == nil then
-      result = @couples.values.find do |c|
-        c.person_a.id == person.id || c.person_b.id == person.id
+      # Look in the "married couples" list:
+      @couples.values.each do |c|
+        if c.person_a.id == person.id then
+          result = c.partner_a
+        elsif c.person_b.id == person.id
+          result = c.partner_b
+        end
+        if result != nil then
+          break
+        end
       end
     end
     result
@@ -71,12 +81,14 @@ class Coordinates
   pre :valid_node do |node| node.is_a?(PersonNode) end
   pre :has_person do |node| node.person.is_a?(Person) end
   pre :not_married do |node| ! node.person.is_married end
+  post :invariant do invariant end
   def add_node(node)
     @nodes[node.id] = node
   end
 
   # Register a couple.
   pre :valid_node do |node| node.is_a?(CoupleNode) end
+  post :invariant do invariant end
   def add_couple(node)
     self.couples[node.id] = node
   end
@@ -90,8 +102,8 @@ class Coordinates
 
   def invariant
     nodes != nil && couples != nil &&
-    nodes.values.all? { |n| n.is_a?(Node) } &&
-    couples.values.all? { |n| n.is_a?(Node) }
+    nodes.values.all? { |n| n.is_a?(PersonNode) && ! n.person.is_married } &&
+    couples.values.all? { |n| n.is_a?(CoupleNode) }
   end
 
 end
