@@ -37,7 +37,6 @@ class PersonNode < Node
 
   pre :xy_valid do |p, x, y| x != nil && y != nil end
   pre :person_valid do |person| person.is_a?(Person) end
-  pre :not_married do |person| ! person.is_married end
   def initialize(person, x = 0, y = 0)
     super(x, y)
     @person = person

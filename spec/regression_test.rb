@@ -50,11 +50,11 @@ context = LayoutContext.new(people, people.values.select { |p| p.is_root },
                             Coordinates.new, :descendant)
 pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
 pipeline.execute(context)
-renderer = GraphRenderer.new(context.coordinates, people, :descent, :ids)
+renderer = GraphRenderer.new(context.coordinates, :descent, :ids)
 renderer.render(output_dir, 'descent_test')
 # Test :none with HierarchicalPlacement
 puts "Rendering None graph..."
-renderer = GraphRenderer.new(context.coordinates, people, :none, :dates)
+renderer = GraphRenderer.new(context.coordinates, :none, :dates)
 renderer.render(output_dir, 'none_test')
 
 puts "Renderer options passed!"

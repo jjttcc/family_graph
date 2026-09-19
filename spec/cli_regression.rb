@@ -64,7 +64,10 @@ assert(out.include?("root_ancestor_100"), "List-roots should contain root ID")
 
 # Test -i / --root (Custom root)
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("-i child_gen1_200 data/sample_tree.yaml -o #{tmpdir}")
+  out, status = run_cli("-i child_gen1_200 data/sample_tree.yaml -o #{tmpdir} -s 1")
+  if status != 0 then
+    puts "CLI Output: #{out}"
+  end
   assert(status == 0, "Root ID flag should exit with 0")
   glob_pattern = File.join(tmpdir, "family_tree_child_gen1_200_*.svg")
   assert(Dir.glob(glob_pattern).any?, "SVG should be generated")
@@ -73,7 +76,7 @@ end
 # Test -i / --root (Multiple roots, unified rendering)
 Dir.mktmpdir do |tmpdir|
   out, status = run_cli("-i child_gen1_200,baptism_test_person_500 " \
-                        "data/sample_tree.yaml -o #{tmpdir}")
+                        "data/sample_tree.yaml -o #{tmpdir} -s 1")
   assert(status == 0, "Multiple Root IDs flag should exit with 0")
   glob_pattern = File.join(tmpdir, "family_tree_unified_*.svg")
   assert(Dir.glob(glob_pattern).any?, "Unified SVG should be generated")
@@ -81,7 +84,7 @@ end
 
 # Test -i / --root (All roots) - Now implicitly handled
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir}")
+  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -s 1")
   assert(status == 0, "Default root (all) should exit with 0")
   glob_pattern = File.join(tmpdir, "family_tree_unified_*.svg")
   assert(Dir.glob(glob_pattern).any?, "Unified SVG should be generated")
@@ -89,19 +92,22 @@ end
 
 # Test -d / --direction
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -d descent")
+  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -d descent -s 1")
+  if status != 0 then
+    puts "CLI Output: #{out}"
+  end
   assert(status == 0, "Direction flag should exit with 0")
 end
 
 # Test -t / --traversal
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -t ancestor")
+  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -t ancestor -s 1")
   assert(status == 0, "Traversal flag should exit with 0")
 end
 
 # Test -m / --label-mode
 Dir.mktmpdir do |tmpdir|
-  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -m ids")
+  out, status = run_cli("data/sample_tree.yaml -o #{tmpdir} -m ids -s 1")
   assert(status == 0, "Label-mode flag should exit with 0")
 end
 

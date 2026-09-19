@@ -68,7 +68,9 @@ class Coordinates
   public  ###  Element change
 
   # Store Node instance for a person.
-  pre 'valid_node' do |node| node.is_a?(PersonNode) end
+  pre :valid_node do |node| node.is_a?(PersonNode) end
+  pre :has_person do |node| node.person.is_a?(Person) end
+  pre :not_married do |node| ! node.person.is_married end
   def add_node(node)
     @nodes[node.id] = node
   end
