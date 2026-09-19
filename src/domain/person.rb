@@ -99,6 +99,8 @@ end
     !@spouses.empty?
   end
 
+  alias is_married has_spouse
+
   # Is self a root node (has no parents)?
   def is_root
     parents.empty?
