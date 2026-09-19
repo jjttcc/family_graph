@@ -30,24 +30,29 @@ puts "Verifying Coordinates class..."
 coords = Coordinates.new
 
 # Add nodes
-coords.add_node('person_1', 100, 200)
-coords.add_node('person_2', 150, 200)
+coords.add_node(PersonNode.new(Person.new('person_1', {}), 100, 200))
+coords.add_node(PersonNode.new(Person.new('person_2', {}), 150, 200))
 
 assert(coords.has_node?('person_1'),
        "person_1 should exist in coordinates")
-assert(coords.node('person_1') == [100, 200],
+assert(coords.node('person_1').x == 100 && coords.node('person_1').y == 200,
        "person_1 coordinates mismatched")
 assert(!coords.has_node?('person_3'),
        "person_3 should not exist in coordinates")
 
 # Add spouses and check uniqueness/sorting
-coords.add_couple('person_1', 'person_2')
-coords.add_couple('person_2', 'person_1') # Duplicate with reversed order
+p1 = coords.node('person_1')
+p2 = coords.node('person_2')
+couple = CoupleNode.new(p1, p2, 125, 200)
+coords.add_couple(couple)
+# Try adding same couple again (should not duplicate)
+coords.add_couple(couple)
 
 assert(coords.couples.size == 1,
        "Should only have 1 spousal couple registered")
-assert(coords.couples.first == ['person_1', 'person_2'].sort,
-       "Spouse pairing sorting failed")
+couple_id = coords.couples.keys.first
+assert(couple_id == 'person_1.person_2',
+       "Spouse pairing sorting failed: #{couple_id}")
 
 puts "Coordinates class verification PASSED!"
 
@@ -97,25 +102,18 @@ layout_coords = context.coordinates
 # Setup Finder
 finder = RelationshipConnectionFinder.new(people)
 
-# Verify coordinates generated for root and spouse
-assert(layout_coords.has_node?(root_person.id),
-       "Root should have coordinates")
-if root_person.has_spouse then
-  root_person.spouses.each do |spouse|
-    assert(layout_coords.has_node?(spouse.id),
-           "Root spouse should have coordinates")
-  end
-end
-
-root_x, root_y = layout_coords.node(root_person.id)
-assert(root_y == 0, "Root should be at level 0")
+root_node = layout_coords.node_for_person(root_person)
+assert(root_node != nil, "Root #{root_person.id} should have coordinates. Nodes: #{layout_coords.nodes.keys}")
+assert(root_node.y == 0, "Root should be at level 0")
 
 if root_person.has_spouse then
   root_person.spouses.each do |spouse|
-    spouse_x, spouse_y = layout_coords.node(spouse.id)
-    assert(spouse_y == 0, "Spouse should be at level 0")
-    assert((spouse_x - root_x).abs == COUPLE_SPACING,
-           "Spouses should be separated by couple spacing")
+    spouse_node = layout_coords.node_for_person(spouse)
+    assert(spouse_node != nil, "Root spouse should have coordinates")
+    assert(spouse_node.y == 0, "Spouse should be at level 0")
+    expected_spacing = NODE_WIDTH + 20
+    assert((spouse_node.x - root_node.x).abs == expected_spacing,
+           "Spouses should be separated. Expected: #{expected_spacing}, Got: #{(spouse_node.x - root_node.x).abs}")
   end
 end
 

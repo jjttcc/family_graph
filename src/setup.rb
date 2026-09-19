@@ -29,6 +29,7 @@ geometry
 layout
 core
 construction
+util
 rendering]
 
 set_rubylib(dirlist)

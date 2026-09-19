@@ -2,6 +2,7 @@ require 'ruby_contracts'
 require 'graph_primitives'
 
 # Builds the graph of representations from the Person tree.
+# !!!This class might not be needed.
 class GraphBuilder
   include Contracts::DSL
 

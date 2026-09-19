@@ -21,33 +21,33 @@ class LayoutContext
     @traversal_direction == ANCESTOR ? person.parents : person.children
   end
 
+=begin
   def update_person(person, x, y, other_person_id = nil)
+$stderr.puts "'update_person' is obsolete returning..."; return
     person.send(:add_coordinate_set, x, y, other_person_id)
-    @coordinates.add_node(person.id, x, y)
+    # Use context_id if other_person_id is nil
+    context_id = other_person_id || Person::SELF
+    node = PersonNode.new(person, context_id, x, y)
+    @coordinates.add_node(node)
   end
 
   def shift_person(person, dx, dy)
+raise
+$stderr.puts "'LayoutContext.shift_person' is obsolete"; return
     coord = person.self_coordinates
     return unless coord
     update_person(person, coord[0] + dx, coord[1] + dy)
   end
 
   def shift_subtree(person, dx, dy = 0)
+raise
+$stderr.puts "'LayoutContext.shift_subtree' is obsolete?"; return
     return unless person
     shift_person(person, dx, dy)
     if person.has_spouse
       person.spouses.each { |spouse| shift_person(spouse, dx, dy) }
     end
     branches(person).each { |child| shift_subtree(child, dx, dy) }
-  end
-
-=begin
-  # Note: 'attr_reader :coordinates' will already allow the contents of
-  # @coordinates to be changed. Therefore, this method is not needed and
-  # should be removed.
-  # Expose coordinates for next_x manipulation
-  def coordinates
-    @coordinates
   end
 =end
 

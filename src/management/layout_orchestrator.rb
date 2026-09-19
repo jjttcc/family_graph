@@ -27,9 +27,7 @@ class LayoutOrchestrator
     end
     # Render
     puts "Rendering SVG..."
-    people = context.people
-    renderer = GraphRenderer.new(context.coordinates, people,
-                                 options[DIRECTION],
+    renderer = GraphRenderer.new(context.coordinates, options[DIRECTION],
                                  options[:label_mode])
     # Use the pre-determined roots
     root_ids = context.roots.map(&:id)

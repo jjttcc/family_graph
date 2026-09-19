@@ -1,9 +1,10 @@
 require 'ruby_contracts'
+require 'utilities'
+require 'graph_primitives'
 
-# Repository of coordinates and spousal pairings used to construct
-# the graphic layout
+# Repository of nodes and spousal pairings used to construct the layout.
 class Coordinates
-  include Contracts::DSL
+  include Contracts::DSL, Utilities
 
   public
 
@@ -11,62 +12,84 @@ class Coordinates
 
   public  ###  Initialization
 
-  # Initialize coordinates with empty structures.
+  # Initialize registry with empty structures.
   post 'invariant' do invariant end
   def initialize
     @nodes = {}
-    @couples = []
+    @couples = {}
     @next_x = Hash.new(0)
   end
 
   public  ###  Access
 
-  # Retrieve coordinates for a given person.
+  # The node with node-id of 'id'
+  post :nil_or_node do |result|
+    result == nil || result.is_a?(PersonNode)
+  end
   def node(id)
-    @nodes[id]
+    self.nodes[id]
   end
 
-  # The next available X position for a given Y level.
+  # The node associated with 'person'
+  pre 'valid_person' do |person| person.is_a?(Person) end
+  post :nil_or_node do |result|
+    result == nil || result.is_a?(Node)
+  end
+  def node_for_person(person)
+    result = @nodes.values.find { |n| n.person.id == person.id }
+    if result == nil then
+      result = @couples.values.find do |c|
+        c.person_a.id == person.id || c.person_b.id == person.id
+      end
+    end
+    result
+  end
+
+  # couple for 'id'
+  post :nil_or_node do |result|
+    result == nil || result.is_a?(CoupleNode)
+  end
+  def couple(id)
+    self.couples[id]
+  end
+
+  # The next available x position for a given y level.
   def next_x(y)
     @next_x[y]
   end
 
-  # Update next available X position for a given Y level.
-  def update_next_x(y, value)
-    @next_x[y] = value
-  end
+  ###  Status report
 
-  public  ###  Status report
-
-  # Check if a person has coordinates defined.
+  # Check if a person has a registered node.
   def has_node?(id)
-    @nodes.key?(id)
+    self.nodes.key?(id)
   end
 
   public  ###  Element change
 
-  # Store coordinates for an individual person.
-  pre 'valid_coords' do |id, x, y|
-    id != nil && x.is_a?(Numeric) && y.is_a?(Numeric)
-  end
-  def add_node(id, x, y)
-    @nodes[id] = [x, y]
+  # Store Node instance for a person.
+  pre 'valid_node' do |node| node.is_a?(PersonNode) end
+  def add_node(node)
+    @nodes[node.id] = node
   end
 
-  # Register a spousal pairing.
-  pre 'valid_spouses' do |spouse1, spouse2|
-    spouse1 != nil && spouse2 != nil
+  # Register a couple.
+  pre :valid_node do |node| node.is_a?(CoupleNode) end
+  def add_couple(node)
+    self.couples[node.id] = node
   end
-  def add_couple(spouse1, spouse2)
-    # Store sorted pair to avoid duplicating (A, B) and (B, A)
-    pair = [spouse1, spouse2].sort
-    @couples << pair unless @couples.include?(pair)
+
+  # Update next available x position for a given y level.
+  def update_next_x(y, value)
+    @next_x[y] = value
   end
 
   private
 
   def invariant
-    @nodes != nil && @couples != nil
+    nodes != nil && couples != nil &&
+    nodes.values.all? { |n| n.is_a?(Node) } &&
+    couples.values.all? { |n| n.is_a?(Node) }
   end
 
 end

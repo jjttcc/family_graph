@@ -1,5 +1,6 @@
 # Abstract base for all visual entities
 require 'ruby_contracts'
+require 'utilities'
 
 class Node
   include Contracts::DSL
@@ -7,6 +8,14 @@ class Node
   public
 
   attr_accessor :x, :y
+
+  public  ###  Access
+
+  def id
+    raise "virtual method"
+  end
+
+  public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
   def initialize(x = 0, y = 0)
@@ -16,29 +25,34 @@ class Node
 
 end
 
-# Represents an individual person node
+# Geometric node for a person
 class PersonNode < Node
   include Contracts::DSL
 
   public
 
-  attr_reader :person, :context_id
+  attr_reader :person
+
+  public  ###  Initialization
 
   pre :xy_valid do |p, cid, x, y| x != nil && y != nil end
-  pre :person_valid do |person, cid|
-    person.is_a?(Person) && cid.is_a?(String)
-  end
-  def initialize(person, context_id, x = 0, y = 0)
+  pre :person_valid do |person| person.is_a?(Person) end
+  def initialize(person, x = 0, y = 0)
     super(x, y)
     @person = person
-    @context_id = context_id
+  end
+
+  public  ###  Access
+
+  def id
+    person.id
   end
 
 end
 
-# Represents a couple node (atomic spousal representation)
+# Geometric node for a couple (atomic "couple" representation)
 class CoupleNode < Node
-  include Contracts::DSL
+  include Contracts::DSL, Utilities
 
   public
 
@@ -54,6 +68,10 @@ class CoupleNode < Node
   end
 
   public  ###  Access
+
+  def id
+    joined_id(partner_a.id, partner_b.id)
+  end
 
   def person_a
     partner_a.person
