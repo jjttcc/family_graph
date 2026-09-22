@@ -16,7 +16,6 @@ require 'hierarchy_analyzer'
 require 'layout_pipeline'
 require 'hierarchical_placement_step'
 require 'layout_context'
-require 'relationship_connection_finder'
 
 def assert(condition, message)
   if !condition then
@@ -35,14 +34,15 @@ coords.add_node(PersonNode.new(Person.new('person_2', {}), 150, 200))
 
 assert(coords.has_node?('person_1'),
        "person_1 should exist in coordinates")
-assert(coords.node('person_1').x == 100 && coords.node('person_1').y == 200,
+assert(coords.node_by_id('person_1').x == 100 && 
+       coords.node_by_id('person_1').y == 200,
        "person_1 coordinates mismatched")
 assert(!coords.has_node?('person_3'),
        "person_3 should not exist in coordinates")
 
 # Add spouses and check uniqueness/sorting
-p1 = coords.node('person_1')
-p2 = coords.node('person_2')
+p1 = coords.node_by_id('person_1')
+p2 = coords.node_by_id('person_2')
 couple = CoupleNode.new(p1, p2, 125, 200)
 coords.add_couple(couple)
 # Try adding same couple again (should not duplicate)
@@ -99,11 +99,10 @@ pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
 pipeline.execute(context)
 layout_coords = context.coordinates
 
-# Setup Finder
-finder = RelationshipConnectionFinder.new(people)
-
 root_node = layout_coords.node_for_person(root_person)
-assert(root_node != nil, "Root #{root_person.id} should have coordinates. Nodes: #{layout_coords.nodes.keys}")
+assert(root_node != nil, "Root #{root_person.id} should have coordinates. " +
+       "Nodes: #{layout_coords.single_nodes.keys}")
+
 assert(root_node.y == 0, "Root should be at level 0")
 
 if root_person.has_spouse then
@@ -111,27 +110,25 @@ if root_person.has_spouse then
     spouse_node = layout_coords.node_for_person(spouse)
     assert(spouse_node != nil, "Root spouse should have coordinates")
     assert(spouse_node.y == 0, "Spouse should be at level 0")
+    puts "DEBUG: Root X: #{root_node.x}, Spouse X: #{spouse_node.x}"
     expected_spacing = NODE_WIDTH + 20
     assert((spouse_node.x - root_node.x).abs == expected_spacing,
-           "Spouses should be separated. Expected: #{expected_spacing}, Got: #{(spouse_node.x - root_node.x).abs}")
+           "Spouses should be separated. Expected: #{expected_spacing}, " \
+           "Got: #{(spouse_node.x - root_node.x).abs}")
   end
 end
 
 # Verify children are positioned centered beneath the couple
 if !root_person.children.empty? then
   children = root_person.children
-  context_id = root_person.has_spouse ? root_person.spouses.first.id : nil
-
-  child_xs = children.map { |c| finder.find(c, context_id)[0] }
+  child_xs = children.map { |c| layout_coords.node_for_person(c).x }
   midpoint = (child_xs.min + child_xs.max) / 2
-
   if root_person.has_spouse then
     spouse_id = root_person.spouses.first.id
-    spouse_x = layout_coords.node(spouse_id)[0]
-    couple_midpoint = (root_x + spouse_x) / 2
-
+    spouse_node = layout_coords.node_for_person(root_person.spouses.first)
+    spouse_x = spouse_node.x
+    couple_midpoint = (root_node.x + spouse_x) / 2
     puts "DEBUG: midpoint: #{midpoint}, couple_midpoint: #{couple_midpoint}"
-
     if (midpoint - couple_midpoint).abs >= 1 then
       assert(false, "Children should be centered beneath root couple midpoint: " +
              "midpoint: #{midpoint}, couple_midpoint: #{couple_midpoint}")

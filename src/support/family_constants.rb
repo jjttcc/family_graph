@@ -7,6 +7,7 @@ SPOUSE  = 'spouse'
 SPOUSES = 'spouses'
 GNAME   = 'given-name'
 SURNAME = 'surname'
+BDATE   = 'birth-date'
 PARENTS = [FATHER, MOTHER].freeze
 
 # spacing

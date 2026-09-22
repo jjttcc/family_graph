@@ -3,7 +3,7 @@ require 'graph_primitives'
 
 # Builds the graph of representations from the Person tree.
 # !!!This class might not be needed.
-class GraphBuilder
+class ObsoleteGraphBuilder
   include Contracts::DSL
 
   private #!!!forcing an exception - for a reason

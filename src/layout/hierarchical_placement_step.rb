@@ -20,6 +20,7 @@ class HierarchicalPlacementStep < LayoutStep
 
   # Recursively places a person and their descendants.
   def place_node(person, context, y, processed_couples = Set.new)
+    DebugLogger.log("DEBUG: Placing #{person.id} at Y=#{y}")
     if person.has_spouse then
       place_couple(person, context, y, processed_couples)
     else
@@ -29,6 +30,7 @@ class HierarchicalPlacementStep < LayoutStep
 
   def place_individual(person, context, y, processed_couples)
     branches = context.branches(person)
+    DebugLogger.log("DEBUG: #{person.id} branches: #{branches.map(&:id)}")
     next_x = coords.next_x(y)
     if branches.empty? then
       x = next_x
@@ -50,8 +52,8 @@ class HierarchicalPlacementStep < LayoutStep
       coords.add_node(node)
       coords.update_next_x(y, x + NODE_WIDTH + SIBLING_SPACING)
     end
-    branches.each { |b| place_node(b, context, y + 100, processed_couples) }
-    node
+    branches.each { |b| place_node(b, context, y + LEVEL_HEIGHT,
+                                   processed_couples) }
   end
 
   def place_couple(person, context, y, processed_couples)
@@ -70,7 +72,7 @@ class HierarchicalPlacementStep < LayoutStep
         coords.update_next_x(y, x + (2 * NODE_WIDTH) + 40 + SIBLING_SPACING)
       else
         branch_xs = branches.map do |b|
-          node = coords.node(b.id)
+          node = coords.node_by_id(b.id)
           if node.nil? then
             DebugLogger.log("DEBUG: Node not found for #{b.id}")
             0
@@ -90,24 +92,10 @@ class HierarchicalPlacementStep < LayoutStep
         coords.add_couple(couple)
         coords.update_next_x(y, x + (2 * NODE_WIDTH) + 40 + SIBLING_SPACING)
       end
-      branches.each { |b| place_node(b, context, y + 100, processed_couples) }
+      branches.each { |b| place_node(b, context, y + LEVEL_HEIGHT,
+                                     processed_couples) }
       processed_couples.add(couple_id)
-      return couple
     end
   end
 
-  def shift_subtree(person, amount, context)
-    if person then
-      person.coordinate_sets.each do |cid, (x, y)|
-        new_x = x + amount
-        if coords.has_node?(person.id) then
-          node = coords.node(person.id)
-          node.x = new_x
-        end
-        coords.update_next_x(y, [coords.next_x(y),
-                                 new_x + NODE_WIDTH + SIBLING_SPACING].max)
-      end
-      context.branches(person).each { |b| shift_subtree(b, amount, context) }
-    end
-  end
 end

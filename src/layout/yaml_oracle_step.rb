@@ -13,7 +13,7 @@ class YamlOracleStep < LayoutStep
 
   def execute(context)
     data = {
-      nodes: context.coordinates.nodes,
+      nodes: context.coordinates.single_nodes,
       couples: context.coordinates.couples,
       next_x: context.coordinates.instance_variable_get(:@next_x)
     }

@@ -10,6 +10,9 @@ end
 require setup_path
 require 'yaml'
 require 'fileutils'
+require 'person'
+require 'graph_primitives'
+require 'date'
 
 # Verification script for Stage 3 Oracle
 # Runs the pipeline and diffs the candidate against the oracle.
@@ -27,6 +30,8 @@ system("./bin/family_graph -m ids #{DATA_PATH} -s 3 -o " +
        "/tmp/test_dir -d ancestry -t descendant > /dev/null")
 
 # Move the generated candidate to the test/candidates location
+# Note: YamlOracleStep currently writes to hardcoded files based on name.
+# We need to ensure the correct file is captured.
 if File.exist?('oracle_stage_3.yaml')
   FileUtils.mv('oracle_stage_3.yaml', CANDIDATE_PATH)
 else
@@ -42,8 +47,9 @@ if !File.exist?(ORACLE_PATH)
   exit 1
 end
 
-oracle = YAML.load_file(ORACLE_PATH)
-candidate = YAML.load_file(CANDIDATE_PATH)
+permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
+oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
+candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
 
 if oracle == candidate
   puts "SUCCESS: Candidate matches Oracle."

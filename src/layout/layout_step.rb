@@ -13,4 +13,16 @@ class LayoutStep
     raise NotImplementedError, "#{self.class} must implement #execute"
   end
 
+  protected
+
+  pre :pvalid do |p| p.is_a?(Person) end
+  def shift_subtree(person, amount, context)
+    node = context.coordinates.node_for_person(person)
+    if node then
+      node.x += amount
+    end
+    context.branches(person).each { |b| shift_subtree(b, amount, context) }
+  end
+
 end
+

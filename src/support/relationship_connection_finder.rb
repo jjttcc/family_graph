@@ -1,6 +1,6 @@
 # Encapsulates logic for finding the correct coordinate representation
 # of a person within a specific genealogical context.
-class RelationshipConnectionFinder
+class Obs_RelationshipConnectionFinder
 
   public
 

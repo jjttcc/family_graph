@@ -2,33 +2,53 @@ require 'ruby_contracts'
 require 'utilities'
 require 'graph_primitives'
 
-# Repository of nodes and spousal pairings used to construct the layout.
+# Registry of nodes and spousal pairings used to construct the layout.
 class Coordinates
   include Contracts::DSL, Utilities
 
   public
 
-  attr_reader :nodes    # "PersonNode"s containing single persons
-  attr_reader :couples  # "CoupleNode"s - married couples
+  attr_reader :single_nodes    # "PersonNode"s containing single persons
+  attr_reader :couples         # "CoupleNode"s - married couples
 
   public  ###  Initialization
 
   # Initialize registry with empty structures.
   post :invariant do invariant end
   def initialize
-    @nodes = {}
+    @single_nodes = {}
     @couples = {}
     @next_x = Hash.new(0)
   end
 
   public  ###  Access
 
-  # The node with node-id of 'id'
+  # All individual person nodes (singles + partners in couples)
+  def all_person_nodes
+    @single_nodes.values + @couples.values.flat_map { |c| [c.partner_a,
+                                                           c.partner_b] }
+  end
+
+  # PersonNode from the registry (i.e., single_nodes and couples) associated
+  # with 'id', (a person id)
   post :nil_or_node do |result|
     result == nil || result.is_a?(PersonNode)
   end
-  def node(id)
-    self.nodes[id]
+  def node_by_id(id)
+    result = @single_nodes[id]
+    if result == nil then
+      @couples.values.each do |c|
+        if c.partner_a.id == id then
+          result = c.partner_a
+        elsif c.partner_b.id == id then
+          result = c.partner_b
+        end
+        if result != nil then
+          break
+        end
+      end
+    end
+    result
   end
 
   # The node (PersonNode) associated with 'person'
@@ -37,14 +57,15 @@ class Coordinates
     result == nil || result.is_a?(PersonNode)
   end
   def node_for_person(person)
+    target_id = person.id
     # Look in the "singles" list:
-    result = @nodes.values.find { |n| n.person.id == person.id }
+    result = @single_nodes.values.find { |n| n.id == target_id }
     if result == nil then
       # Look in the "married couples" list:
       @couples.values.each do |c|
-        if c.person_a.id == person.id then
+        if c.partner_a.id == target_id then
           result = c.partner_a
-        elsif c.person_b.id == person.id
+        elsif c.partner_b.id == target_id
           result = c.partner_b
         end
         if result != nil then
@@ -72,7 +93,9 @@ class Coordinates
 
   # Check if a person has a registered node.
   def has_node?(id)
-    self.nodes.key?(id)
+    self.single_nodes.key?(id) || @couples.values.any? do |c|
+      c.person_a.id == id || c.person_b.id == id
+    end
   end
 
   public  ###  Element change
@@ -83,7 +106,7 @@ class Coordinates
   pre :not_married do |node| ! node.person.is_married end
   post :invariant do invariant end
   def add_node(node)
-    @nodes[node.id] = node
+    @single_nodes[node.id] = node
   end
 
   # Register a couple.
@@ -101,8 +124,10 @@ class Coordinates
   private
 
   def invariant
-    nodes != nil && couples != nil &&
-    nodes.values.all? { |n| n.is_a?(PersonNode) && ! n.person.is_married } &&
+    single_nodes != nil && couples != nil &&
+    single_nodes.values.all? do |n|
+      n.is_a?(PersonNode) && ! n.person.is_married 
+    end &&
     couples.values.all? { |n| n.is_a?(CoupleNode) }
   end
 

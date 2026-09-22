@@ -10,6 +10,9 @@ end
 require setup_path
 require 'yaml'
 require 'fileutils'
+require 'person'
+require 'graph_primitives'
+require 'date'
 
 # Verification script for Stage 1 Oracle
 # Runs the pipeline and diffs the candidate against the oracle.
@@ -42,11 +45,11 @@ end
 
 # 2. Perform the diff
 puts "Comparing candidate against oracle..."
+permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
+oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
+candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
+if oracle == candidate then
 
-oracle = YAML.load_file(ORACLE_PATH)
-candidate = YAML.load_file(CANDIDATE_PATH)
-
-if oracle == candidate
   puts "SUCCESS: Candidate matches Oracle."
   exit 0
 else

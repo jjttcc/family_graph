@@ -7,7 +7,7 @@ require 'svg_utility'
 class GraphRenderer
   include Contracts::DSL, SVGUtility
 
-  public
+  public  ###  Initialization
 
   def initialize(coordinates, direction = ANCESTRY, label_mode = :dates)
     @coordinates = coordinates
@@ -15,8 +15,13 @@ class GraphRenderer
     @label_mode = label_mode
   end
 
+  public  ###  Basic operations 
+
+  # Renders the registered family tree structure into an SVG file.
+  # @param output_dir [String] The directory path where the SVG is saved.
+  # @param root_id [String] The identifier for the root of the tree.
   def render(output_dir, root_id = "tree")
-    if @coordinates.nodes.empty? && @coordinates.couples.empty? then
+    if @coordinates.single_nodes.empty? && @coordinates.couples.empty? then
       puts "No nodes to render."
       return
     end
@@ -26,9 +31,11 @@ class GraphRenderer
     offset_x, offset_y, width, height = calculate_dimensions
     svg_lines = []
     svg_nodes = []
-    @coordinates.nodes.values.each do |node|
+    # render "single-person" nodes
+    @coordinates.single_nodes.values.each do |node|
       render_person(node, svg_nodes, offset_x, offset_y)
     end
+    # render "married-person" nodes
     @coordinates.couples.values.each do |couple|
       render_couple(couple, svg_lines, svg_nodes, offset_x, offset_y)
     end
@@ -40,8 +47,10 @@ class GraphRenderer
 
   private
 
+  # Calculates the total SVG dimensions and canvas offset to contain all nodes.
+  # @return [Array<Numeric>] offset_x, offset_y, width, height.
   def calculate_dimensions
-    all_nodes = @coordinates.nodes.values +
+    all_nodes = @coordinates.single_nodes.values +
                 @coordinates.couples.values.flat_map { |c| [c.partner_a,
                                                             c.partner_b] }
     min_x = all_nodes.map { |n| n.x }.min
@@ -53,14 +62,18 @@ class GraphRenderer
      max_y - min_y + NODE_HEIGHT + (2 * RENDER_OFFSET_Y)]
   end
 
+  # Renders an individual person node as a rectangle with text labels.
+  # @param node [PersonNode] The node representing the person.
+  # @param svg_nodes [Array] The collection of SVG elements to add to.
+  # @param offset_x [Numeric] X-axis offset for rendering.
+  # @param offset_y [Numeric] Y-axis offset for rendering.
   def render_person(node, svg_nodes, offset_x, offset_y)
     nx = node.x + offset_x
     ny = node.y + offset_y
-    person = node.person
-    name_label = "#{person.given_name} #{person.surname}".strip
+    name_label = "#{node.given_name} #{node.surname}".strip
     texts = [["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_NAME_Y_OFFSET}",
               name_label, 9]]
-    date = person.respond_to?(:birth_date) ? person.birth_date : nil
+    date = node.birth_date
     date_label = (date || "").to_s
     case @label_mode
     when :dates then
@@ -68,17 +81,23 @@ class GraphRenderer
                 date_label, 7]
     when :ids then
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_ID_Y_OFFSET}",
-                person.id, 7]
+                node.id, 7]
     when :both then
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_DATE_BOTH_Y_OFFSET}",
                 date_label, 7]
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_ID_BOTH_Y_OFFSET}",
-                person.id, 7]
+                node.id, 7]
     end
     svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each { |x, y, l, s| svg_nodes << text(x, y, l, s) }
   end
 
+  # Renders a couple, including their individual nodes and the spousal line.
+  # @param couple [CoupleNode] The couple node to render.
+  # @param svg_lines [Array] Collection of SVG line elements.
+  # @param svg_nodes [Array] Collection of SVG node elements.
+  # @param offset_x [Numeric] X-axis offset for rendering.
+  # @param offset_y [Numeric] Y-axis offset for rendering.
   def render_couple(couple, svg_lines, svg_nodes, offset_x, offset_y)
     # Render partner nodes
     render_person(couple.partner_a, svg_nodes, offset_x, offset_y)
@@ -92,21 +111,29 @@ class GraphRenderer
     svg_lines << line(x1, y1, x2, y2, 'black', 1, '4')
   end
 
+  # Renders lines connecting children to their respective parents.
+  # @param svg_lines [Array] Collection of SVG line elements.
+  # @param offset_x [Numeric] X-axis offset for rendering.
+  # @param offset_y [Numeric] Y-axis offset for rendering.
   def render_parent_child_lines(svg_lines, offset_x, offset_y)
-    @coordinates.nodes.values.each do |node|
-      next unless node.is_a?(PersonNode)
-      person = node.person
-      person.parents.each do |parent|
-        parent_node = @coordinates.node_for_person(parent)
-        next unless parent_node
-        px = parent_node.x + (NODE_WIDTH / 2)
-        py = parent_node.y + ( @direction == DESCENT ? NODE_HEIGHT : 0 )
-        cx = node.x + (NODE_WIDTH / 2)
-        cy = node.y + ( @direction == DESCENT ? 0 : NODE_HEIGHT )
-        marker = (@direction == NONE) ? "" : " marker-end=\"url(#arrowhead)\""
-        svg_lines << line(px + offset_x, py + offset_y, cx + offset_x,
-                          cy + offset_y, 'black', 1, nil, marker != "")
+    @coordinates.all_person_nodes.each do |node|
+      if node.is_a?(PersonNode) then
+        person = node.person
+        person.parents.each do |parent|
+          parent_node = @coordinates.node_for_person(parent)
+          if parent_node then
+            px = parent_node.x + (NODE_WIDTH / 2)
+            py = parent_node.y + (@direction == DESCENT ? NODE_HEIGHT : 0)
+            cx = node.x + (NODE_WIDTH / 2)
+            cy = node.y + (@direction == DESCENT ? 0 : NODE_HEIGHT)
+            marker = (@direction == NONE) ? "" :
+              " marker-end=\"url(#arrowhead)\""
+            svg_lines << line(px + offset_x, py + offset_y, cx + offset_x,
+                              cy + offset_y, 'black', 1, nil, marker != "")
+          end
+        end
       end
     end
   end
+
 end

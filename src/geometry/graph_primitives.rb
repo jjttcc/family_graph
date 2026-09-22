@@ -1,4 +1,5 @@
-# Abstract base for all visual entities
+# The abstract base class for all visual nodes within the family tree
+# rendering pipeline, providing common position attributes.
 require 'ruby_contracts'
 require 'utilities'
 
@@ -11,6 +12,7 @@ class Node
 
   public  ###  Access
 
+  # The id of the underlying entity (e.g., person)
   def id
     raise "virtual method"
   end
@@ -40,12 +42,34 @@ class PersonNode < Node
   def initialize(person, x = 0, y = 0)
     super(x, y)
     @person = person
+    if ! invariant then raise "invariant violation" end
   end
 
   public  ###  Access
 
+  # The id of 'person'
+  pre  :inv do invariant end
+  post :inv do invariant end
   def id
     person.id
+  end
+
+  def given_name
+    person.given_name
+  end
+
+  def surname
+    person.surname
+  end
+
+  def birth_date
+    person.birth_date
+  end
+
+  private ###  Class invariant
+
+  def invariant
+    person.is_a?(Person)
   end
 
 end
@@ -69,14 +93,17 @@ class CoupleNode < Node
 
   public  ###  Access
 
+  # The ids of 'partner_a' and 'partner_b', sorted and joined together.
   def id
     joined_id(partner_a.id, partner_b.id)
   end
 
+  # The 'partner_a' person
   def person_a
     partner_a.person
   end
 
+  # The 'partner_b' person
   def person_b
     partner_b.person
   end
@@ -84,12 +111,13 @@ class CoupleNode < Node
   private ###  Class invariant
 
   def invariant
-    person_a.is_a?(Person) && person_b.is_a?(Person)
+    person_a.is_a?(Person) && person_b.is_a?(Person) &&
+    partner_a.is_a?(PersonNode) && partner_b.is_a?(PersonNode)
   end
 
 end
 
-# Represents a relationship edge (e.g., parent-child)
+# Relationship edges (e.g., parent-child)
 class Edge
 
   include Contracts::DSL
