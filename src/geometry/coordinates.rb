@@ -34,7 +34,7 @@ class Coordinates
   post :nil_or_node do |result|
     result == nil || result.is_a?(PersonNode)
   end
-  def node_by_id(id)
+  def node_by_person_id(id)
     result = @single_nodes[id]
     if result == nil then
       @couples.values.each do |c|

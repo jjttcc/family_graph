@@ -1,8 +1,8 @@
-# The abstract base class for all visual nodes within the family tree
-# rendering pipeline, providing common position attributes.
 require 'ruby_contracts'
 require 'utilities'
 
+# The abstract base class for all visual nodes within the family tree
+# rendering pipeline, providing common position attributes.
 class Node
   include Contracts::DSL
 

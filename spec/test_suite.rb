@@ -34,15 +34,15 @@ coords.add_node(PersonNode.new(Person.new('person_2', {}), 150, 200))
 
 assert(coords.has_node?('person_1'),
        "person_1 should exist in coordinates")
-assert(coords.node_by_id('person_1').x == 100 && 
-       coords.node_by_id('person_1').y == 200,
+assert(coords.node_by_person_id('person_1').x == 100 && 
+       coords.node_by_person_id('person_1').y == 200,
        "person_1 coordinates mismatched")
 assert(!coords.has_node?('person_3'),
        "person_3 should not exist in coordinates")
 
 # Add spouses and check uniqueness/sorting
-p1 = coords.node_by_id('person_1')
-p2 = coords.node_by_id('person_2')
+p1 = coords.node_by_person_id('person_1')
+p2 = coords.node_by_person_id('person_2')
 couple = CoupleNode.new(p1, p2, 125, 200)
 coords.add_couple(couple)
 # Try adding same couple again (should not duplicate)

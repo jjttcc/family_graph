@@ -72,7 +72,7 @@ class HierarchicalPlacementStep < LayoutStep
         coords.update_next_x(y, x + (2 * NODE_WIDTH) + 40 + SIBLING_SPACING)
       else
         branch_xs = branches.map do |b|
-          node = coords.node_by_id(b.id)
+          node = coords.node_by_person_id(b.id)
           if node.nil? then
             DebugLogger.log("DEBUG: Node not found for #{b.id}")
             0
