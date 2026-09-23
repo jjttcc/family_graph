@@ -9,12 +9,14 @@ class LayoutContext
   public
 
   attr_reader :people, :roots, :coordinates
+  attr_accessor :offspring_generation_widths
 
   def initialize(people, roots, coordinates, traversal_direction)
     @people = people
     @roots = roots
     @coordinates = coordinates
     @traversal_direction = traversal_direction
+    @offspring_generation_widths = {}
   end
 
   def branches(person)

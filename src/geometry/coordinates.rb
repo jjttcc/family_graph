@@ -8,8 +8,8 @@ class Coordinates
 
   public
 
-  attr_reader :single_nodes    # "PersonNode"s containing single persons
-  attr_reader :couples         # "CoupleNode"s - married couples
+  attr_reader :single_nodes    # Hash: "PersonNode"s containing single persons
+  attr_reader :couples         # Hash: "CoupleNode"s - married couples
 
   public  ###  Initialization
 
@@ -23,7 +23,7 @@ class Coordinates
 
   public  ###  Access
 
-  # All individual person nodes (singles + partners in couples)
+  # Array: All individual person nodes (singles + partners in couples)
   def all_person_nodes
     @single_nodes.values + @couples.values.flat_map { |c| [c.partner_a,
                                                            c.partner_b] }
@@ -100,12 +100,12 @@ class Coordinates
 
   public  ###  Element change
 
-  # Store Node instance for a person.
+  # Register a single node.
   pre :valid_node do |node| node.is_a?(PersonNode) end
   pre :has_person do |node| node.person.is_a?(Person) end
   pre :not_married do |node| ! node.person.is_married end
   post :invariant do invariant end
-  def add_node(node)
+  def add_single_node(node)
     @single_nodes[node.id] = node
   end
 

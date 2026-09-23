@@ -8,7 +8,7 @@ class Node
 
   public
 
-  attr_accessor :x, :y
+  attr_accessor :x, :y, :offspring_width
 
   public  ###  Access
 

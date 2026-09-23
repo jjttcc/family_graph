@@ -17,7 +17,9 @@ require 'hierarchical_placement_step'
 require 'compaction_layout_step'
 require 'structural_alignment_step'
 require 'yaml_oracle_step'
-require 'hierarchy_analyzer'
+require 'hierarchy_analyzer_step'
+require 'width_calculator_step'
+require 'node_creator_step'
 
 options = {
   root_ids: nil,
@@ -122,8 +124,7 @@ data_paths.each do |path|
 end
 
 # Calculate generations
-ha = HierarchyAnalyzer.new
-ha.calculate_and_assign_generations(people)
+# (Moved to HierarchyAnalyzerStep)
 
 if options[:root_ids] then
   root_ids = options[:root_ids]
@@ -140,6 +141,9 @@ end
 
 # Build pipeline
 full_pipeline = [
+  HierarchyAnalyzerStep.new,
+  NodeCreatorStep.new,
+  WidthCalculatorStep.new,
   HierarchicalPlacementStep.new,
   YamlOracleStep.new("oracle_stage_1.yaml"),
   StructuralAlignmentStep.new,
@@ -148,16 +152,15 @@ full_pipeline = [
   YamlOracleStep.new("oracle_stage_3.yaml"),
 ]
 
-# Truncate pipeline based on stop_at_stage
 # Map stages to pipeline indices:
-# Stage 1: Index 0, 1
-# Stage 2: Index 2, 3
-# Stage 3: Index 4, 5
+# Stage 1: Index 0, 1, 2, 3, 4
+# Stage 2: Index 5, 6
+# Stage 3: Index 7, 8
 stop_index = case options[:stop_at_stage]
-             when 1 then 1
-             when 2 then 3
-             when 3 then 5
-             else 5
+             when 1 then 4
+             when 2 then 6
+             when 3 then 8
+             else 8
              end
 
 layout_pipeline = full_pipeline[0..stop_index]

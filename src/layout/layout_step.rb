@@ -24,5 +24,19 @@ class LayoutStep
     context.branches(person).each { |b| shift_subtree(b, amount, context) }
   end
 
+  def max_siblings_in_subtree(person, context)
+    counts = Hash.new(0)
+    update_sibling_counts(person, context, counts, 0)
+    counts.values.max || 1
+  end
+
+  private
+
+  def update_sibling_counts(person, context, counts, level)
+    counts[level] += 1
+    context.branches(person).each do |child|
+      update_sibling_counts(child, context, counts, level + 1)
+    end
+  end
 end
 

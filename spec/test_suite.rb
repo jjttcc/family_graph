@@ -29,8 +29,8 @@ puts "Verifying Coordinates class..."
 coords = Coordinates.new
 
 # Add nodes
-coords.add_node(PersonNode.new(Person.new('person_1', {}), 100, 200))
-coords.add_node(PersonNode.new(Person.new('person_2', {}), 150, 200))
+coords.add_single_node(PersonNode.new(Person.new('person_1', {}), 100, 200))
+coords.add_single_node(PersonNode.new(Person.new('person_2', {}), 150, 200))
 
 assert(coords.has_node?('person_1'),
        "person_1 should exist in coordinates")
