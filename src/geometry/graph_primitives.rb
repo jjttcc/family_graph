@@ -39,13 +39,16 @@ class PersonNode < Node
 
   pre :xy_valid do |p, x, y| x != nil && y != nil end
   pre :person_valid do |person| person.is_a?(Person) end
-  def initialize(person, x = 0, y = 0)
+  def initialize(person, x = 0, y = 0, is_primary_representation = true)
     super(x, y)
     @person = person
+    @is_primary_representation = is_primary_representation
     if ! invariant then raise "invariant violation" end
   end
 
   public  ###  Access
+
+  attr_accessor :is_primary_representation
 
   # The id of 'person'
   pre  :inv do invariant end
@@ -77,10 +80,17 @@ end
 # Geometric node for a couple (atomic "couple" representation)
 class CoupleNode < Node
   include Contracts::DSL, Utilities
+  extend Utilities
 
   public
 
   attr_reader :partner_a, :partner_b
+
+  # Generates a standard ID for a couple given two persons.
+  def self.generate_id(person1, person2)
+    # Using the joined_id helper logic from Utilities.
+    joined_id(person1.id, person2.id)
+  end
 
   pre :nodes_valid do |p1, p2| p1.is_a?(PersonNode) && p2.is_a?(PersonNode) end
   pre :coords_valid do |p1, p2, x, y| x != nil && y != nil end
@@ -106,6 +116,13 @@ class CoupleNode < Node
   # The 'partner_b' person
   def person_b
     partner_b.person
+  end
+
+  public  ###  Boolean queries
+
+  # Does this "couple" contain 'person1' and 'person2'?
+  def is_match(person1, person2)
+    self.id == joined_id(person1.id, person2.id)
   end
 
   private ###  Class invariant

@@ -123,9 +123,6 @@ data_paths.each do |path|
   end
 end
 
-# Calculate generations
-# (Moved to HierarchyAnalyzerStep)
-
 if options[:root_ids] then
   root_ids = options[:root_ids]
 else

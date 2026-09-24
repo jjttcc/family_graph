@@ -11,11 +11,11 @@ require setup_path
 require 'data_loader'
 require 'graph_renderer'
 require 'family_constants'
-require 'hierarchy_analyzer'
 require 'layout_pipeline'
 require 'coordinates'
 require 'layout_context'
 require 'hierarchical_placement_step'
+require 'hierarchy_analyzer_step'
 
 def assert(condition, message)
   unless condition
@@ -45,9 +45,9 @@ output_dir = 'output'
 
 # Test :descent with HierarchicalPlacement
 puts "Rendering Descent graph..."
-HierarchyAnalyzer.new.calculate_and_assign_generations(people)
 context = LayoutContext.new(people, people.values.select { |p| p.is_root },
                             Coordinates.new, :descendant)
+HierarchyAnalyzerStep.new.execute(context)
 pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
 pipeline.execute(context)
 renderer = GraphRenderer.new(context.coordinates, :descent, :ids)

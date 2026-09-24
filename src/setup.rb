@@ -18,7 +18,8 @@ def set_rubylib(args)
   end
 end
 
-dirlist = %w[util
+dirlist = %w[
+util
 graph_logic
 management
 data
@@ -30,6 +31,7 @@ layout
 core
 construction
 util
-rendering]
+rendering
+]
 
 set_rubylib(dirlist)

@@ -1,5 +1,6 @@
 # Expanded Tree for Testing - Diverse Surnames and Correct Relationships
 # Structure: 5 Generations, various surnames, multi-spouse, and single parents.
+# ADDED: Test branch for multi_spouse_400
 
 # Gen 0
 root_ancestor_100:
@@ -44,6 +45,14 @@ spouse_2:
   given-name: Sarah
   surname: Miller
 
+# Added test branch for multi_spouse_400 (David Doe)
+test_child_500:
+  given-name: TestChild
+  surname: Doe
+  birth-date: 1925-01-01
+  father: multi_spouse_400
+  mother: spouse_1
+
 # Gen 2
 grandchild_gen2_300:
   given-name: Diana
@@ -85,25 +94,25 @@ great_grandchild_b_303:
 
 # Gen 4
 gen4_child_1:
-  given-name: Gen4-One
+  given-name: Olivia
   surname: Brown
   birth-date: 1970-01-01
   mother: great_grandchild_gen3_400
 
 gen4_child_2:
-  given-name: Gen4-Two
+  given-name: William
   surname: Brown
   birth-date: 1972-01-01
   mother: great_grandchild_gen3_400
 
 gen4_child_3:
-  given-name: Gen4-Three
+  given-name: James
   surname: Doe
   birth-date: 1974-01-01
   father: great_grandchild_b_303
 
 gen4_child_4:
-  given-name: Gen4-Four
+  given-name: Emily
   surname: Doe
   birth-date: 1976-01-01
   father: great_grandchild_b_303

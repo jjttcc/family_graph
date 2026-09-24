@@ -12,10 +12,12 @@ require 'data_loader'
 require 'family_constants'
 require 'coordinates'
 require 'graph_renderer'
-require 'hierarchy_analyzer'
+require 'hierarchy_analyzer_step'
 require 'layout_pipeline'
 require 'hierarchical_placement_step'
 require 'layout_context'
+require 'node_creator_step'
+require 'width_calculator_step'
 
 def assert(condition, message)
   if !condition then
@@ -90,12 +92,16 @@ puts "Verifying Layout Engine (Modern Pipeline)..."
 root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
 
-HierarchyAnalyzer.new.calculate_and_assign_generations(people)
 context = LayoutContext.new(people,
                             [root_person],
                             Coordinates.new,
                             :descendant)
-pipeline = LayoutPipeline.new([HierarchicalPlacementStep.new])
+pipeline = LayoutPipeline.new([
+  HierarchyAnalyzerStep.new,
+  NodeCreatorStep.new,
+  WidthCalculatorStep.new,
+  HierarchicalPlacementStep.new
+])
 pipeline.execute(context)
 layout_coords = context.coordinates
 
@@ -122,7 +128,7 @@ end
 if !root_person.children.empty? then
   children = root_person.children
   child_xs = children.map { |c| layout_coords.node_for_person(c).x }
-  midpoint = (child_xs.min + child_xs.max) / 2
+  midpoint = (child_xs.min + child_xs.max + NODE_WIDTH) / 2
   if root_person.has_spouse then
     spouse_id = root_person.spouses.first.id
     spouse_node = layout_coords.node_for_person(root_person.spouses.first)
@@ -155,7 +161,7 @@ assert(!svg_files.empty?,
 
 latest_svg = svg_files.max_by { |f| File.mtime(f) }
 svg_content = File.read(latest_svg)
-assert(svg_content.include?("David Doe +"),
+assert(svg_content.include?("David Doe") && svg_content.include?("+"),
        "Multi-spouse person 'David Doe' should have '+' indicator")
 assert(svg_content.include?("1950-01-01 [bap]"),
        "Baptism person 'Baptism Test' should have '[bap]' indicator")

@@ -33,6 +33,7 @@ spec/data
 test*run*
 /notes
 for_gemini
+for_jtc
 *dialog*
 .stodo*
 new_*
@@ -42,3 +43,8 @@ orac*yaml
 xfr
 lines.txt
 rects.txt
+coords*.txt
+labels*.txt
+/util/
+/logs/
+*_old.yaml

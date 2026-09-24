@@ -88,6 +88,13 @@ class GraphRenderer
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_ID_BOTH_Y_OFFSET}",
                 node.id, 7]
     end
+
+    # Multi-spouse representation indicator
+    if node.person.spouses.size > 1 then
+      symbol = node.is_primary_representation ? "*" : "+"
+      texts << ["#{nx + NODE_WIDTH - 10}", "#{ny + 15}", symbol, 10]
+    end
+
     svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each { |x, y, l, s| svg_nodes << text(x, y, l, s) }
   end
@@ -117,7 +124,7 @@ class GraphRenderer
   # @param offset_y [Numeric] Y-axis offset for rendering.
   def render_parent_child_lines(svg_lines, offset_x, offset_y)
     @coordinates.all_person_nodes.each do |node|
-      if node.is_a?(PersonNode) then
+      if node.is_a?(PersonNode) && node.is_primary_representation then
         person = node.person
         person.parents.each do |parent|
           parent_node = @coordinates.node_for_person(parent)

@@ -1,5 +1,17 @@
+
+### Requirement Refinement: Primary Node Selection
+- **Strategy**: Initially, the first representation of a multi-spouse person encountered in the data structure will be designated as the "primary" node.
+- **Future Requirement**: Implement a more sophisticated selection logic based on geometric proximity to the person's parents.
 YAML Field,Relationship Meaning,SVG Connector Class,Recommended Line Style
 father:,Confirmed biological parent,.line-biological,Solid Line
 adoptive-father:,Legal or informal adoptive parent,.line-adoptive,"Fine Dotted Line (stroke-dasharray=""0, 6"")"
 assumed-father:,Hypothesized or unproven link,.line-assumed,"Medium Dashed Line (stroke-dasharray=""8, 4"")"
 step-father:,Parent by marriage (if used),.line-step,"Dash-Dot Line (stroke-dasharray=""12, 4, 3, 4"")"
+
+### Requirement: Multi-Spouse Representation
+- **Objective**: Visually distinguish primary node representation (with parent-child lines) from secondary representations (without lines) for persons with multiple spouses.
+- **Visuals**:
+  - Secondary representations: Mark with '+' symbol.
+  - Primary representation: Mark with a different, TBD symbol.
+  - Parent-child lines: Draw ONLY from the primary representation.
+

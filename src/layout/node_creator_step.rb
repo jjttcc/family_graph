@@ -23,14 +23,17 @@ class NodeCreatorStep < LayoutStep
   private
 
   def process_couple(person, context)
+    is_first_spouse = true
     person.spouses.each do |spouse|
-      couple_id = [person.id, spouse.id].sort
-      if !context.coordinates.couples.key?(couple_id.join('.')) then
-        p1 = PersonNode.new(person, 0, 0)
+      if !context.coordinates.has_couple_for_persons?(person, spouse) then
+        p1 = PersonNode.new(person, 0, 0, is_first_spouse)
         p2 = PersonNode.new(spouse, 0, 0)
         couple = CoupleNode.new(p1, p2, 0, 0)
         context.coordinates.add_couple(couple)
+        is_first_spouse = false
       end
     end
   end
+
 end
+
