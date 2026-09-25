@@ -23,7 +23,7 @@ class StructuralAlignmentStep < LayoutStep
   def align_spouses(person, context)
     return unless person.has_spouse
     unless context.coordinates.has_node?(person.id) then
-      DebugLogger.log(["DEBUG: Spouse alignment skipped: #{person.id}",
+      log(["DEBUG: Spouse alignment skipped: #{person.id}",
                        "has no coords."], "\n")
       return
     end
@@ -31,7 +31,7 @@ class StructuralAlignmentStep < LayoutStep
     p_x = node.x
     person.spouses.each_with_index do |spouse, index|
       unless context.coordinates.has_node?(spouse.id) then
-        DebugLogger.log(["DEBUG: Spouse alignment skipped: Spouse ",
+        log(["DEBUG: Spouse alignment skipped: Spouse ",
                          "#{spouse.id} of #{person.id} has no coords."], "\n")
         next
       end

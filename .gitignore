@@ -49,3 +49,4 @@ labels*.txt
 /logs/
 *_old.yaml
 .vimrc
+*bck

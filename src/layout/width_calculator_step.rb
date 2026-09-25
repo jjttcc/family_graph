@@ -12,14 +12,13 @@ class WidthCalculatorStep < LayoutStep
   def execute(context)
     coords = context.coordinates
     coords.single_nodes.each_value do |node|
-      width = node_offspring_width(node, context)
-      node.offspring_width = width || 0
+      node.offspring_width = node_offspring_width(node, context)
     end
     coords.couples.each_value do |couple_node|
       width = couple_offspring_width(couple_node, context)
-      couple_node.offspring_width = width || 0
-      couple_node.partner_a.offspring_width = width || 0
-      couple_node.partner_b.offspring_width = width || 0
+      couple_node.offspring_width = width
+      couple_node.partner_a.offspring_width = width
+      couple_node.partner_b.offspring_width = width
     end
     coords.set_nodes_initialized
   end

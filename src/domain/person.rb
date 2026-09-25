@@ -6,6 +6,7 @@ require 'ruby_contracts'
 # genealogical data.
 class Person
   include Contracts::DSL
+  include DebugLogger
 
   public
 
@@ -17,7 +18,7 @@ class Person
   post :invariant do invariant end
   def initialize(id, data = {})
     @id = id
-    DebugLogger.log("DEBUG: Creating Person #{id} (OID: #{self.object_id}")
+    log("DEBUG: Creating Person #{id} (OID: #{self.object_id}")
     @data = data
     @spouses = []
     @children = []
