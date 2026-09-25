@@ -48,3 +48,4 @@ labels*.txt
 /util/
 /logs/
 *_old.yaml
+.vimrc
