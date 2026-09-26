@@ -15,7 +15,7 @@ class GraphRenderer
     @label_mode = label_mode
   end
 
-  public  ###  Basic operations 
+  public  ###  Basic operations
 
   # Renders the registered family tree structure into an SVG file.
   # @param output_dir [String] The directory path where the SVG is saved.
@@ -92,13 +92,11 @@ class GraphRenderer
       texts << ["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_ID_BOTH_Y_OFFSET}",
                 node.id, 7]
     end
-
     # Multi-spouse representation indicator
     if node.person.spouses.size > 1 then
       symbol = node.is_primary_representation ? "*" : "+"
       texts << ["#{nx + NODE_WIDTH - 10}", "#{ny + 15}", symbol, 10]
     end
-
     svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each { |x, y, l, s| svg_nodes << text(x, y, l, s) }
   end
@@ -133,10 +131,8 @@ class GraphRenderer
         person.parents.each do |parent|
           parent_node = @coordinates.node_for_person(parent)
           if parent_node then
-            x1 = node.x + (NODE_WIDTH / 2)
-            y1 = node.y
-            x2 = parent_node.x + (NODE_WIDTH / 2)
-            y2 = parent_node.y + NODE_HEIGHT
+            x1, y1 = node.top_center
+            x2, y2 = parent_node.bottom_center
             marker = if @direction == NONE then
               ""
             else

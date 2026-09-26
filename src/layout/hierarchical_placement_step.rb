@@ -56,14 +56,8 @@ class HierarchicalPlacementStep < LayoutStep
         couple_node = coords.node_for_couple(person, spouse)
         if couple_node then
           if couple_node.x == 0 && couple_node.y == 0 then
-            couple_node.y = y
-            couple_width = COUPLE_WIDTH
-            couple_node.x = coords.next_x(y)
-            couple_node.partner_a.x = couple_node.x
-            couple_node.partner_a.y = y
-            couple_node.partner_b.x = couple_node.x + NODE_WIDTH + 20
-            couple_node.partner_b.y = y
-            coords.update_next_x(y, couple_node.x + couple_width +
+            couple_node.initialize_coordinates(coords.next_x(y), y)
+            coords.update_next_x(y, couple_node.x + COUPLE_WIDTH +
                                  SIBLING_SPACING)
           end
           processed_couples.add(couple_id)
@@ -107,23 +101,15 @@ class HierarchicalPlacementStep < LayoutStep
           if !processed_couples.include?(couple_id) then
             couple_node = coords.node_for_couple(child, spouse)
             if couple_node then
-              couple_width = COUPLE_WIDTH
               if couple_node.x == 0 && couple_node.y == 0 then
-#!!!Note: Strongly consider refactoring some of this logic into the Node
-#!!!      class hierarchy.
-                couple_node.y = y
-                couple_node.x = current_x
-                couple_node.partner_a.x = current_x
-                couple_node.partner_a.y = y
-                couple_node.partner_b.x = current_x + NODE_WIDTH + 20
-                couple_node.partner_b.y = y
-                coords.update_next_x(y, current_x + couple_width +
+                couple_node.initialize_coordinates(current_x, y)
+                coords.update_next_x(y, current_x + COUPLE_WIDTH +
                                      SIBLING_SPACING)
               end
               processed_couples.add(couple_id)
               place_couple_children(child, spouse, context, y + LEVEL_HEIGHT,
                                     couple_node)
-              current_x += couple_width + SIBLING_SPACING
+              current_x += COUPLE_WIDTH + SIBLING_SPACING
             end
           end
         end

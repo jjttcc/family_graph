@@ -23,6 +23,16 @@ class Node
     raise "virtual method"
   end
 
+  # The top-center coordinates [x, y] of the node
+  def top_center
+    raise "virtual method"
+  end
+
+  # The bottom-center coordinates [x, y] of the node
+  def bottom_center
+    raise "virtual method"
+  end
+
   public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
@@ -78,6 +88,16 @@ class PersonNode < Node
   # The horizontal center coordinate of this person node
   def center_x
     x + (NODE_WIDTH / 2.0)
+  end
+
+  # The top-center coordinates [x, y] of this person node
+  def top_center
+    [x + (NODE_WIDTH / 2.0), y]
+  end
+
+  # The bottom-center coordinates [x, y] of this person node
+  def bottom_center
+    [x + (NODE_WIDTH / 2.0), y + NODE_HEIGHT]
   end
 
   def method_missing(method_name, *args, &block)
@@ -144,6 +164,26 @@ class CoupleNode < Node
   # The horizontal center coordinate of this couple node
   def center_x
     (partner_a.x + partner_b.x) / 2.0
+  end
+
+  # The top-center coordinates [x, y] of this couple node
+  def top_center
+    [center_x, y]
+  end
+
+  # The bottom-center coordinates [x, y] of this couple node
+  def bottom_center
+    [center_x, y + NODE_HEIGHT]
+  end
+
+  # Initializes coordinates for this couple and its partner nodes
+  def initialize_coordinates(new_x, new_y)
+    @x = new_x
+    @y = new_y
+    partner_a.x = new_x
+    partner_a.y = new_y
+    partner_b.x = new_x + NODE_WIDTH + 20
+    partner_b.y = new_y
   end
 
   public  ###  Boolean queries
