@@ -109,6 +109,8 @@ class HierarchicalPlacementStep < LayoutStep
             if couple_node then
               couple_width = COUPLE_WIDTH
               if couple_node.x == 0 && couple_node.y == 0 then
+#!!!Note: Strongly consider refactoring some of this logic into the Node
+#!!!      class hierarchy.
                 couple_node.y = y
                 couple_node.x = current_x
                 couple_node.partner_a.x = current_x

@@ -133,14 +133,17 @@ class GraphRenderer
         person.parents.each do |parent|
           parent_node = @coordinates.node_for_person(parent)
           if parent_node then
-            px = parent_node.x + (NODE_WIDTH / 2)
-            py = parent_node.y + (@direction == DESCENT ? NODE_HEIGHT : 0)
-            cx = node.x + (NODE_WIDTH / 2)
-            cy = node.y + (@direction == DESCENT ? 0 : NODE_HEIGHT)
-            marker = (@direction == NONE) ? "" :
+            x1 = node.x + (NODE_WIDTH / 2)
+            y1 = node.y
+            x2 = parent_node.x + (NODE_WIDTH / 2)
+            y2 = parent_node.y + NODE_HEIGHT
+            marker = if @direction == NONE then
+              ""
+            else
               " marker-end=\"url(#arrowhead)\""
-            svg_lines << line(px + offset_x, py + offset_y, cx + offset_x,
-                              cy + offset_y, 'black', 1, nil, marker != "")
+            end
+            svg_lines << line(x1 + offset_x, y1 + offset_y, x2 + offset_x,
+                              y2 + offset_y, 'black', 1, nil, marker != "")
           end
         end
       end
