@@ -57,7 +57,7 @@ class HierarchicalPlacementStep < LayoutStep
         if couple_node then
           if couple_node.x == 0 && couple_node.y == 0 then
             couple_node.y = y
-            couple_width = (2 * NODE_WIDTH) + COUPLE_SPACING
+            couple_width = COUPLE_WIDTH
             couple_node.x = coords.next_x(y)
             couple_node.partner_a.x = couple_node.x
             couple_node.partner_a.y = y
@@ -107,7 +107,7 @@ class HierarchicalPlacementStep < LayoutStep
           if !processed_couples.include?(couple_id) then
             couple_node = coords.node_for_couple(child, spouse)
             if couple_node then
-              couple_width = (2 * NODE_WIDTH) + COUPLE_SPACING
+              couple_width = COUPLE_WIDTH
               if couple_node.x == 0 && couple_node.y == 0 then
                 couple_node.y = y
                 couple_node.x = current_x

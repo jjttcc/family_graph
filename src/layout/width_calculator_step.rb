@@ -50,7 +50,7 @@ class WidthCalculatorStep < LayoutStep
     if ! children.empty? then
       children.each do |child|
         if child.has_spouse then
-          result += (2 * NODE_WIDTH) + COUPLE_SPACING
+          result += COUPLE_WIDTH
         else
           result += NODE_WIDTH
         end

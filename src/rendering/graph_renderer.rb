@@ -73,10 +73,10 @@ class GraphRenderer
     name_label = "#{node.given_name} #{node.surname}".strip
     texts = [["#{nx + NODE_WIDTH / 2}", "#{ny + TEXT_NAME_Y_OFFSET}",
               name_label, 9]]
-    date = if node.respond_to?(:baptism_date) && node.baptism_date then
-      "#{node.baptism_date} [bap]"
+    if node.respond_to?(:baptism_date) && node.baptism_date then
+      date = "#{node.baptism_date} [bap]"
     else
-      node.birth_date
+      date = node.birth_date
     end
     date_label = (date || "").to_s
     case @label_mode

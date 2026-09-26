@@ -11,8 +11,17 @@ module SVGUtility
   def line(x1, y1, x2, y2, stroke = 'black', stroke_width = 1,
            dash = nil, marker = nil)
     attr = "stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\""
-    attr += " stroke-dasharray=\"#{dash}\"" if dash
-    attr += " marker-end=\"url(#arrowhead)\"" if marker
+    if dash then
+      dash_attr = " stroke-dasharray=\"#{dash}\""
+    else
+      dash_attr = ""
+    end
+    if marker then
+      marker_attr = " marker-end=\"url(#arrowhead)\""
+    else
+      marker_attr = ""
+    end
+    attr += dash_attr + marker_attr
     "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" y2=\"#{y2}\" #{attr} />"
   end
 
