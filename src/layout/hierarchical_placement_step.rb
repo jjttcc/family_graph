@@ -1,6 +1,7 @@
+require 'set'
 require 'layout_step'
 require 'graph_primitives'
-require 'set'
+require 'family_constants'
 
 # Implements recursive, top-down generation-order hierarchical placement
 # utilizing pre-calculated offspring widths for centering.
@@ -43,8 +44,7 @@ class HierarchicalPlacementStep < LayoutStep
         node.x = coords.next_x(y)
         coords.update_next_x(y, node.x + NODE_WIDTH + SIBLING_SPACING)
       end
-      place_children(person, context, y + LEVEL_HEIGHT, node,
-                     NODE_WIDTH)
+      place_children(person, context, y + LEVEL_HEIGHT, node)
     end
   end
 
@@ -68,43 +68,36 @@ class HierarchicalPlacementStep < LayoutStep
           end
           processed_couples.add(couple_id)
           place_couple_children(person, spouse, context, y + LEVEL_HEIGHT,
-                                couple_node, (2 * NODE_WIDTH) + COUPLE_SPACING)
+                                couple_node)
         end
       end
     end
   end
 
   # Identify and lay out descendants for an individual person.
-  def place_children(person, context, y, parent_node, parent_width)
+  def place_children(person, context, y, parent_node)
     children = context.branches(person).select do |child|
       !person.has_spouse || child.parents.include?(person)
     end
     if !children.empty? then
-      layout_siblings(children, context, y, parent_node,
-                            parent_width)
+      layout_siblings(children, context, y, parent_node)
     end
   end
 
   # Identify and lay out descendants for a couple.
-  def place_couple_children(person_a, person_b, context, y, couple_node,
-                            couple_width)
+  def place_couple_children(person_a, person_b, context, y, couple_node)
     children = context.branches(person_a).select do |child|
       child.parents.include?(person_a) || child.parents.include?(person_b)
     end
     if !children.empty? then
-      layout_siblings(children, context, y, couple_node,
-                            couple_width)
+      layout_siblings(children, context, y, couple_node)
     end
   end
 
   # Lay out a group of siblings centered beneath their parent node.
-  def layout_siblings(children, context, y, parent_node, parent_width)
+  def layout_siblings(children, context, y, parent_node)
     offspring_width = parent_node.offspring_width
-    parent_center = if parent_node.is_a?(CoupleNode) then
-      (parent_node.partner_a.x + parent_node.partner_b.x) / 2.0
-    else
-      parent_node.x + (parent_width / 2.0)
-    end
+    parent_center = parent_node.center_x
     start_x = parent_center - (offspring_width / 2.0)
     current_x = start_x
     children.each do |child|
@@ -127,7 +120,7 @@ class HierarchicalPlacementStep < LayoutStep
               end
               processed_couples.add(couple_id)
               place_couple_children(child, spouse, context, y + LEVEL_HEIGHT,
-                                    couple_node, couple_width)
+                                    couple_node)
               current_x += couple_width + SIBLING_SPACING
             end
           end
@@ -140,8 +133,7 @@ class HierarchicalPlacementStep < LayoutStep
             child_node.x = current_x
             coords.update_next_x(y, current_x + NODE_WIDTH + SIBLING_SPACING)
           end
-          place_children(child, context, y + LEVEL_HEIGHT, child_node,
-                         NODE_WIDTH)
+          place_children(child, context, y + LEVEL_HEIGHT, child_node)
           current_x += NODE_WIDTH + SIBLING_SPACING
         end
       end

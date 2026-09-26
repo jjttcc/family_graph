@@ -1,5 +1,6 @@
 require 'ruby_contracts'
 require 'utilities'
+require 'family_constants'
 
 # The abstract base class for all visual nodes within the family tree
 # rendering pipeline, providing common position attributes.
@@ -10,10 +11,15 @@ class Node
 
   attr_accessor :x, :y, :offspring_width
 
-  public  ###  Access
+  public  ###  Queries
 
   # The id of the underlying entity (e.g., person)
   def id
+    raise "virtual method"
+  end
+
+  # The horizontal center coordinate of the node
+  def center_x
     raise "virtual method"
   end
 
@@ -69,6 +75,23 @@ class PersonNode < Node
     person.birth_date
   end
 
+  # The horizontal center coordinate of this person node
+  def center_x
+    x + (NODE_WIDTH / 2.0)
+  end
+
+  def method_missing(method_name, *args, &block)
+    if person.respond_to?(method_name) then
+      person.send(method_name, *args, &block)
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    person.respond_to?(method_name) || super
+  end
+
   private ###  Class invariant
 
   def invariant
@@ -116,6 +139,11 @@ class CoupleNode < Node
   # The 'partner_b' person
   def person_b
     partner_b.person
+  end
+
+  # The horizontal center coordinate of this couple node
+  def center_x
+    (partner_a.x + partner_b.x) / 2.0
   end
 
   public  ###  Boolean queries
