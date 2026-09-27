@@ -97,10 +97,10 @@ context = LayoutContext.new(people,
                             Coordinates.new,
                             :descendant)
 pipeline = LayoutPipeline.new([
-  HierarchyAnalyzerStep.new,
-  NodeCreatorStep.new,
-  WidthCalculatorStep.new,
-  HierarchicalPlacementStep.new
+  HierarchyAnalyzerStep.new(context),
+  NodeCreatorStep.new(context),
+  WidthCalculatorStep.new(context),
+  HierarchicalPlacementStep.new(context)
 ])
 pipeline.execute(context)
 layout_coords = context.coordinates

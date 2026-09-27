@@ -2,22 +2,20 @@
 require 'debug_logger'
 require 'layout_step'
 require 'family_constants'
-# Identifies disconnected node islands at the same generation level
-# and compacts them horizontally to minimize wasted space.
+
 class CompactionLayoutStep < LayoutStep
   include Contracts::DSL
 
   public
 
-  # Performs the global compaction pass until no collisions or gaps exist.
-  def execute(context)
+  def execute
     people = context.people
-    compact(context, people)
+    compact(people)
   end
 
   private
 
-  def compact(context, people)
+  def compact(people)
     coords = context.coordinates
     levels = {}
     coords.single_nodes.each do |id, node|
@@ -42,7 +40,7 @@ class CompactionLayoutStep < LayoutStep
           min_separation = NODE_WIDTH + 20
           if (node2.x - node1.x) < min_separation then
             shift_amount = min_separation - (node2.x - node1.x)
-            block = connected_block(id2, context)
+            block = connected_block(id2)
             block.each { |id| coords.node_by_person_id(id).x += shift_amount }
             shifted = true
             break
@@ -50,7 +48,7 @@ class CompactionLayoutStep < LayoutStep
           gap = node2.x - (node1.x + SIBLING_SPACING)
           if gap > threshold then
             shift_amount = -(gap - SIBLING_SPACING)
-            block = connected_block(id2, context)
+            block = connected_block(id2)
             block.each { |id| coords.node_by_person_id(id).x += shift_amount }
             shifted = true
             break
@@ -61,16 +59,16 @@ class CompactionLayoutStep < LayoutStep
     end
   end
 
-  def connected_block(person_id, context, visited = Set.new)
+  def connected_block(person_id, visited = Set.new)
     return [] if visited.include?(person_id)
     visited << person_id
     block = [person_id]
     person = context.people[person_id]
     person.spouses.each do |spouse|
-      block.concat(connected_block(spouse.id, context, visited))
+      block.concat(connected_block(spouse.id, visited))
     end
     context.branches(person).each do |child|
-      block.concat(connected_block(child.id, context, visited))
+      block.concat(connected_block(child.id, visited))
     end
     block.uniq
   end

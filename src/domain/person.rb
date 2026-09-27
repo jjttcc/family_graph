@@ -10,8 +10,8 @@ class Person
 
   public
 
-  attr_reader :id, :children, :generation
-  attr_accessor :spouses, :father, :mother
+  attr_reader :id, :children
+  attr_accessor :spouses, :father, :mother, :generation
 
   public  ###  Initialization
 

@@ -26,7 +26,7 @@ puts "Successfully loaded #{people.size} people."
 
 # Calculate generations
 context = LayoutContext.new(people, [], Coordinates.new, :descendant)
-HierarchyAnalyzerStep.new.execute(context)
+HierarchyAnalyzerStep.new(context).execute
 
 # Expectations:
 # wife1 (child of root) -> Gen 1

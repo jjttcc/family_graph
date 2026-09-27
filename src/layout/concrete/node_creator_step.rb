@@ -8,21 +8,21 @@ class NodeCreatorStep < LayoutStep
 
   public
 
-  def execute(context)
+  def execute
     coords = context.coordinates
     context.people.each_value do |person|
       if !person.has_spouse then
         node = PersonNode.new(person, 0, 0)
         coords.add_single_node(node)
       else
-        process_couple(person, context)
+        process_couple(person)
       end
     end
   end
 
   private
 
-  def process_couple(person, context)
+  def process_couple(person)
     is_first_spouse = true
     person.spouses.each do |spouse|
       if !context.coordinates.has_couple_for_persons?(person, spouse) then
@@ -36,4 +36,3 @@ class NodeCreatorStep < LayoutStep
   end
 
 end
-

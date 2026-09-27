@@ -10,6 +10,8 @@ require setup_path
 require 'debug'
 require 'optparse'
 require 'data_loader'
+require 'coordinates'
+require 'layout_context'
 require 'layout_orchestrator'
 require 'family_constants'
 require 'layout_pipeline'
@@ -22,12 +24,12 @@ require 'width_calculator_step'
 require 'node_creator_step'
 
 options = {
-  root_ids: nil,
-  DIRECTION: NONE,
-  TRAVERSAL: DESCENDANT,
-  output_dir: Dir.pwd,
-  label_mode: :dates,
-  stop_at_stage: 3 # Default to running full pipeline
+  ROOT_IDS        => nil,
+  DIRECTION       => NONE,
+  TRAVERSAL       => DESCENDANT,
+  OUTPUT_DIR      => Dir.pwd,
+  LABEL_MODE      => DATES,
+  STOP_AT_STAGE   => 3 # Default to running full pipeline
 }
 
 parser = OptionParser.new do |opts|
@@ -35,7 +37,7 @@ parser = OptionParser.new do |opts|
   opts.summary_width = 30
   opts.on("-i", "--root ID1,ID2", Array,
           "Comma-separated list of Root IDs") do |v|
-    options[:root_ids] = v
+    options[ROOT_IDS] = v
   end
   opts.on("-d", "--direction DIR", "arrow Direction (ancestry/a,",
           "descent/d, none/n)") do |v|
@@ -55,20 +57,20 @@ parser = OptionParser.new do |opts|
   end
   opts.on("-m", "--label-mode MODE", [:dates, :ids, :both],
           "label mode (dates, ids, both)") do |v|
-    options[:label_mode] = v
+    options[LABEL_MODE] = v
   end
   opts.on("-o", "--output DIR", "output directory (default: .)") do |v|
-    options[:output_dir] = v
+    options[OUTPUT_DIR] = v
   end
   opts.on("-s", "--stop-at-stage STAGE", Integer,
           "Stop after the specified stage number") do |v|
-    options[:stop_at_stage] = v
+    options[STOP_AT_STAGE] = v
   end
   opts.on("-l", "--list-all", "list all person IDs") do
-    options[:list_all] = true
+    options[LIST_ALL] = true
   end
   opts.on("-r", "--list-roots", "list all Root person IDs") do
-    options[:list_roots] = true
+    options[LIST_ROOTS] = true
   end
   opts.on("-h", "--help", "show this help message") do
     puts opts
@@ -82,13 +84,13 @@ end
 
 parser.parse!
 
+people = {}
 # Determine if we are just listing IDs
-if options[:list_all] || options[:list_roots] then
+if options[LIST_ALL] || options[LIST_ROOTS] then
   if ARGV.empty? then
     $stderr.puts "Error: Data file path is required for listing."
     exit 1
   end
-  people = {}
   ARGV.each do |path|
     if File.exist?(path) then
       people.merge!(DataLoader.load(path))
@@ -96,9 +98,9 @@ if options[:list_all] || options[:list_roots] then
       $stderr.puts "Warning: #{path} does not exist."
     end
   end
-  if options[:list_all] then
+  if options[LIST_ALL] then
     puts people.keys.sort
-  elsif options[:list_roots] then
+  elsif options[LIST_ROOTS] then
     roots = people.select do |_id, p|
       p.father.nil? && p.mother.nil?
     end
@@ -114,7 +116,6 @@ if ARGV.empty? then
 end
 
 data_paths = ARGV
-people = {}
 data_paths.each do |path|
   if File.exist?(path) then
     people.merge!(DataLoader.load(path))
@@ -123,8 +124,8 @@ data_paths.each do |path|
   end
 end
 
-if options[:root_ids] then
-  root_ids = options[:root_ids]
+if options[ROOT_IDS] then
+  root_ids = options[ROOT_IDS]
 else
   root_ids = people.values.select { |p| p.is_root }.map { |p| p.id }
 end
@@ -136,24 +137,27 @@ if roots.empty?
   exit 0
 end
 
+coordinates = Coordinates.new
+context = LayoutContext.new(people, roots, coordinates, options)
+
 # Build pipeline
 full_pipeline = [
-  HierarchyAnalyzerStep.new,
-  NodeCreatorStep.new,
-  WidthCalculatorStep.new,
-  HierarchicalPlacementStep.new,
-  YamlOracleStep.new("oracle_stage_1.yaml"),
-  StructuralAlignmentStep.new,
-  YamlOracleStep.new("oracle_stage_2.yaml"),
-  CompactionLayoutStep.new,
-  YamlOracleStep.new("oracle_stage_3.yaml"),
+  HierarchyAnalyzerStep.new(context),
+  NodeCreatorStep.new(context),
+  WidthCalculatorStep.new(context),
+  HierarchicalPlacementStep.new(context),
+  YamlOracleStep.new("oracle_stage_1.yaml", context),
+  StructuralAlignmentStep.new(context),
+  YamlOracleStep.new("oracle_stage_2.yaml", context),
+  CompactionLayoutStep.new(context),
+  YamlOracleStep.new("oracle_stage_3.yaml", context),
 ]
 
 # Map stages to pipeline indices:
 # Stage 1: Index 0, 1, 2, 3, 4
 # Stage 2: Index 5, 6
 # Stage 3: Index 7, 8
-stop_index = case options[:stop_at_stage]
+stop_index = case options[STOP_AT_STAGE]
              when 1 then 4
              when 2 then 6
              when 3 then 8
@@ -162,5 +166,5 @@ stop_index = case options[:stop_at_stage]
 
 layout_pipeline = full_pipeline[0..stop_index]
 
-orchestrator = LayoutOrchestrator.new(roots, people, layout_pipeline, options)
+orchestrator = LayoutOrchestrator.new(layout_pipeline, context)
 orchestrator.render

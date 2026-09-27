@@ -50,10 +50,10 @@ puts "Rendering Descent graph..."
 context = LayoutContext.new(people, people.values.select { |p| p.is_root },
                             Coordinates.new, :descendant)
 pipeline = LayoutPipeline.new([
-  HierarchyAnalyzerStep.new,
-  NodeCreatorStep.new,
-  WidthCalculatorStep.new,
-  HierarchicalPlacementStep.new
+  HierarchyAnalyzerStep.new(context),
+  NodeCreatorStep.new(context),
+  WidthCalculatorStep.new(context),
+  HierarchicalPlacementStep.new(context)
 ])
 pipeline.execute(context)
 renderer = GraphRenderer.new(context.coordinates, :descent, :ids)

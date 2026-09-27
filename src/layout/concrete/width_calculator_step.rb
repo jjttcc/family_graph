@@ -9,13 +9,13 @@ class WidthCalculatorStep < LayoutStep
 
   # Executes the width calculator step, populating offspring_width
   # for all nodes.
-  def execute(context)
+  def execute
     coords = context.coordinates
     coords.single_nodes.each_value do |node|
-      node.offspring_width = node_offspring_width(node, context)
+      node.offspring_width = node_offspring_width(node)
     end
     coords.couples.each_value do |couple_node|
-      width = couple_offspring_width(couple_node, context)
+      width = couple_offspring_width(couple_node)
       couple_node.offspring_width = width
       couple_node.partner_a.offspring_width = width
       couple_node.partner_b.offspring_width = width
@@ -26,7 +26,7 @@ class WidthCalculatorStep < LayoutStep
   private
 
   # Offspring width for a singleton person node.
-  def node_offspring_width(node, context)
+  def node_offspring_width(node)
     person = node.person
     children = context.branches(person).select do |child|
       !person.has_spouse || child.parents.include?(person)
@@ -35,7 +35,7 @@ class WidthCalculatorStep < LayoutStep
   end
 
   # Offspring width for a couple node.
-  def couple_offspring_width(couple_node, context)
+  def couple_offspring_width(couple_node)
     person_a = couple_node.person_a
     person_b = couple_node.person_b
     children = context.branches(person_a).select do |child|

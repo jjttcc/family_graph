@@ -5,8 +5,8 @@ class LayoutPipeline
     @strategies = strategies
   end
 
-  def execute(contxt)
-    @strategies.each { |s| s.execute(contxt) }
+  def execute(contxt = nil)
+    @strategies.each { |s| s.execute }
   end
 
   def shift_subtree(person, amount)

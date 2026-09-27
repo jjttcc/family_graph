@@ -7,11 +7,12 @@ class YamlOracleStep < LayoutStep
 
   public
 
-  def initialize(filename)
+  def initialize(filename, context)
+    super(context)
     @filename = filename
   end
 
-  def execute(context)
+  def execute
     data = {
       nodes: context.coordinates.single_nodes,
       couples: context.coordinates.couples,

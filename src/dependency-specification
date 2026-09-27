@@ -1,16 +1,17 @@
-CLUSTER          DEPENDENCY RANK[1]
-construction     4
-data             4
-domain           3
-geometry         4   # (needs refinement)
-graph_logic      4
-layout           5   # [2]
-main             8
-management       7
-obsolete         11
-rendering        5
-support          2
-util             1
+CLUSTER               DEPENDENCY RANK[1]
+construction          4
+data                  4
+domain                3
+geometry              3   # (needs refinement)
+graph_logic           4
+layout/abstract       4
+layout/concrete       5
+main                  8
+management/concrete   5
+management/abstract   4
+obsolete              11
+rendering             5
+support               2
+util                  1
 
 [1] Lower means less dependent.
-[2] layout_step.rb needs to be moved to a lower-ranked cluster.

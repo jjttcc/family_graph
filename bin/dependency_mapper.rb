@@ -6,6 +6,7 @@ require 'set'
 
 # Dynamically determine the project root (assuming script is in bin/)
 ROOT = File.expand_path('..', __dir__)
+$status = 0
 
 # Helper to get path relative to current working directory
 def relative_path(full_path)
@@ -70,12 +71,15 @@ def report_violations
       rank_dir = RANK_MAP[dir]
       rank_dep = RANK_MAP[dep]
       if rank_dep && rank_dir && rank_dep > rank_dir
-        puts "VIOLATION: #{dir} (Rank #{rank_dir}) depends on #{dep} (Rank #{rank_dep})"
+        $status += 1
+        puts "VIOLATION: #{dir} (Rank #{rank_dir}) depends on #{dep} " +
+          "(Rank #{rank_dep})"
         FILE_DEPENDENCIES.each do |file, file_deps|
           next unless FILE_CLUSTER_MAP[file] == dir
           file_deps.each do |dep_file|
             if FILE_CLUSTER_MAP[dep_file] == dep
-              puts "  -> #{relative_path(file)} depends on #{relative_path(dep_file)}"
+              puts "  -> #{relative_path(file)} depends on " +
+                "#{relative_path(dep_file)}"
             end
           end
         end
@@ -145,3 +149,5 @@ else
     puts "Error: Target '#{target_arg}' not found."
   end
 end
+
+exit $status

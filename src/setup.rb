@@ -21,13 +21,15 @@ end
 dirlist = %w[
 util
 graph_logic
-management
+management/abstract
+management/concrete
 data
 support
 domain
 main
 geometry
-layout
+layout/abstract
+layout/concrete
 core
 construction
 util

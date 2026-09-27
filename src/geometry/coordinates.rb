@@ -113,10 +113,6 @@ class Coordinates
   post :invariant do invariant end
   def set_nodes_initialized
     @nodes_initialized = true
-# debug:
-all_person_nodes.each do |n|
-puts "#{n.id}: #{n.offspring_width.inspect}"
-end
   end
 
   public  ###  Element change

@@ -43,3 +43,14 @@ DIRECTION = :direction
 ANCESTRY  = :ancestry
 DESCENT   = :descent
 NONE      = :none
+
+# options constants
+LABEL_MODE       = :label_mode
+OUTPUT_DIR       = :output_dir
+STOP_AT_STAGE    = :stop_at_stage
+LIST_ALL         = :list_all
+LIST_ROOTS       = :list_roots
+
+# modes, etc.
+DATES      = :dates
+ROOT_IDS   = :root_ids
