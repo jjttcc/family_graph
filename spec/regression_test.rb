@@ -48,7 +48,7 @@ output_dir = 'output'
 # Test :descent with HierarchicalPlacement
 puts "Rendering Descent graph..."
 context = LayoutContext.new(people, people.values.select { |p| p.is_root },
-                            Coordinates.new, :descendant)
+                            Coordinates.new, { TRAVERSAL => DESCENDANT })
 pipeline = LayoutPipeline.new([
   HierarchyAnalyzerStep.new(context),
   NodeCreatorStep.new(context),

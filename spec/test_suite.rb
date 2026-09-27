@@ -95,7 +95,7 @@ assert(root_person != nil, "A root person must exist in the sample data")
 context = LayoutContext.new(people,
                             [root_person],
                             Coordinates.new,
-                            :descendant)
+                            { TRAVERSAL => DESCENDANT })
 pipeline = LayoutPipeline.new([
   HierarchyAnalyzerStep.new(context),
   NodeCreatorStep.new(context),

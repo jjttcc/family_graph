@@ -50,3 +50,4 @@ labels*.txt
 *_old.yaml
 .vimrc
 *bck
+/reports/

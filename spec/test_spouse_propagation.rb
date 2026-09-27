@@ -25,7 +25,7 @@ people = DataLoader.load(data_path)
 puts "Successfully loaded #{people.size} people."
 
 # Calculate generations
-context = LayoutContext.new(people, [], Coordinates.new, :descendant)
+context = LayoutContext.new(people, [], Coordinates.new, { TRAVERSAL => DESCENDANT })
 HierarchyAnalyzerStep.new(context).execute
 
 # Expectations:
