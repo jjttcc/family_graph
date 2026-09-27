@@ -130,10 +130,9 @@ if !root_person.children.empty? then
   child_xs = children.map { |c| layout_coords.node_for_person(c).x }
   midpoint = (child_xs.min + child_xs.max + NODE_WIDTH) / 2
   if root_person.has_spouse then
-    spouse_id = root_person.spouses.first.id
-    spouse_node = layout_coords.node_for_person(root_person.spouses.first)
-    spouse_x = spouse_node.x
-    couple_midpoint = (root_node.x + spouse_x) / 2
+    spouse = root_person.spouses.first
+    couple_node = layout_coords.node_for_couple(root_person, spouse)
+    couple_midpoint = couple_node.center_x
     puts "DEBUG: midpoint: #{midpoint}, couple_midpoint: #{couple_midpoint}"
     if (midpoint - couple_midpoint).abs >= 1 then
       assert(false, "Children should be centered beneath root couple midpoint: " +

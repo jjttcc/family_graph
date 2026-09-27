@@ -163,7 +163,7 @@ class CoupleNode < Node
 
   # The horizontal center coordinate of this couple node
   def center_x
-    (partner_a.x + partner_b.x) / 2.0
+    (partner_a.center_x + partner_b.center_x) / 2.0
   end
 
   # The top-center coordinates [x, y] of this couple node
