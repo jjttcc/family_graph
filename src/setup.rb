@@ -24,6 +24,8 @@ graph_logic
 management/abstract
 management/concrete
 data
+analysis
+resolution
 support
 domain
 main

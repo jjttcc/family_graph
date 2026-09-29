@@ -51,7 +51,7 @@ permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
 oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
 candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
 
-if oracle == candidate
+if YAML.dump(oracle) == YAML.dump(candidate)
   puts "SUCCESS: Candidate matches Oracle."
   exit 0
 else

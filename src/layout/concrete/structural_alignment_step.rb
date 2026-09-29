@@ -2,6 +2,7 @@
 require 'ruby_contracts'
 require 'layout_step'
 
+# [Temporarily - possibly permanently - on sabbatical]
 class StructuralAlignmentStep < LayoutStep
   include Contracts::DSL
 

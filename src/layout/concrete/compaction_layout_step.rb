@@ -1,8 +1,8 @@
-# vim: ts=2 sw=2 expandtab
 require 'debug_logger'
 require 'layout_step'
 require 'family_constants'
 
+# Note: This class is probably obsolete.
 class CompactionLayoutStep < LayoutStep
   include Contracts::DSL
 

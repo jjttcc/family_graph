@@ -15,13 +15,12 @@ require 'layout_context'
 require 'layout_orchestrator'
 require 'family_constants'
 require 'layout_pipeline'
-require 'hierarchical_placement_step'
-require 'compaction_layout_step'
-require 'structural_alignment_step'
-require 'yaml_oracle_step'
 require 'hierarchy_analyzer_step'
-require 'width_calculator_step'
 require 'node_creator_step'
+require 'width_calculator_step'
+require 'hierarchical_placement_step'
+require 'line_optimization_step'
+require 'yaml_oracle_step'
 
 options = {
   ROOT_IDS        => nil,
@@ -147,10 +146,10 @@ full_pipeline = [
   WidthCalculatorStep.new(context),
   HierarchicalPlacementStep.new(context),
   YamlOracleStep.new("oracle_stage_1.yaml", context),
-  StructuralAlignmentStep.new(context),
+  LineOptimizationStep.new(context),
   YamlOracleStep.new("oracle_stage_2.yaml", context),
-  CompactionLayoutStep.new(context),
-  YamlOracleStep.new("oracle_stage_3.yaml", context),
+#  OverlapEliminationStep.new(context),
+#  YamlOracleStep.new("oracle_stage_3.yaml", context),
 ]
 
 # Map stages to pipeline indices:

@@ -51,3 +51,4 @@ labels*.txt
 .vimrc
 *bck
 /reports/
+/plans/

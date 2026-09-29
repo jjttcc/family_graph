@@ -1,6 +1,6 @@
 # Expanded Tree for Testing - Diverse Surnames and Correct Relationships
 # Structure: 5 Generations, various surnames, multi-spouse, and single parents.
-# ADDED: Test branch for multi_spouse_400
+# ADDED: Test branch for multi_spouse_400 and extended branches for Edward and Catherine.
 
 # Gen 0
 root_ancestor_100:
@@ -28,6 +28,26 @@ child_gen1_201:
   birth-date: 1882-05-20
   father: root_ancestor_100
   mother: bob_doe_101
+  spouse: catherine_spouse_710
+
+# Gen -1 (Parents of Catherine's spouse)
+catherine_spouse_father_711:
+  given-name: George
+  surname: Green
+  birth-date: 1855-03-12
+
+catherine_spouse_mother_712:
+  given-name: Beatrice
+  surname: Green
+  birth-date: 1858-07-22
+
+# Gen 1 (Catherine's spouse)
+catherine_spouse_710:
+  given-name: Arthur
+  surname: Green
+  birth-date: 1880-11-05
+  father: catherine_spouse_father_711
+  mother: catherine_spouse_mother_712
 
 # Multi-spouse (Gen 2 - child of Gen 1)
 multi_spouse_400:
@@ -71,12 +91,59 @@ grandchild_gen2_302:
   surname: Doe
   birth-date: 1912-02-15
   father: child_gen1_200
+  spouse: edward_spouse_700, edward_spouse_b_705
+
+# Gen 1 (Edward's spouse's parents)
+edward_spouse_father_701:
+  given-name: Thomas
+  surname: Taylor
+  birth-date: 1885-02-20
+
+edward_spouse_mother_702:
+  given-name: Margaret
+  surname: Taylor
+  birth-date: 1888-09-15
+
+# Gen 2 (Edward's spouses)
+edward_spouse_700:
+  given-name: Hannah
+  surname: Taylor
+  birth-date: 1914-04-10
+  father: edward_spouse_father_701
+  mother: edward_spouse_mother_702
+
+edward_spouse_b_705:
+  given-name: Clara
+  surname: Roberts
+  birth-date: 1915-08-20
 
 niece_gen2_600:
   given-name: Grace
   surname: White
   birth-date: 1910-01-01
   mother: child_gen1_201
+
+# Gen 2 (Children of Catherine and Arthur)
+catherine_child_720:
+  given-name: Robert
+  surname: Green
+  birth-date: 1910-08-14
+  father: catherine_spouse_710
+  mother: child_gen1_201
+
+catherine_child_721:
+  given-name: Eleanor
+  surname: Green
+  birth-date: 1913-12-03
+  father: catherine_spouse_710
+  mother: child_gen1_201
+  spouse: catherine_child_spouse_730
+
+# Gen 2 (Spouse of Eleanor Green)
+catherine_child_spouse_730:
+  given-name: Chloe
+  surname: Evans
+  birth-date: 1915-05-18
 
 # Gen 3
 great_grandchild_gen3_400:
@@ -91,6 +158,22 @@ great_grandchild_b_303:
   surname: Doe
   birth-date: 1942-01-01
   father: grandchild_gen2_302
+  mother: edward_spouse_b_705
+
+# Gen 3 (Children of Eleanor Green and Chloe Evans)
+grandchild_740:
+  given-name: Daniel
+  surname: Green
+  birth-date: 1940-02-10
+  father: catherine_child_721
+  mother: catherine_child_spouse_730
+
+grandchild_741:
+  given-name: Sophia
+  surname: Green
+  birth-date: 1943-08-25
+  father: catherine_child_721
+  mother: catherine_child_spouse_730
 
 # Gen 4
 gen4_child_1:

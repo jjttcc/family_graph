@@ -33,7 +33,7 @@ FileUtils.mkdir_p('test/candidates')
 
 puts "Running pipeline on #{DATA_PATH}..."
 system("./bin/family_graph -m ids #{DATA_PATH} -o " +
-       "/tmp/test_dir -d ancestry -t descendant > /dev/null")
+       "/tmp/test_dir -s 1 > /dev/null")
 
 # Move the generated oracle_stage_1.yaml to the candidate location
 if File.exist?('oracle_stage_1.yaml')
@@ -48,7 +48,7 @@ puts "Comparing candidate against oracle..."
 permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
 oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
 candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
-if oracle == candidate then
+if YAML.dump(oracle) == YAML.dump(candidate) then
 
   puts "SUCCESS: Candidate matches Oracle."
   exit 0

@@ -1,68 +1,583 @@
 ---
 :nodes:
-  multi_spouse_400:
-  - 2350
-  - 400
-  spouse_1:
-  - 1920
-  - 400
-  gen4_child_1:
-  - 2495
-  - 800
-  gen4_child_2:
-  - 2645
-  - 800
-  great_grandchild_gen3_400:
-  - 2570
-  - 600
-  grandchild_gen2_300:
-  - 2640
-  - 400
-  frank_smith_301:
-  - 2500
-  - 400
-  gen4_child_3:
-  - 1545
-  - 800
-  gen4_child_4:
-  - 1695
-  - 800
-  great_grandchild_b_303:
-  - 1620
-  - 600
-  grandchild_gen2_302:
-  - 1620
-  - 400
-  child_gen1_200:
-  - 1290
-  - 200
-  niece_gen2_600:
-  - 1770
-  - 400
-  child_gen1_201:
-  - 1770
-  - 200
-  root_ancestor_100:
-  - 1600
-  - 0
-  bob_doe_101:
-  - 1460
-  - 0
-  spouse_2:
-  - 2210
-  - 400
+  child_gen1_200: !ruby/object:PersonNode
+    x: -195.0
+    y: 200
+    person: &4 !ruby/object:Person
+      id: child_gen1_200
+      data:
+        given-name: Charlie
+        surname: Doe
+        birth-date: 1880-03-12
+        father: root_ancestor_100
+        mother: bob_doe_101
+      spouses: []
+      children:
+      - &1 !ruby/object:Person
+        id: multi_spouse_400
+        data:
+          given-name: David
+          surname: Doe
+          birth-date: 1900-01-01
+          father: child_gen1_200
+          spouse: spouse_1, spouse_2
+        spouses:
+        - &2 !ruby/object:Person
+          id: spouse_1
+          data:
+            given-name: Elena
+            surname: Jones
+          spouses:
+          - *1
+          children:
+          - &3 !ruby/object:Person
+            id: test_child_500
+            data:
+              given-name: TestChild
+              surname: Doe
+              birth-date: 1925-01-01
+              father: multi_spouse_400
+              mother: spouse_1
+            spouses: []
+            children: []
+            father: *1
+            mother: *2
+            generation: 3
+          generation: 2
+        - &30 !ruby/object:Person
+          id: spouse_2
+          data:
+            given-name: Sarah
+            surname: Miller
+          spouses:
+          - *1
+          children: []
+          generation: 2
+        children:
+        - *3
+        father: *4
+        generation: 2
+      - &5 !ruby/object:Person
+        id: grandchild_gen2_300
+        data:
+          given-name: Diana
+          surname: Doe
+          birth-date: 1910-05-20
+          father: child_gen1_200
+          spouse: frank_smith_301
+        spouses:
+        - &7 !ruby/object:Person
+          id: frank_smith_301
+          data:
+            given-name: Frank
+            surname: Smith
+            birth-date: 1908-01-10
+          spouses:
+          - *5
+          children:
+          - &6 !ruby/object:Person
+            id: great_grandchild_gen3_400
+            data:
+              given-name: Fiona
+              surname: Smith
+              birth-date: 1940-06-10
+              father: grandchild_gen2_300
+              mother: frank_smith_301
+            spouses: []
+            children:
+            - &26 !ruby/object:Person
+              id: gen4_child_1
+              data:
+                given-name: Olivia
+                surname: Brown
+                birth-date: 1970-01-01
+                mother: great_grandchild_gen3_400
+              spouses: []
+              children: []
+              mother: *6
+              generation: 4
+            - &27 !ruby/object:Person
+              id: gen4_child_2
+              data:
+                given-name: William
+                surname: Brown
+                birth-date: 1972-01-01
+                mother: great_grandchild_gen3_400
+              spouses: []
+              children: []
+              mother: *6
+              generation: 4
+            father: *5
+            mother: *7
+            generation: 3
+          generation: 2
+        children:
+        - *6
+        father: *4
+        generation: 2
+      - &8 !ruby/object:Person
+        id: grandchild_gen2_302
+        data:
+          given-name: Edward
+          surname: Doe
+          birth-date: 1912-02-15
+          father: child_gen1_200
+          spouse: edward_spouse_700, edward_spouse_b_705
+        spouses:
+        - &9 !ruby/object:Person
+          id: edward_spouse_700
+          data:
+            given-name: Hannah
+            surname: Taylor
+            birth-date: 1914-04-10
+            father: edward_spouse_father_701
+            mother: edward_spouse_mother_702
+          spouses:
+          - *8
+          children: []
+          father: &23 !ruby/object:Person
+            id: edward_spouse_father_701
+            data:
+              given-name: Thomas
+              surname: Taylor
+              birth-date: 1885-02-20
+            spouses: []
+            children:
+            - *9
+            generation: 0
+          mother: &24 !ruby/object:Person
+            id: edward_spouse_mother_702
+            data:
+              given-name: Margaret
+              surname: Taylor
+              birth-date: 1888-09-15
+            spouses: []
+            children:
+            - *9
+            generation: 0
+          generation: 2
+        - &11 !ruby/object:Person
+          id: edward_spouse_b_705
+          data:
+            given-name: Clara
+            surname: Roberts
+            birth-date: 1915-08-20
+          spouses:
+          - *8
+          children:
+          - &10 !ruby/object:Person
+            id: great_grandchild_b_303
+            data:
+              given-name: Earl
+              surname: Doe
+              birth-date: 1942-01-01
+              father: grandchild_gen2_302
+              mother: edward_spouse_b_705
+            spouses: []
+            children:
+            - &28 !ruby/object:Person
+              id: gen4_child_3
+              data:
+                given-name: James
+                surname: Doe
+                birth-date: 1974-01-01
+                father: great_grandchild_b_303
+              spouses: []
+              children: []
+              father: *10
+              generation: 4
+            - &29 !ruby/object:Person
+              id: gen4_child_4
+              data:
+                given-name: Emily
+                surname: Doe
+                birth-date: 1976-01-01
+                father: great_grandchild_b_303
+              spouses: []
+              children: []
+              father: *10
+              generation: 4
+            father: *8
+            mother: *11
+            generation: 3
+          generation: 2
+        children:
+        - *10
+        father: *4
+        generation: 2
+      father: &12 !ruby/object:Person
+        id: root_ancestor_100
+        data:
+          given-name: Alice
+          surname: Doe
+          birth-date: 1850-01-01
+        spouses:
+        - &20 !ruby/object:Person
+          id: bob_doe_101
+          data:
+            given-name: Bob
+            surname: Smith
+            birth-date: 1848-06-20
+            spouse: root_ancestor_100
+          spouses:
+          - *12
+          children:
+          - *4
+          - &13 !ruby/object:Person
+            id: child_gen1_201
+            data:
+              given-name: Catherine
+              surname: Doe
+              birth-date: 1882-05-20
+              father: root_ancestor_100
+              mother: bob_doe_101
+              spouse: catherine_spouse_710
+            spouses:
+            - &14 !ruby/object:Person
+              id: catherine_spouse_710
+              data:
+                given-name: Arthur
+                surname: Green
+                birth-date: 1880-11-05
+                father: catherine_spouse_father_711
+                mother: catherine_spouse_mother_712
+              spouses:
+              - *13
+              children:
+              - &19 !ruby/object:Person
+                id: catherine_child_720
+                data:
+                  given-name: Robert
+                  surname: Green
+                  birth-date: 1910-08-14
+                  father: catherine_spouse_710
+                  mother: child_gen1_201
+                spouses: []
+                children: []
+                father: *14
+                mother: *13
+                generation: 2
+              - &15 !ruby/object:Person
+                id: catherine_child_721
+                data:
+                  given-name: Eleanor
+                  surname: Green
+                  birth-date: 1913-12-03
+                  father: catherine_spouse_710
+                  mother: child_gen1_201
+                  spouse: catherine_child_spouse_730
+                spouses:
+                - &16 !ruby/object:Person
+                  id: catherine_child_spouse_730
+                  data:
+                    given-name: Chloe
+                    surname: Evans
+                    birth-date: 1915-05-18
+                  spouses:
+                  - *15
+                  children:
+                  - &17 !ruby/object:Person
+                    id: grandchild_740
+                    data:
+                      given-name: Daniel
+                      surname: Green
+                      birth-date: 1940-02-10
+                      father: catherine_child_721
+                      mother: catherine_child_spouse_730
+                    spouses: []
+                    children: []
+                    father: *15
+                    mother: *16
+                    generation: 3
+                  - &18 !ruby/object:Person
+                    id: grandchild_741
+                    data:
+                      given-name: Sophia
+                      surname: Green
+                      birth-date: 1943-08-25
+                      father: catherine_child_721
+                      mother: catherine_child_spouse_730
+                    spouses: []
+                    children: []
+                    father: *15
+                    mother: *16
+                    generation: 3
+                  generation: 2
+                children:
+                - *17
+                - *18
+                father: *14
+                mother: *13
+                generation: 2
+              father: &21 !ruby/object:Person
+                id: catherine_spouse_father_711
+                data:
+                  given-name: George
+                  surname: Green
+                  birth-date: 1855-03-12
+                spouses: []
+                children:
+                - *14
+                generation: 0
+              mother: &22 !ruby/object:Person
+                id: catherine_spouse_mother_712
+                data:
+                  given-name: Beatrice
+                  surname: Green
+                  birth-date: 1858-07-22
+                spouses: []
+                children:
+                - *14
+                generation: 0
+              generation: 1
+            children:
+            - &25 !ruby/object:Person
+              id: niece_gen2_600
+              data:
+                given-name: Grace
+                surname: White
+                birth-date: 1910-01-01
+                mother: child_gen1_201
+              spouses: []
+              children: []
+              mother: *13
+              generation: 2
+            - *19
+            - *15
+            father: *12
+            mother: *20
+            generation: 1
+          generation: 0
+        children:
+        - *4
+        - *13
+        generation: 0
+      mother: *20
+      generation: 1
+    is_primary_representation: true
+    offspring_width: 1440
+  catherine_spouse_father_711: !ruby/object:PersonNode
+    x: 530
+    y: 0
+    person: *21
+    is_primary_representation: true
+    offspring_width: 380
+  catherine_spouse_mother_712: !ruby/object:PersonNode
+    x: 800
+    y: 0
+    person: *22
+    is_primary_representation: true
+    offspring_width: 380
+  test_child_500: !ruby/object:PersonNode
+    x: -785.0
+    y: 600
+    person: *3
+    is_primary_representation: true
+    offspring_width: 0
+  edward_spouse_father_701: !ruby/object:PersonNode
+    x: 1070
+    y: 0
+    person: *23
+    is_primary_representation: true
+    offspring_width: 380
+  edward_spouse_mother_702: !ruby/object:PersonNode
+    x: 1340
+    y: 0
+    person: *24
+    is_primary_representation: true
+    offspring_width: 380
+  niece_gen2_600: !ruby/object:PersonNode
+    x: -255.0
+    y: 400
+    person: *25
+    is_primary_representation: true
+    offspring_width: 0
+  catherine_child_720: !ruby/object:PersonNode
+    x: 15.0
+    y: 400
+    person: *19
+    is_primary_representation: true
+    offspring_width: 0
+  great_grandchild_gen3_400: !ruby/object:PersonNode
+    x: 275.0
+    y: 600
+    person: *6
+    is_primary_representation: true
+    offspring_width: 390
+  great_grandchild_b_303: !ruby/object:PersonNode
+    x: 805.0
+    y: 600
+    person: *10
+    is_primary_representation: true
+    offspring_width: 390
+  grandchild_740: !ruby/object:PersonNode
+    x: 220.0
+    y: 600
+    person: *17
+    is_primary_representation: true
+    offspring_width: 0
+  grandchild_741: !ruby/object:PersonNode
+    x: 490.0
+    y: 600
+    person: *18
+    is_primary_representation: true
+    offspring_width: 0
+  gen4_child_1: !ruby/object:PersonNode
+    x: 140.0
+    y: 800
+    person: *26
+    is_primary_representation: true
+    offspring_width: 0
+  gen4_child_2: !ruby/object:PersonNode
+    x: 410.0
+    y: 800
+    person: *27
+    is_primary_representation: true
+    offspring_width: 0
+  gen4_child_3: !ruby/object:PersonNode
+    x: 670.0
+    y: 800
+    person: *28
+    is_primary_representation: true
+    offspring_width: 0
+  gen4_child_4: !ruby/object:PersonNode
+    x: 940.0
+    y: 800
+    person: *29
+    is_primary_representation: true
+    offspring_width: 0
 :couples:
-- - multi_spouse_400
-  - spouse_1
-- - frank_smith_301
-  - grandchild_gen2_300
-- - bob_doe_101
-  - root_ancestor_100
-- - multi_spouse_400
-  - spouse_2
+  bob_doe_101.root_ancestor_100: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 0
+      y: 0
+      person: *12
+      is_primary_representation: true
+      offspring_width: 650
+    partner_b: !ruby/object:PersonNode
+      x: 140
+      y: 0
+      person: *20
+      is_primary_representation: true
+      offspring_width: 650
+    x: 0
+    y: 0
+    offspring_width: 650
+  catherine_spouse_710.child_gen1_201: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 75.0
+      y: 200
+      person: *13
+      is_primary_representation: true
+      offspring_width: 920
+    partner_b: !ruby/object:PersonNode
+      x: 215.0
+      y: 200
+      person: *14
+      is_primary_representation: true
+      offspring_width: 920
+    x: 75.0
+    y: 200
+    offspring_width: 920
+  multi_spouse_400.spouse_1: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: -855.0
+      y: 400
+      person: *1
+      is_primary_representation: true
+      offspring_width: 120
+    partner_b: !ruby/object:PersonNode
+      x: -715.0
+      y: 400
+      person: *2
+      is_primary_representation: true
+      offspring_width: 120
+    x: -855.0
+    y: 400
+    offspring_width: 120
+  multi_spouse_400.spouse_2: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: -325.0
+      y: 400
+      person: *1
+      is_primary_representation: false
+      offspring_width: 120
+    partner_b: !ruby/object:PersonNode
+      x: -185.0
+      y: 400
+      person: *30
+      is_primary_representation: true
+      offspring_width: 120
+    x: -325.0
+    y: 400
+    offspring_width: 120
+  frank_smith_301.grandchild_gen2_300: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 205.0
+      y: 400
+      person: *5
+      is_primary_representation: true
+      offspring_width: 120
+    partner_b: !ruby/object:PersonNode
+      x: 345.0
+      y: 400
+      person: *7
+      is_primary_representation: true
+      offspring_width: 120
+    x: 205.0
+    y: 400
+    offspring_width: 120
+  edward_spouse_700.grandchild_gen2_302: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 735.0
+      y: 400
+      person: *8
+      is_primary_representation: true
+      offspring_width: 120
+    partner_b: !ruby/object:PersonNode
+      x: 875.0
+      y: 400
+      person: *9
+      is_primary_representation: true
+      offspring_width: 120
+    x: 735.0
+    y: 400
+    offspring_width: 120
+  edward_spouse_b_705.grandchild_gen2_302: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 1265.0
+      y: 400
+      person: *8
+      is_primary_representation: false
+      offspring_width: 120
+    partner_b: !ruby/object:PersonNode
+      x: 1405.0
+      y: 400
+      person: *11
+      is_primary_representation: true
+      offspring_width: 120
+    x: 1265.0
+    y: 400
+    offspring_width: 120
+  catherine_child_721.catherine_child_spouse_730: !ruby/object:CoupleNode
+    partner_a: !ruby/object:PersonNode
+      x: 285.0
+      y: 400
+      person: *15
+      is_primary_representation: true
+      offspring_width: 390
+    partner_b: !ruby/object:PersonNode
+      x: 425.0
+      y: 400
+      person: *16
+      is_primary_representation: true
+      offspring_width: 390
+    x: 285.0
+    y: 400
+    offspring_width: 390
 :next_x:
-  400: 2790
-  800: 2795
-  600: 2720
-  200: 1920
-  0: 1750
+  0: 1610
+  200: 605.0
+  400: 815.0
+  600: 760.0
+  800: 1210.0
