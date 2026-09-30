@@ -138,6 +138,32 @@ class Coordinates
     @next_x[y] = value
   end
 
+  public ###  State Copying
+
+  # Copies coordinate x and y values from another Coordinates registry.
+  pre :valid_coords do |coords| coords.is_a?(Coordinates) end
+  def copy_coordinates_from(other_coordinates)
+    @single_nodes.each do |id, node|
+      other_node = other_coordinates.single_nodes[id]
+      if other_node then
+        node.x = other_node.x
+        node.y = other_node.y
+      end
+    end
+    @couples.each do |id, couple|
+      other_couple = other_coordinates.couples[id]
+      if other_couple then
+        couple.x = other_couple.x
+        couple.y = other_couple.y
+        couple.partner_a.x = other_couple.partner_a.x
+        couple.partner_a.y = other_couple.partner_a.y
+        couple.partner_b.x = other_couple.partner_b.x
+        couple.partner_b.y = other_couple.partner_b.y
+      end
+    end
+    @next_x = other_coordinates.instance_variable_get(:@next_x).dup
+  end
+
   private
 
   def invariant

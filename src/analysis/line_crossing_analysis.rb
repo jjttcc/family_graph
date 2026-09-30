@@ -7,6 +7,10 @@ require 'family_constants'
 class LineCrossingAnalysis
   include Contracts::DSL
 
+  public
+
+  attr_accessor :coordinates
+
   public ###  Initialization
 
   def initialize(coordinates)
@@ -89,7 +93,5 @@ class LineCrossingAnalysis
   end
 
   private
-
-  attr_reader :coordinates
 
 end

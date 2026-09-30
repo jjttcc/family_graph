@@ -5,6 +5,10 @@ require 'ruby_contracts'
 class LineCrossingResolution
   include Contracts::DSL
 
+  public
+
+  attr_accessor :coordinates
+
   public ###  Initialization
 
   def initialize(coordinates)
@@ -17,9 +21,5 @@ class LineCrossingResolution
     raise NotImplementedError,
       "#{self.class} #execute must be implemented in subclasses."
   end
-
-  private ###  Implementation
-
-  attr_reader :coordinates
 
 end
