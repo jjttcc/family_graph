@@ -74,7 +74,7 @@ class Coordinates
     @couples[CoupleNode.generate_id(person1, person2)]
   end
 
-  # couple for 'id'
+  # couple for 'id' (the id of an existing CoupleNode)
   post :nil_or_node do |result|
     result == nil || result.is_a?(CoupleNode)
   end

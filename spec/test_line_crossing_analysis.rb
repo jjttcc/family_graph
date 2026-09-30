@@ -10,6 +10,9 @@ end
 require setup_path
 require 'coordinates'
 require 'line_crossing_analysis'
+require 'line_crossing_resolution'
+require 'node_swap_resolution'
+require 'sibling_reorder_resolution'
 require 'person'
 require 'graph_primitives'
 require 'data_loader'
@@ -21,9 +24,7 @@ def assert(condition, message)
   end
 end
 
-puts "Running LineCrossingAnalysis verification tests..."
-
-analyzer = LineCrossingAnalysis.new
+puts "Running LineCrossingAnalysis & Resolution verification tests..."
 
 # Test: Explicit crossing setup
 p1 = Person.new('p1', {})
@@ -48,9 +49,17 @@ coords.add_single_node(n_p2)
 coords.add_single_node(n_cx1)
 coords.add_single_node(n_cx2)
 
-crossings = analyzer.crossing_pairs(coords)
+analyzer = LineCrossingAnalysis.new(coords)
+crossings = analyzer.crossing_pairs
 assert(crossings.size == 1, "Expected 1 crossing pair, got #{crossings.size}")
-puts "Test (Explicit Crossing): PASSED"
+puts "Test (Explicit Crossing Detection): PASSED"
+
+# Test: NodeSwapResolution execution on crossings
+resolver = NodeSwapResolution.new(coords)
+resolver.execute(crossings)
+# After resolver execution (swapping x coordinates of cx1 and cx2)
+assert(n_cx1.x == 0 && n_cx2.x == 200, "Resolver should swap X coordinates of crossing nodes")
+puts "Test (Explicit Crossing Resolution): PASSED"
 
 # Test: Parallel non-crossing setup
 coords2 = Coordinates.new
@@ -59,9 +68,10 @@ coords2.add_single_node(PersonNode.new(p2, 200, 0))
 coords2.add_single_node(PersonNode.new(c1, 0, 100))   # c1 under p1 (parallel)
 coords2.add_single_node(PersonNode.new(c2, 200, 100)) # c2 under p2 (parallel)
 
-crossings2 = analyzer.crossing_pairs(coords2)
+analyzer2 = LineCrossingAnalysis.new(coords2)
+crossings2 = analyzer2.crossing_pairs
 assert(crossings2.empty?, "Expected 0 crossing pairs, got #{crossings2.size}")
 puts "Test (Parallel Non-Crossing): PASSED"
 
-puts "All LineCrossingAnalysis verification tests PASSED!"
+puts "All LineCrossingAnalysis & Resolution verification tests PASSED!"
 exit 0
