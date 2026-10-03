@@ -19,7 +19,8 @@ class LineOptimizationStep < LayoutStep
     @analyzer = LineCrossingAnalysis.new(context.coordinates)
     @resolvers = [
       NodeSwapResolution.new(context.coordinates),
-      SiblingReorderResolution.new(context.coordinates)
+# (just one for now)
+#      SiblingReorderResolution.new(context.coordinates)
     ]
   end
 
@@ -28,7 +29,10 @@ class LineOptimizationStep < LayoutStep
   # Executes the iterative greedy best-first line optimization algorithm
   # using coordinate snapshotting, rollback, and single instance reuse.
   def execute
-    current_crossings = analyzer.crossing_pairs.size
+    initial_count = analyzer.crossing_pairs.size
+    context.coordinates.initial_crossed_line_count = initial_count
+    current_crossings = initial_count
+
     if current_crossings > 0 then
       max_iterations = 20
       iteration = 0
@@ -68,6 +72,10 @@ class LineOptimizationStep < LayoutStep
     else
       puts "LineOptimizationStep: Zero edge crossings detected."
     end
+
+    final_crossings = analyzer.crossing_pairs.size
+#!!!rm:    context.coordinates.remaining_crossed_lines = final_crossings
+    context.coordinates.resolved_crossed_line_count = initial_count - final_crossings
   end
 
   private ###  Implementation

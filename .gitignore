@@ -19,7 +19,7 @@ GEMINI_*
 /*.md
 /bugs/
 /debug/
-*.rb.*
+*.rb[.-]*
 bin/cnvrtsvg
 bin/fgr
 /*.txt

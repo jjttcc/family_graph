@@ -13,6 +13,8 @@ class Coordinates
   # Have all nodes in 'all_person_nodes' been initialized - prepared for
   # layout operations?
   attr_reader :nodes_initialized
+  attr_accessor :initial_overlap_count, :remaining_overlap_count
+  attr_accessor :initial_crossed_line_count, :resolved_crossed_line_count
 
   public  ###  Initialization
 

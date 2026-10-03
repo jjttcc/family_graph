@@ -21,6 +21,7 @@ require 'width_calculator_step'
 require 'hierarchical_placement_step'
 require 'line_optimization_step'
 require 'yaml_oracle_step'
+require 'overlap_elimination_step'
 
 options = {
   ROOT_IDS        => nil,
@@ -148,8 +149,8 @@ full_pipeline = [
   YamlOracleStep.new("oracle_stage_1.yaml", context),
   LineOptimizationStep.new(context),
   YamlOracleStep.new("oracle_stage_2.yaml", context),
-#  OverlapEliminationStep.new(context),
-#  YamlOracleStep.new("oracle_stage_3.yaml", context),
+  OverlapEliminationStep.new(context),
+  YamlOracleStep.new("oracle_stage_3.yaml", context),
 ]
 
 # Map stages to pipeline indices:

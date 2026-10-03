@@ -33,6 +33,11 @@ class Node
     raise "virtual method"
   end
 
+  # The width of the node
+  def width
+    raise "virtual method"
+  end
+
   public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
@@ -98,6 +103,12 @@ class PersonNode < Node
   # The bottom-center coordinates [x, y] of this person node
   def bottom_center
     [x + (NODE_WIDTH / 2.0), y + NODE_HEIGHT]
+  end
+
+  # The width of the node
+  def width
+    #!!! Gemini: implement this!!
+0
   end
 
   def method_missing(method_name, *args, &block)
@@ -174,6 +185,12 @@ class CoupleNode < Node
   # The bottom-center coordinates [x, y] of this couple node
   def bottom_center
     [center_x, y + NODE_HEIGHT]
+  end
+
+  # The width of the node
+  def width
+    #!!! Gemini: implement this!!
+0
   end
 
   # Initializes coordinates for this couple and its partner nodes

@@ -1,7 +1,10 @@
 require 'ruby_contracts'
 require 'debug_logger'
+require 'ruby_contracts'
+require 'debug_logger'
 require 'family_constants'
 require 'svg_utility'
+require 'line_crossing_analysis'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
@@ -15,8 +18,6 @@ class GraphRenderer
     @label_mode = label_mode
   end
 
-  public  ###  Basic operations
-
   # Renders the registered family tree structure into an SVG file.
   # @param output_dir [String] The directory path where the SVG is saved.
   # @param root_id [String] The identifier for the root of the tree.
@@ -25,6 +26,28 @@ class GraphRenderer
       puts "No nodes to render."
       return
     end
+    all_nodes = @coordinates.all_person_nodes
+    unique_persons = all_nodes.map(&:person).uniq.size
+    total_nodes = all_nodes.size
+    duplicate_nodes = total_nodes - unique_persons
+#!!! FIX: GraphRenderer should not be doing analysis - the 'crossing_count'
+#!!!     should be stored in Coordinates.
+    analyzer = LineCrossingAnalysis.new(@coordinates)
+    crossing_count = analyzer.crossing_pairs.size
+    initial_crossed = @coordinates.respond_to?(:initial_crossed_line_count) && @coordinates.initial_crossed_line_count ? @coordinates.initial_crossed_line_count : crossing_count
+    resolved_crossed = @coordinates.respond_to?(:resolved_crossed_line_count) && @coordinates.resolved_crossed_line_count ? @coordinates.resolved_crossed_line_count : 0
+    initial_overlaps = @coordinates.respond_to?(:initial_overlap_count) && @coordinates.initial_overlap_count ? @coordinates.initial_overlap_count : 0
+    remaining_overlaps = @coordinates.respond_to?(:remaining_overlap_count) && @coordinates.remaining_overlap_count ? @coordinates.remaining_overlap_count : 0
+    puts "--- Generation Report ---"
+    puts "Number of nodes: #{total_nodes} (#{unique_persons} persons, #{duplicate_nodes} are duplicates)"
+    puts "Number of crossed lines: #{crossing_count} (Initial: #{initial_crossed}, Resolved: #{resolved_crossed})"
+    if initial_overlaps == 0 then
+      puts "No overlaps detected"
+    else
+      puts "Number of overlaps detected: #{initial_overlaps}"
+    end
+    puts "Number of overlaps remaining: #{remaining_overlaps}"
+    puts "-------------------------"
     timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
     filename = "family_tree_#{root_id}_#{timestamp}.svg"
     output_path = File.join(output_dir, filename)
