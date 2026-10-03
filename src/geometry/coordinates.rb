@@ -13,8 +13,14 @@ class Coordinates
   # Have all nodes in 'all_person_nodes' been initialized - prepared for
   # layout operations?
   attr_reader :nodes_initialized
-  attr_accessor :initial_overlap_count, :remaining_overlap_count
-  attr_accessor :initial_crossed_line_count, :resolved_crossed_line_count
+  # First count of node overlaps:
+  attr_accessor :initial_overlap_count
+  # Count of unresolved overlaps:
+  attr_accessor :remaining_overlap_count
+  # First count of line crossings:
+  attr_accessor :initial_crossed_line_count
+  # Count of unresolved line crossings:
+  attr_accessor :remaining_crossed_line_count
 
   public  ###  Initialization
 
@@ -26,9 +32,23 @@ class Coordinates
     @couples = {}
     @next_x = Hash.new(0)
     @nodes_initialized = false
+    @initial_overlap_count = 0
+    @remaining_overlap_count = 0
+    @initial_crossed_line_count = 0
+    @remaining_crossed_line_count = 0
   end
 
   public  ###  Access
+
+  # The number of resolved overlaps
+  def resolved_overlap_count
+    initial_overlap_count - remaining_overlap_count
+  end
+
+  # The number of resolved crossed lines
+  def resolved_crossed_line_count
+    initial_crossed_line_count - remaining_crossed_line_count
+  end
 
   # Array: All individual person nodes (singles + partners in couples)
   def all_person_nodes

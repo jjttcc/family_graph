@@ -4,13 +4,14 @@ require 'line_crossing_analysis'
 require 'line_crossing_resolution'
 require 'node_swap_resolution'
 require 'sibling_reorder_resolution'
+require 'assertions'
 
 # A layout step that analyzes parent-child connection line crossings
 # and optimizes sibling or node ordering to minimize edge intersections
 # using an iterative greedy best-first search with coordinate rollback
 # and single instance reuse for analyzer and resolvers.
 class LineOptimizationStep < LayoutStep
-  include Contracts::DSL
+  include Contracts::DSL, Assertions
 
   public ###  Initialization
 
@@ -19,8 +20,6 @@ class LineOptimizationStep < LayoutStep
     @analyzer = LineCrossingAnalysis.new(context.coordinates)
     @resolvers = [
       NodeSwapResolution.new(context.coordinates),
-# (just one for now)
-#      SiblingReorderResolution.new(context.coordinates)
     ]
   end
 
@@ -29,16 +28,15 @@ class LineOptimizationStep < LayoutStep
   # Executes the iterative greedy best-first line optimization algorithm
   # using coordinate snapshotting, rollback, and single instance reuse.
   def execute
-    initial_count = analyzer.crossing_pairs.size
+    initial_count = analyzer.crossing_pairs.count
     context.coordinates.initial_crossed_line_count = initial_count
     current_crossings = initial_count
-
     if current_crossings > 0 then
       max_iterations = 20
       iteration = 0
       continue_optimization = true
       while continue_optimization && current_crossings > 0 &&
-            iteration < max_iterations do
+            iteration < max_iterations
         best_resolver = nil
         best_crossings = current_crossings
         best_mutated_coords = nil
@@ -48,7 +46,7 @@ class LineOptimizationStep < LayoutStep
           resolver.coordinates = test_coords
           test_crossings_pairs = analyzer.crossing_pairs
           resolver.execute(test_crossings_pairs)
-          new_crossings = analyzer.crossing_pairs.size
+          new_crossings = analyzer.crossing_pairs.count
           if new_crossings < best_crossings then
             best_crossings = new_crossings
             best_resolver = resolver
@@ -72,10 +70,9 @@ class LineOptimizationStep < LayoutStep
     else
       puts "LineOptimizationStep: Zero edge crossings detected."
     end
-
-    final_crossings = analyzer.crossing_pairs.size
-#!!!rm:    context.coordinates.remaining_crossed_lines = final_crossings
-    context.coordinates.resolved_crossed_line_count = initial_count - final_crossings
+    final_crossings = analyzer.crossing_pairs.count
+    check { final_crossings == current_crossings }
+    context.coordinates.remaining_crossed_line_count = final_crossings
   end
 
   private ###  Implementation

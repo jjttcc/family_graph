@@ -107,8 +107,7 @@ class PersonNode < Node
 
   # The width of the node
   def width
-    #!!! Gemini: implement this!!
-0
+    NODE_WIDTH
   end
 
   def method_missing(method_name, *args, &block)
@@ -189,8 +188,7 @@ class CoupleNode < Node
 
   # The width of the node
   def width
-    #!!! Gemini: implement this!!
-0
+    COUPLE_WIDTH
   end
 
   # Initializes coordinates for this couple and its partner nodes

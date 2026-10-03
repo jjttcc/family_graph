@@ -1,5 +1,4 @@
-require 'ruby_contracts'
-require 'debug_logger'
+# vim: ts=2 sw=2 expandtab
 require 'ruby_contracts'
 require 'debug_logger'
 require 'family_constants'
@@ -22,25 +21,53 @@ class GraphRenderer
   # @param output_dir [String] The directory path where the SVG is saved.
   # @param root_id [String] The identifier for the root of the tree.
   def render(output_dir, root_id = "tree")
-    if @coordinates.single_nodes.empty? && @coordinates.couples.empty? then
+    if coordinates.single_nodes.empty? && coordinates.couples.empty? then
       puts "No nodes to render."
-      return
+    else
+      generate_report
+      timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
+      filename = "family_tree_#{root_id}_#{timestamp}.svg"
+      output_path = File.join(output_dir, filename)
+      offset_x, offset_y, width, height = calculate_dimensions
+      svg_lines = []
+      svg_nodes = []
+      # render "single-person" nodes
+      coordinates.single_nodes.values.each do |node|
+        render_person(node, svg_nodes, offset_x, offset_y)
+      end
+      # render "married-person" nodes
+      coordinates.couples.values.each do |couple|
+        render_couple(couple, svg_lines, svg_nodes, offset_x, offset_y)
+      end
+      render_parent_child_lines(svg_lines, offset_x, offset_y)
+      svg_template = template(width, height, svg_lines, svg_nodes)
+      File.write(output_path, svg_template)
+      puts "Successfully rendered SVG to #{output_path}"
     end
-    all_nodes = @coordinates.all_person_nodes
+  end
+
+  private
+
+  attr_reader :coordinates
+
+  # Generates and outputs the diagram generation report.
+  def generate_report
+    all_nodes = coordinates.all_person_nodes
     unique_persons = all_nodes.map(&:person).uniq.size
     total_nodes = all_nodes.size
     duplicate_nodes = total_nodes - unique_persons
-#!!! FIX: GraphRenderer should not be doing analysis - the 'crossing_count'
-#!!!     should be stored in Coordinates.
-    analyzer = LineCrossingAnalysis.new(@coordinates)
-    crossing_count = analyzer.crossing_pairs.size
-    initial_crossed = @coordinates.respond_to?(:initial_crossed_line_count) && @coordinates.initial_crossed_line_count ? @coordinates.initial_crossed_line_count : crossing_count
-    resolved_crossed = @coordinates.respond_to?(:resolved_crossed_line_count) && @coordinates.resolved_crossed_line_count ? @coordinates.resolved_crossed_line_count : 0
-    initial_overlaps = @coordinates.respond_to?(:initial_overlap_count) && @coordinates.initial_overlap_count ? @coordinates.initial_overlap_count : 0
-    remaining_overlaps = @coordinates.respond_to?(:remaining_overlap_count) && @coordinates.remaining_overlap_count ? @coordinates.remaining_overlap_count : 0
+    initial_crossed = coordinates.initial_crossed_line_count
+    remaining_crossed = coordinates.remaining_crossed_line_count
+    resolved_crossed = coordinates.resolved_crossed_line_count
+    initial_overlaps = coordinates.initial_overlap_count
+    remaining_overlaps = coordinates.remaining_overlap_count
     puts "--- Generation Report ---"
-    puts "Number of nodes: #{total_nodes} (#{unique_persons} persons, #{duplicate_nodes} are duplicates)"
-    puts "Number of crossed lines: #{crossing_count} (Initial: #{initial_crossed}, Resolved: #{resolved_crossed})"
+    msg_nodes = "Number of nodes: #{total_nodes} (#{unique_persons} " +
+                "persons, #{duplicate_nodes} are duplicates)"
+    puts msg_nodes
+    msg_cross = "Number of crossed lines: #{remaining_crossed} " +
+                "(Initial: #{initial_crossed}, Resolved: #{resolved_crossed})"
+    puts msg_cross
     if initial_overlaps == 0 then
       puts "No overlaps detected"
     else
@@ -48,37 +75,17 @@ class GraphRenderer
     end
     puts "Number of overlaps remaining: #{remaining_overlaps}"
     puts "-------------------------"
-    timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
-    filename = "family_tree_#{root_id}_#{timestamp}.svg"
-    output_path = File.join(output_dir, filename)
-    offset_x, offset_y, width, height = calculate_dimensions
-    svg_lines = []
-    svg_nodes = []
-    # render "single-person" nodes
-    @coordinates.single_nodes.values.each do |node|
-      render_person(node, svg_nodes, offset_x, offset_y)
-    end
-    # render "married-person" nodes
-    @coordinates.couples.values.each do |couple|
-      render_couple(couple, svg_lines, svg_nodes, offset_x, offset_y)
-    end
-    render_parent_child_lines(svg_lines, offset_x, offset_y)
-    svg_template = template(width, height, svg_lines, svg_nodes)
-    File.write(output_path, svg_template)
-    puts "Successfully rendered SVG to #{output_path}"
   end
-
-  private
 
   # Calculates the total SVG dimensions and canvas offset to contain all nodes.
   # @return [Array<Numeric>] offset_x, offset_y, width, height.
   def calculate_dimensions
-    all_nodes = @coordinates.single_nodes.values +
-                @coordinates.couples.values.flat_map { |c| [c.partner_a,
+    all_nodes = coordinates.single_nodes.values +
+                coordinates.couples.values.flat_map { |c| [c.partner_a,
                                                             c.partner_b] }
     min_x = all_nodes.map { |n| n.x }.min
     min_y = all_nodes.map { |n| n.y }.min
-    max_x = all_nodes.map { |n| n.x + NODE_WIDTH }.max
+    max_x = all_nodes.map { |n| n.x + n.width }.max
     max_y = all_nodes.map { |n| n.y + NODE_HEIGHT }.max
     [-min_x + RENDER_OFFSET_X, -min_y + RENDER_OFFSET_Y,
      max_x - min_x + NODE_WIDTH + (2 * RENDER_OFFSET_X),
@@ -148,11 +155,11 @@ class GraphRenderer
   # @param offset_x [Numeric] X-axis offset for rendering.
   # @param offset_y [Numeric] Y-axis offset for rendering.
   def render_parent_child_lines(svg_lines, offset_x, offset_y)
-    @coordinates.all_person_nodes.each do |node|
+    coordinates.all_person_nodes.each do |node|
       if node.is_a?(PersonNode) && node.is_primary_representation then
         person = node.person
         person.parents.each do |parent|
-          parent_node = @coordinates.node_for_person(parent)
+          parent_node = coordinates.node_for_person(parent)
           if parent_node then
             x1, y1 = node.top_center
             x2, y2 = parent_node.bottom_center
