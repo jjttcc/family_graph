@@ -2,11 +2,12 @@
 require 'layout_step'
 require 'ruby_contracts'
 require 'family_constants'
+require 'assertions'
 
-# Implements Stage 3 bounding-box overlap elimination, detecting and resolving
-# horizontal node collisions across layout levels.
+# Implements Stage 3 bounding-box overlap elimination across all individual
+# person nodes (single nodes and couple partners) using 2D AABB collision detection.
 class OverlapEliminationStep < LayoutStep
-  include Contracts::DSL
+  include Contracts::DSL, Assertions
 
   public
 
@@ -14,92 +15,84 @@ class OverlapEliminationStep < LayoutStep
   # and records overlap detection metrics.
   def execute
     coords = context.coordinates
-    levels = nodes_by_level(coords)
-    initial_count = overlaps(coords, levels)
-    coords.initial_overlap_count = initial_count
-    eliminate_overlaps(coords, levels)
-    final_levels = nodes_by_level(coords)
-    final_count = overlaps(coords, final_levels)
-    coords.remaining_overlap_count = final_count
+    nodes = all_person_nodes(coords)
+
+    initial_pairs = overlaps(nodes)
+    coords.initial_overlap_count = initial_pairs.size
+    $stdout.puts "OverlapEliminationStep: Initial overlaps detected: #{initial_pairs.size}"
+
+    max_passes = 1_000_000
+    pass = 0
+    loop do
+      pass += 1
+      current_pairs = overlaps(nodes)
+      $stdout.puts "OverlapEliminationStep: Pass #{pass}: found #{current_pairs.size} overlap(s)"
+
+      if current_pairs.empty? || pass > max_passes then
+        break
+      end
+
+      resolve_overlaps(current_pairs)
+    end
+
+    final_pairs = overlaps(nodes)
+    coords.remaining_overlap_count = final_pairs.size
+    $stdout.puts "OverlapEliminationStep: Final remaining overlaps: #{final_pairs.size}"
+
+    check("All overlaps must be eliminated") { final_pairs.empty? }
   end
 
   private
 
-  # Total number of overlaps in 'coords'
-  def overlaps(coords, levels)
-    result = 0
-    levels.each do |_y, nodes|
-      sorted_nodes = nodes.sort_by(&:x)
-      sorted_nodes.each_with_index do |node1, i|
-        if i != sorted_nodes.size - 1 then
-          node2 = sorted_nodes[i + 1]
-          width1 = node1.width
-          min_separation = width1 + 20
-          actual_separation = node2.x - node1.x
-          if actual_separation < min_separation then
-            result += 1
-          end
+  # Collects all individual person nodes (single nodes + couple partners)
+  def all_person_nodes(coords)
+    single = coords.single_nodes.values
+    couples = coords.couples.values.flat_map { |c| [c.partner_a, c.partner_b] }
+    single + couples
+  end
+
+  # Identifies and returns an array of overlapping person node pairs [node1, node2]
+  def overlaps(nodes)
+    overlap_pairs = []
+    sorted_nodes = nodes.sort_by { |n| [n.y, n.x] }
+    sorted_nodes.each_with_index do |node1, i|
+      ((i + 1)...sorted_nodes.size).each do |j|
+        node2 = sorted_nodes[j]
+        if node1.y == node2.y && bounding_boxes_overlap(node1, node2) then
+          overlap_pairs << [node1, node2]
+        else
+          break if node2.y > node1.y || node2.x >= node1.x + NODE_WIDTH + 20
         end
       end
     end
-    result
+    overlap_pairs
   end
 
-  # Detects and resolves overlapping bounding boxes on each Y level.
-  def eliminate_overlaps(coords, levels)
-    max_passes = 15
-    pass_count = 0
-    loop do
-      pass_count += 1
-      if pass_count > max_passes then
-        break
-      end
-      shifted = false
-      levels.each do |_y, nodes|
-        sorted_nodes = nodes.sort_by(&:x)
-        sorted_nodes.each_with_index do |node1, i|
-          if i != sorted_nodes.size - 1 then
-            node2 = sorted_nodes[i + 1]
-            width1 = node1.width
-            min_separation = width1 + 20
-            actual_separation = node2.x - node1.x
-            if actual_separation < min_separation then
-              shift_amount = min_separation - actual_separation
-              node2.x += shift_amount
-              shifted = true
-            end
-          end
-        end
-      end
-      if !shifted then
-        break
+  # Resolves a given list of overlapping node pairs by shifting node2 rightwards
+  def resolve_overlaps(overlap_pairs)
+    overlap_pairs.each do |node1, node2|
+      required_x = node1.x + NODE_WIDTH + 20
+      if node2.x < required_x then
+        shift_amount = required_x - node2.x
+        node2.x += shift_amount
       end
     end
   end
 
-  # Collects all nodes (single nodes and couples) grouped by their Y coordinate.
-  def nodes_by_level(coords)
-    result = {}
-    coords.single_nodes.values.each do |node|
-      y = node.y
-      result[y] ||= []
-      result[y] << node
-    end
-    coords.couples.values.each do |couple|
-      y = couple.y
-      result[y] ||= []
-      result[y] << couple
-    end
-    result
-  end
+  # Robust 2D Axis-Aligned Bounding Box (AABB) overlap check including 20px minimum separation
+  def bounding_boxes_overlap(node1, node2)
+    x1 = node1.x
+    y1 = node1.y
+    w1 = NODE_WIDTH
+    h1 = NODE_HEIGHT
 
-  # !!! obsolete: remove
-  def node_width(node)
-    if node.respond_to?(:partner_a) then
-      COUPLE_WIDTH
-    else
-      NODE_WIDTH
-    end
+    x2 = node2.x
+    y2 = node2.y
+    w2 = NODE_WIDTH
+    h2 = NODE_HEIGHT
+
+    # Two nodes overlap if their bounding boxes (with 20px min separation) intersect
+    !(x1 >= x2 + w2 + 20 || x1 + w1 + 20 <= x2 || y1 >= y2 + h2 || y1 + h1 <= y2)
   end
 
 end
