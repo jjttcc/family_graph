@@ -5,9 +5,9 @@ require 'ruby_contracts'
 require 'family_constants'
 require 'assertions'
 
-# Implements Stage 3 bounding-box overlap elimination across all individual
-# person nodes (single nodes and couple partners) using 2D AABB collision
-# detection.
+# Implements Stage 3 bounding-box overlap elimination across all layout units
+# (single person nodes and couple nodes) using 2D AABB collision detection
+# with couple-atomic unit shifting.
 class OverlapEliminationStep < LayoutStep
   include Contracts::DSL, Assertions, DebugLogger
 
@@ -17,7 +17,7 @@ class OverlapEliminationStep < LayoutStep
   # and records overlap detection metrics.
   def execute
     coords = context.coordinates
-    nodes = all_person_nodes(coords)
+    nodes = all_layout_nodes(coords)
     initial_pairs = overlaps(nodes)
     coords.initial_overlap_count = initial_pairs.size
     log("OverlapEliminationStep: Initial overlaps detected: ",
@@ -43,14 +43,12 @@ class OverlapEliminationStep < LayoutStep
 
   private
 
-  # Collects all individual person nodes (single nodes + couple partners)
-  def all_person_nodes(coords)
-    single = coords.single_nodes.values
-    couples = coords.couples.values.flat_map { |c| [c.partner_a, c.partner_b] }
-    single + couples
+  # Collects all layout units (single nodes + couple nodes)
+  def all_layout_nodes(coords)
+    coords.single_nodes.values + coords.couples.values
   end
 
-  # Identifies and returns an array of overlapping person node pairs
+  # Identifies and returns an array of overlapping layout node pairs
   # [node1, node2]
   def overlaps(nodes)
     overlap_pairs = []
@@ -61,35 +59,35 @@ class OverlapEliminationStep < LayoutStep
         if node1.y == node2.y && bounding_boxes_overlap(node1, node2) then
           overlap_pairs << [node1, node2]
         else
-          break if node2.y > node1.y || node2.x >= node1.x + NODE_WIDTH + 20
+          break if node2.y > node1.y || node2.x >= node1.x + node1.width + 20
         end
       end
     end
     overlap_pairs
   end
 
-  # Resolves a given list of overlapping node pairs by shifting node2
+  # Resolves a given list of overlapping node pairs by atomically shifting node2
   # rightwards
   def resolve_overlaps(overlap_pairs)
     overlap_pairs.each do |node1, node2|
-      required_x = node1.x + NODE_WIDTH + 20
+      required_x = node1.x + node1.width + 20
       if node2.x < required_x then
         shift_amount = required_x - node2.x
-        node2.x += shift_amount
+        node2.shift!(shift_amount)
       end
     end
   end
 
   # Robust 2D Axis-Aligned Bounding Box (AABB) overlap check including
-  # 20px minimum separation
+  # 20px minimum separation, using polymorphic node widths
   def bounding_boxes_overlap(node1, node2)
     x1 = node1.x
     y1 = node1.y
-    w1 = NODE_WIDTH
+    w1 = node1.width
     h1 = NODE_HEIGHT
     x2 = node2.x
     y2 = node2.y
-    w2 = NODE_WIDTH
+    w2 = node2.width
     h2 = NODE_HEIGHT
     # Two nodes overlap if their bounding boxes
     # (with 20px min separation) intersect

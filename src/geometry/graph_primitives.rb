@@ -38,6 +38,16 @@ class Node
     raise "virtual method"
   end
 
+  # Is this node a couple? (false == self.is_a?(PersonNode))
+  def is_couple
+    raise "virtual method"
+  end
+
+  # Shifts the node horizontally by dx
+  def shift!(dx)
+    raise "virtual method"
+  end
+
   public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
@@ -108,6 +118,14 @@ class PersonNode < Node
   # The width of the node
   def width
     NODE_WIDTH
+  end
+
+  def is_couple
+    false
+  end
+
+  def shift!(dx)
+    @x += dx
   end
 
   def method_missing(method_name, *args, &block)
@@ -189,6 +207,16 @@ class CoupleNode < Node
   # The width of the node
   def width
     COUPLE_WIDTH
+  end
+
+  def is_couple
+    true
+  end
+
+  def shift!(dx)
+    @x += dx
+    partner_a.x += dx
+    partner_b.x += dx
   end
 
   # Initializes coordinates for this couple and its partner nodes
