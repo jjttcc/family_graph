@@ -9,30 +9,21 @@ if ! ENV[root] then
 end
 require setup_path
 require 'line_style_map'
-require 'person'
-require 'biological_parent'
-require 'non_biological_parent'
 require 'family_constants'
 
 puts "Verifying LineStyleMap..."
 
-person = Person.new('test_person')
-bio_parent = BiologicalParent.new(person)
-adoptive_parent = NonBiologicalParent.new(person, ADOPTIVE)
-assumed_parent = NonBiologicalParent.new(person, ASSUMED)
+spouse_style = LineStyleMap.style_for(SPOUSE)
+raise "Expected stroke-dasharray=\"8, 4\" for SPOUSE" unless spouse_style == 'stroke-dasharray="8, 4"'
 
-bio_style = LineStyleMap.style_for(bio_parent)
-raise "Expected nil dasharray for biological parent" unless bio_style[:stroke_dasharray].nil?
+bio_style = LineStyleMap.style_for(BIOLOGICAL)
+raise "Expected empty string for BIOLOGICAL" unless bio_style == ''
 
-adoptive_style = LineStyleMap.style_for(adoptive_parent)
-raise "Expected '1, 4' dasharray for adoptive parent" unless adoptive_style[:stroke_dasharray] == '1, 4'
-raise "Expected 'round' linecap for adoptive parent" unless adoptive_style[:stroke_linecap] == 'round'
+adoptive_style = LineStyleMap.style_for(ADOPTIVE)
+raise "Expected stroke-dasharray=\"1, 4\" stroke-linecap=\"round\" for ADOPTIVE" unless adoptive_style == 'stroke-dasharray="1, 4" stroke-linecap="round"'
 
-assumed_style = LineStyleMap.style_for(assumed_parent)
-raise "Expected '8, 4' dasharray for assumed parent" unless assumed_style[:stroke_dasharray] == '8, 4'
-
-nil_style = LineStyleMap.style_for(nil)
-raise "Expected nil dasharray for nil parent" unless nil_style[:stroke_dasharray].nil?
+assumed_style = LineStyleMap.style_for(ASSUMED)
+raise "Expected stroke-dasharray=\"8, 4\" for ASSUMED" unless assumed_style == 'stroke-dasharray="8, 4"'
 
 puts "LineStyleMap verification PASSED!"
 exit 0

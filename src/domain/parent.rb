@@ -24,6 +24,7 @@ class Parent
   end
 
   # Type of parent: BIOLOGICAL, ADOPTIVE, etc.
+  post :valid do |result| result.is_a?(String) end
   def type
     raise "virtual method"
   end

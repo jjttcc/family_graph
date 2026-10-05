@@ -1,46 +1,24 @@
 require 'family_constants'
 
-# Encapsulates mapping from parent relationship types to SVG line styling
-# properties (stroke-dasharray, stroke-linecap, stroke-width, etc.).
+# Encapsulates mapping from relationship types to SVG line style
+# attribute strings using a lookup hash.
 class LineStyleMap
 
   public
 
-  # Returns a hash of SVG line attributes for the given parent.
-  # @param parent [Parent, nil] The parent object.
-  # @return [Hash] SVG attributes hash.
-  def self.style_for(parent)
-    result = {
-      stroke_dasharray: nil,
-      stroke_linecap: nil,
-      stroke_width: 1,
-      stroke_color: 'black'
-    }
+  STYLE_MAP = {
+    SPOUSE     => 'stroke-dasharray="8, 4"',
+    ADOPTIVE   => 'stroke-dasharray="1, 4" stroke-linecap="round"',
+    ASSUMED    => 'stroke-dasharray="8, 4"',
+    BIOLOGICAL => ''
+  }.freeze
 
-    if parent != nil then
-      if parent.type == ADOPTIVE then
-        result[:stroke_dasharray] = '1, 4'
-        result[:stroke_linecap] = 'round'
-      elsif parent.type == ASSUMED then
-        result[:stroke_dasharray] = '8, 4'
-      else
-        # Biological or default
-      end
-    end
-
-    result
-  end
-
-  # Returns the dasharray string for the given parent.
-  def self.dasharray_for(parent)
-    style = style_for(parent)
-    style[:stroke_dasharray]
-  end
-
-  # Returns the linecap string for the given parent.
-  def self.linecap_for(parent)
-    style = style_for(parent)
-    style[:stroke_linecap]
+  # Returns the SVG attribute string for the given relationship type.
+  # @param type [String] Relationship type (e.g. SPOUSE, BIOLOGICAL,
+  # ADOPTIVE, ASSUMED).
+  # @return [String] SVG attribute string.
+  def self.style_for(type)
+    STYLE_MAP.fetch(type, '')
   end
 
 end

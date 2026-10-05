@@ -147,7 +147,8 @@ class GraphRenderer
     y1 = left_n.y + (NODE_HEIGHT / 2) + offset_y
     x2 = right_n.x + offset_x
     y2 = right_n.y + (NODE_HEIGHT / 2) + offset_y
-    svg_lines << line(x1, y1, x2, y2, 'black', 1, '4')
+    svg_lines << line(x1, y1, x2, y2, 'black', 1,
+                      LineStyleMap.style_for(SPOUSE))
   end
 
   # Renders lines connecting children to their respective parents.
@@ -168,13 +169,10 @@ class GraphRenderer
             else
               " marker-end=\"url(#arrowhead)\""
             end
-            style = LineStyleMap.style_for(parent)
+            style_str = LineStyleMap.style_for(parent.type)
             svg_lines << line(x1 + offset_x, y1 + offset_y, x2 + offset_x,
-                              y2 + offset_y, style[:stroke_color],
-                              style[:stroke_width],
-                              style[:stroke_dasharray],
-                              marker != "",
-                              style[:stroke_linecap])
+                              y2 + offset_y, 'black', 1, style_str,
+                              marker != "")
           end
         end
       end

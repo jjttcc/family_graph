@@ -13,7 +13,7 @@ class Person
   public
 
   attr_reader :id, :children
-  # biological father and mother (type Person)
+  # biological father and mother (type Parent)
   attr_accessor :father, :mother
   attr_accessor :spouses, :generation
   # All of self's non-biological mothers (array of NonBiologicalParent)
@@ -56,24 +56,16 @@ class Person
   # given up for adoption and as a result also has a 'adoptive' mother.
   # Array[Parent]: empty if no parents
   post :result_good do |result| result.is_a?(Array) end
-  post :mother do |result|
-    implies(! self.mother.nil?,
-            result.any? { |p| p.person == self.mother })
-  end
-  post :father do |result|
-    implies(! self.father.nil?,
-            result.any? { |p| p.person == self.father })
-  end
   post :first_parent_check do |result|
     implies(result.count > 0, result[0].is_a?(Parent))
   end
   def parents
     result = []
     if ! mother.nil? then
-      result << BiologicalParent.new(mother)
+      result << mother
     end
     if ! father.nil? then
-      result << BiologicalParent.new(father)
+      result << father
     end
     if non_biological_mothers then
       result.concat(non_biological_mothers)

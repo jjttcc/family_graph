@@ -14,6 +14,7 @@ require 'line_crossing_resolution'
 require 'node_swap_resolution'
 require 'sibling_reorder_resolution'
 require 'person'
+require 'biological_parent'
 require 'graph_primitives'
 require 'data_loader'
 
@@ -32,10 +33,10 @@ p2 = Person.new('p2', {})
 c1 = Person.new('c1', {})
 c2 = Person.new('c2', {})
 
-c1.father = p1
+c1.father = BiologicalParent.new(p1)
 p1.add_child(c1)
 
-c2.father = p2
+c2.father = BiologicalParent.new(p2)
 p2.add_child(c2)
 
 n_p1 = PersonNode.new(p1, 0, 0)

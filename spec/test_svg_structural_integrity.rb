@@ -10,6 +10,8 @@ if ! ENV[root] then
 end
 require setup_path
 require 'fileutils'
+require 'line_style_map'
+require 'family_constants'
 
 def assert(condition, message)
   if not condition then
@@ -36,8 +38,9 @@ parent_child_lines = svg_content.scan(
   /<line[^>]*stroke="black"[^>]*>/).reject {
     |l| l.include?('stroke-dasharray') }.size
 
-# Count spousal lines (those with stroke-dasharray="4")
-spousal_lines = svg_content.scan(/stroke-dasharray="4"/).size
+# Count spousal lines using LineStyleMap
+spouse_style = LineStyleMap.style_for(SPOUSE)
+spousal_lines = svg_content.scan(/#{spouse_style}/).size
 
 puts "Parent-Child lines: #{parent_child_lines}"
 puts "Spousal lines: #{spousal_lines}"
