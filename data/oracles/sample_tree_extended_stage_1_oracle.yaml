@@ -175,7 +175,7 @@
               - *9
               non_biological_mothers: []
               non_biological_fathers: []
-              generation: 0
+              generation: 1
           mother: !ruby/object:BiologicalParent
             person: &24 !ruby/object:Person
               id: edward_spouse_mother_702
@@ -188,7 +188,7 @@
               - *9
               non_biological_mothers: []
               non_biological_fathers: []
-              generation: 0
+              generation: 1
           generation: 2
         - &11 !ruby/object:Person
           id: edward_spouse_b_705
@@ -465,14 +465,14 @@
     is_primary_representation: true
     offspring_width: 0
   edward_spouse_father_701: !ruby/object:PersonNode
-    x: 1070
-    y: 0
+    x: 605.0
+    y: 200
     person: *23
     is_primary_representation: true
     offspring_width: 380
   edward_spouse_mother_702: !ruby/object:PersonNode
-    x: 1340
-    y: 0
+    x: 875.0
+    y: 200
     person: *24
     is_primary_representation: true
     offspring_width: 380
@@ -666,8 +666,8 @@
     y: 400
     offspring_width: 390
 :next_x:
-  0: 1610
-  200: 605.0
+  0: 1070
+  200: 1145.0
   400: 815.0
   600: 760.0
   800: 1210.0

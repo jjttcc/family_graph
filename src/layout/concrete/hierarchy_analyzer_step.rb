@@ -1,5 +1,6 @@
 # vim: ts=2 sw=2 expandtab
 require 'layout_step'
+require 'set'
 
 class HierarchyAnalyzerStep < LayoutStep
   include Contracts::DSL
@@ -21,7 +22,9 @@ class HierarchyAnalyzerStep < LayoutStep
         person.generation = 0
       end
     end
-    align_spouses(people)
+    align_generations(people)
+    correct_generation_gaps(people)
+    align_generations(people)
   end
 
   private
@@ -45,9 +48,10 @@ class HierarchyAnalyzerStep < LayoutStep
     end
   end
 
-  def align_spouses(people)
+  def align_generations(people)
     loop do
       changed = false
+      # Align spouses
       people.each_value do |person|
         person.spouses.each do |spouse|
           max_gen = [person.generation, spouse.generation].max
@@ -58,9 +62,54 @@ class HierarchyAnalyzerStep < LayoutStep
           end
         end
       end
+      # Align co-parents (parents sharing a child)
+      people.each_value do |person|
+        parents = person.parents
+        if parents.size > 1 then
+          max_gen = parents.map(&:generation).max
+          parents.each do |parent|
+            if parent.generation != max_gen then
+              parent.generation = max_gen
+              changed = true
+            end
+          end
+        end
+      end
       if !changed then
         break
       end
+    end
+  end
+
+  def correct_generation_gaps(people)
+    loop do
+      changed = false
+      people.each_value do |person|
+        person.parents.each do |parent|
+          if person.generation - parent.generation > 1 then
+            target_parent_gen = person.generation - 1
+            if parent.generation < target_parent_gen then
+              adjust_ancestors_upward(parent.person, target_parent_gen)
+              changed = true
+            end
+          end
+        end
+      end
+      if !changed then
+        break
+      end
+    end
+  end
+
+  def adjust_ancestors_upward(person, target_gen, visited = Set.new)
+    return if visited.include?(person.id)
+    visited.add(person.id)
+    person.generation = target_gen
+    person.spouses.each do |spouse|
+      spouse.generation = target_gen
+    end
+    person.parents.each do |parent|
+      adjust_ancestors_upward(parent.person, target_gen - 1, visited)
     end
   end
 
