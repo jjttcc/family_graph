@@ -9,19 +9,24 @@ module SVGUtility
   end
 
   def line(x1, y1, x2, y2, stroke = 'black', stroke_width = 1,
-           dash = nil, marker = nil)
+           dash = nil, marker = nil, linecap = nil)
     attr = "stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\""
     if dash then
       dash_attr = " stroke-dasharray=\"#{dash}\""
     else
       dash_attr = ""
     end
+    if linecap then
+      linecap_attr = " stroke-linecap=\"#{linecap}\""
+    else
+      linecap_attr = ""
+    end
     if marker then
       marker_attr = " marker-end=\"url(#arrowhead)\""
     else
       marker_attr = ""
     end
-    attr += dash_attr + marker_attr
+    attr += dash_attr + linecap_attr + marker_attr
     "  <line x1=\"#{x1}\" y1=\"#{y1}\" x2=\"#{x2}\" y2=\"#{y2}\" #{attr} />"
   end
 

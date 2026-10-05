@@ -3,7 +3,7 @@ require 'ruby_contracts'
 require 'debug_logger'
 require 'family_constants'
 require 'svg_utility'
-require 'line_crossing_analysis'
+require 'line_style_map'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
@@ -168,8 +168,13 @@ class GraphRenderer
             else
               " marker-end=\"url(#arrowhead)\""
             end
+            style = LineStyleMap.style_for(parent)
             svg_lines << line(x1 + offset_x, y1 + offset_y, x2 + offset_x,
-                              y2 + offset_y, 'black', 1, nil, marker != "")
+                              y2 + offset_y, style[:stroke_color],
+                              style[:stroke_width],
+                              style[:stroke_dasharray],
+                              marker != "",
+                              style[:stroke_linecap])
           end
         end
       end
