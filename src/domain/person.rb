@@ -1,6 +1,8 @@
 require 'debug_logger'
-# required libraries/tools
 require 'ruby_contracts'
+require 'parent'
+require 'biological_parent'
+require 'non_biological_parent'
 
 # Represents a person in the family tree, storing biographical and
 # genealogical data.
@@ -11,7 +13,13 @@ class Person
   public
 
   attr_reader :id, :children
-  attr_accessor :spouses, :father, :mother, :generation
+  # biological father and mother (type Person)
+  attr_accessor :father, :mother
+  attr_accessor :spouses, :generation
+  # All of self's non-biological mothers (array of NonBiologicalParent)
+  attr_accessor :non_biological_mothers
+  # All of self's non-biological fathers (array of NonBiologicalParent)
+  attr_accessor :non_biological_fathers
 
   public  ###  Initialization
 
@@ -22,6 +30,8 @@ class Person
     @data = data
     @spouses = []
     @children = []
+    @non_biological_mothers = []
+    @non_biological_fathers = []
   end
 
   public  ###  Access
@@ -40,22 +50,36 @@ class Person
 
   public  ### Retrieval
 
-  # Biological mother and father - list: empty if no parents
-  post :result_good do |result| not result.nil? end
-  post :only_two do |result| result.count <= 2 end
+  # Parents - mother and father - of self. These parents may be biological
+  # or non-biological, and there may be more than two parents - for
+  # example, in the case in which a person has a biological mother, was
+  # given up for adoption and as a result also has a 'adoptive' mother.
+  # Array[Parent]: empty if no parents
+  post :result_good do |result| result.is_a?(Array) end
   post :mother do |result|
-    implies(! self.mother.nil?, result.include?(self.mother))
+    implies(! self.mother.nil?,
+            result.any? { |p| p.person == self.mother })
   end
-  post :mother do |result|
-    implies(! self.father.nil?, result.include?(self.father))
+  post :father do |result|
+    implies(! self.father.nil?,
+            result.any? { |p| p.person == self.father })
+  end
+  post :first_parent_check do |result|
+    implies(result.count > 0, result[0].is_a?(Parent))
   end
   def parents
     result = []
     if ! mother.nil? then
-      result << mother
+      result << BiologicalParent.new(mother)
     end
     if ! father.nil? then
-      result << father
+      result << BiologicalParent.new(father)
+    end
+    if non_biological_mothers then
+      result.concat(non_biological_mothers)
+    end
+    if non_biological_fathers then
+      result.concat(non_biological_fathers)
     end
     result
   end

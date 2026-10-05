@@ -11,6 +11,9 @@ require setup_path
 require 'yaml'
 require 'fileutils'
 require 'person'
+require 'parent'
+require 'biological_parent'
+require 'non_biological_parent'
 require 'graph_primitives'
 require 'date'
 
@@ -47,7 +50,7 @@ if !File.exist?(ORACLE_PATH)
   exit 1
 end
 
-permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
+permitted = [PersonNode, CoupleNode, Person, Parent, BiologicalParent, NonBiologicalParent, Symbol, Date, Hash]
 oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
 candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
 

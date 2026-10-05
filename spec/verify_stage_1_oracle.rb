@@ -11,6 +11,9 @@ require setup_path
 require 'yaml'
 require 'fileutils'
 require 'person'
+require 'parent'
+require 'biological_parent'
+require 'non_biological_parent'
 require 'graph_primitives'
 require 'date'
 
@@ -45,7 +48,7 @@ end
 
 # 2. Perform the diff
 puts "Comparing candidate against oracle..."
-permitted = [PersonNode, CoupleNode, Person, Symbol, Date, Hash]
+permitted = [PersonNode, CoupleNode, Person, Parent, BiologicalParent, NonBiologicalParent, Symbol, Date, Hash]
 oracle = YAML.safe_load(File.read(ORACLE_PATH), permitted_classes: permitted, aliases: true)
 candidate = YAML.safe_load(File.read(CANDIDATE_PATH), permitted_classes: permitted, aliases: true)
 if YAML.dump(oracle) == YAML.dump(candidate) then

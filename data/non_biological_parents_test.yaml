@@ -1,0 +1,33 @@
+# Sample tree for testing non-biological (adoptive and assumed) parents
+root_ancestor_100:
+  given-name: Alice
+  surname: Doe
+  birth-date: 1850-01-01
+
+bob_doe_101:
+  given-name: Bob
+  surname: Doe
+  birth-date: 1848-06-20
+  spouse: root_ancestor_100
+
+child_gen1_200:
+  given-name: Charlie
+  surname: Doe
+  birth-date: 1880-03-12
+  father: root_ancestor_100
+  mother: bob_doe_101
+
+# Person with adoptive and assumed parents
+adopted_child_300:
+  given-name: David
+  surname: Smith
+  birth-date: 1910-05-20
+  adoptive-father: root_ancestor_100
+  adoptive-mother: bob_doe_101
+
+assumed_child_400:
+  given-name: Eva
+  surname: Jones
+  birth-date: 1915-08-15
+  assumed-father: root_ancestor_100
+  assumed-mother: bob_doe_101

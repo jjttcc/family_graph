@@ -40,9 +40,15 @@
               mother: spouse_1
             spouses: []
             children: []
-            father: *1
-            mother: *2
+            non_biological_mothers: []
+            non_biological_fathers: []
+            father: !ruby/object:BiologicalParent
+              person: *1
+            mother: !ruby/object:BiologicalParent
+              person: *2
             generation: 3
+          non_biological_mothers: []
+          non_biological_fathers: []
           generation: 2
         - &30 !ruby/object:Person
           id: spouse_2
@@ -52,10 +58,15 @@
           spouses:
           - *1
           children: []
+          non_biological_mothers: []
+          non_biological_fathers: []
           generation: 2
         children:
         - *3
-        father: *4
+        non_biological_mothers: []
+        non_biological_fathers: []
+        father: !ruby/object:BiologicalParent
+          person: *4
         generation: 2
       - &5 !ruby/object:Person
         id: grandchild_gen2_300
@@ -94,7 +105,10 @@
                 mother: great_grandchild_gen3_400
               spouses: []
               children: []
-              mother: *6
+              non_biological_mothers: []
+              non_biological_fathers: []
+              mother: !ruby/object:BiologicalParent
+                person: *6
               generation: 4
             - &27 !ruby/object:Person
               id: gen4_child_2
@@ -105,15 +119,27 @@
                 mother: great_grandchild_gen3_400
               spouses: []
               children: []
-              mother: *6
+              non_biological_mothers: []
+              non_biological_fathers: []
+              mother: !ruby/object:BiologicalParent
+                person: *6
               generation: 4
-            father: *5
-            mother: *7
+            non_biological_mothers: []
+            non_biological_fathers: []
+            father: !ruby/object:BiologicalParent
+              person: *5
+            mother: !ruby/object:BiologicalParent
+              person: *7
             generation: 3
+          non_biological_mothers: []
+          non_biological_fathers: []
           generation: 2
         children:
         - *6
-        father: *4
+        non_biological_mothers: []
+        non_biological_fathers: []
+        father: !ruby/object:BiologicalParent
+          person: *4
         generation: 2
       - &8 !ruby/object:Person
         id: grandchild_gen2_302
@@ -135,26 +161,34 @@
           spouses:
           - *8
           children: []
-          father: &23 !ruby/object:Person
-            id: edward_spouse_father_701
-            data:
-              given-name: Thomas
-              surname: Taylor
-              birth-date: 1885-02-20
-            spouses: []
-            children:
-            - *9
-            generation: 0
-          mother: &24 !ruby/object:Person
-            id: edward_spouse_mother_702
-            data:
-              given-name: Margaret
-              surname: Taylor
-              birth-date: 1888-09-15
-            spouses: []
-            children:
-            - *9
-            generation: 0
+          non_biological_mothers: []
+          non_biological_fathers: []
+          father: !ruby/object:BiologicalParent
+            person: &23 !ruby/object:Person
+              id: edward_spouse_father_701
+              data:
+                given-name: Thomas
+                surname: Taylor
+                birth-date: 1885-02-20
+              spouses: []
+              children:
+              - *9
+              non_biological_mothers: []
+              non_biological_fathers: []
+              generation: 0
+          mother: !ruby/object:BiologicalParent
+            person: &24 !ruby/object:Person
+              id: edward_spouse_mother_702
+              data:
+                given-name: Margaret
+                surname: Taylor
+                birth-date: 1888-09-15
+              spouses: []
+              children:
+              - *9
+              non_biological_mothers: []
+              non_biological_fathers: []
+              generation: 0
           generation: 2
         - &11 !ruby/object:Person
           id: edward_spouse_b_705
@@ -184,7 +218,10 @@
                 father: great_grandchild_b_303
               spouses: []
               children: []
-              father: *10
+              non_biological_mothers: []
+              non_biological_fathers: []
+              father: !ruby/object:BiologicalParent
+                person: *10
               generation: 4
             - &29 !ruby/object:Person
               id: gen4_child_4
@@ -195,164 +232,217 @@
                 father: great_grandchild_b_303
               spouses: []
               children: []
-              father: *10
+              non_biological_mothers: []
+              non_biological_fathers: []
+              father: !ruby/object:BiologicalParent
+                person: *10
               generation: 4
-            father: *8
-            mother: *11
+            non_biological_mothers: []
+            non_biological_fathers: []
+            father: !ruby/object:BiologicalParent
+              person: *8
+            mother: !ruby/object:BiologicalParent
+              person: *11
             generation: 3
+          non_biological_mothers: []
+          non_biological_fathers: []
           generation: 2
         children:
         - *10
-        father: *4
+        non_biological_mothers: []
+        non_biological_fathers: []
+        father: !ruby/object:BiologicalParent
+          person: *4
         generation: 2
-      father: &12 !ruby/object:Person
-        id: root_ancestor_100
-        data:
-          given-name: Alice
-          surname: Doe
-          birth-date: 1850-01-01
-        spouses:
-        - &20 !ruby/object:Person
-          id: bob_doe_101
+      non_biological_mothers: []
+      non_biological_fathers: []
+      father: !ruby/object:BiologicalParent
+        person: &12 !ruby/object:Person
+          id: root_ancestor_100
           data:
-            given-name: Bob
-            surname: Smith
-            birth-date: 1848-06-20
-            spouse: root_ancestor_100
+            given-name: Alice
+            surname: Doe
+            birth-date: 1850-01-01
           spouses:
-          - *12
-          children:
-          - *4
-          - &13 !ruby/object:Person
-            id: child_gen1_201
+          - &20 !ruby/object:Person
+            id: bob_doe_101
             data:
-              given-name: Catherine
-              surname: Doe
-              birth-date: 1882-05-20
-              father: root_ancestor_100
-              mother: bob_doe_101
-              spouse: catherine_spouse_710
+              given-name: Bob
+              surname: Smith
+              birth-date: 1848-06-20
+              spouse: root_ancestor_100
             spouses:
-            - &14 !ruby/object:Person
-              id: catherine_spouse_710
+            - *12
+            children:
+            - *4
+            - &13 !ruby/object:Person
+              id: child_gen1_201
               data:
-                given-name: Arthur
-                surname: Green
-                birth-date: 1880-11-05
-                father: catherine_spouse_father_711
-                mother: catherine_spouse_mother_712
+                given-name: Catherine
+                surname: Doe
+                birth-date: 1882-05-20
+                father: root_ancestor_100
+                mother: bob_doe_101
+                spouse: catherine_spouse_710
               spouses:
-              - *13
-              children:
-              - &19 !ruby/object:Person
-                id: catherine_child_720
+              - &14 !ruby/object:Person
+                id: catherine_spouse_710
                 data:
-                  given-name: Robert
+                  given-name: Arthur
                   surname: Green
-                  birth-date: 1910-08-14
-                  father: catherine_spouse_710
+                  birth-date: 1880-11-05
+                  father: catherine_spouse_father_711
+                  mother: catherine_spouse_mother_712
+                spouses:
+                - *13
+                children:
+                - &19 !ruby/object:Person
+                  id: catherine_child_720
+                  data:
+                    given-name: Robert
+                    surname: Green
+                    birth-date: 1910-08-14
+                    father: catherine_spouse_710
+                    mother: child_gen1_201
+                  spouses: []
+                  children: []
+                  non_biological_mothers: []
+                  non_biological_fathers: []
+                  father: !ruby/object:BiologicalParent
+                    person: *14
+                  mother: !ruby/object:BiologicalParent
+                    person: *13
+                  generation: 2
+                - &15 !ruby/object:Person
+                  id: catherine_child_721
+                  data:
+                    given-name: Eleanor
+                    surname: Green
+                    birth-date: 1913-12-03
+                    father: catherine_spouse_710
+                    mother: child_gen1_201
+                    spouse: catherine_child_spouse_730
+                  spouses:
+                  - &16 !ruby/object:Person
+                    id: catherine_child_spouse_730
+                    data:
+                      given-name: Chloe
+                      surname: Evans
+                      birth-date: 1915-05-18
+                    spouses:
+                    - *15
+                    children:
+                    - &17 !ruby/object:Person
+                      id: grandchild_740
+                      data:
+                        given-name: Daniel
+                        surname: Green
+                        birth-date: 1940-02-10
+                        father: catherine_child_721
+                        mother: catherine_child_spouse_730
+                      spouses: []
+                      children: []
+                      non_biological_mothers: []
+                      non_biological_fathers: []
+                      father: !ruby/object:BiologicalParent
+                        person: *15
+                      mother: !ruby/object:BiologicalParent
+                        person: *16
+                      generation: 3
+                    - &18 !ruby/object:Person
+                      id: grandchild_741
+                      data:
+                        given-name: Sophia
+                        surname: Green
+                        birth-date: 1943-08-25
+                        father: catherine_child_721
+                        mother: catherine_child_spouse_730
+                      spouses: []
+                      children: []
+                      non_biological_mothers: []
+                      non_biological_fathers: []
+                      father: !ruby/object:BiologicalParent
+                        person: *15
+                      mother: !ruby/object:BiologicalParent
+                        person: *16
+                      generation: 3
+                    non_biological_mothers: []
+                    non_biological_fathers: []
+                    generation: 2
+                  children:
+                  - *17
+                  - *18
+                  non_biological_mothers: []
+                  non_biological_fathers: []
+                  father: !ruby/object:BiologicalParent
+                    person: *14
+                  mother: !ruby/object:BiologicalParent
+                    person: *13
+                  generation: 2
+                non_biological_mothers: []
+                non_biological_fathers: []
+                father: !ruby/object:BiologicalParent
+                  person: &21 !ruby/object:Person
+                    id: catherine_spouse_father_711
+                    data:
+                      given-name: George
+                      surname: Green
+                      birth-date: 1855-03-12
+                    spouses: []
+                    children:
+                    - *14
+                    non_biological_mothers: []
+                    non_biological_fathers: []
+                    generation: 0
+                mother: !ruby/object:BiologicalParent
+                  person: &22 !ruby/object:Person
+                    id: catherine_spouse_mother_712
+                    data:
+                      given-name: Beatrice
+                      surname: Green
+                      birth-date: 1858-07-22
+                    spouses: []
+                    children:
+                    - *14
+                    non_biological_mothers: []
+                    non_biological_fathers: []
+                    generation: 0
+                generation: 1
+              children:
+              - &25 !ruby/object:Person
+                id: niece_gen2_600
+                data:
+                  given-name: Grace
+                  surname: White
+                  birth-date: 1910-01-01
                   mother: child_gen1_201
                 spouses: []
                 children: []
-                father: *14
-                mother: *13
+                non_biological_mothers: []
+                non_biological_fathers: []
+                mother: !ruby/object:BiologicalParent
+                  person: *13
                 generation: 2
-              - &15 !ruby/object:Person
-                id: catherine_child_721
-                data:
-                  given-name: Eleanor
-                  surname: Green
-                  birth-date: 1913-12-03
-                  father: catherine_spouse_710
-                  mother: child_gen1_201
-                  spouse: catherine_child_spouse_730
-                spouses:
-                - &16 !ruby/object:Person
-                  id: catherine_child_spouse_730
-                  data:
-                    given-name: Chloe
-                    surname: Evans
-                    birth-date: 1915-05-18
-                  spouses:
-                  - *15
-                  children:
-                  - &17 !ruby/object:Person
-                    id: grandchild_740
-                    data:
-                      given-name: Daniel
-                      surname: Green
-                      birth-date: 1940-02-10
-                      father: catherine_child_721
-                      mother: catherine_child_spouse_730
-                    spouses: []
-                    children: []
-                    father: *15
-                    mother: *16
-                    generation: 3
-                  - &18 !ruby/object:Person
-                    id: grandchild_741
-                    data:
-                      given-name: Sophia
-                      surname: Green
-                      birth-date: 1943-08-25
-                      father: catherine_child_721
-                      mother: catherine_child_spouse_730
-                    spouses: []
-                    children: []
-                    father: *15
-                    mother: *16
-                    generation: 3
-                  generation: 2
-                children:
-                - *17
-                - *18
-                father: *14
-                mother: *13
-                generation: 2
-              father: &21 !ruby/object:Person
-                id: catherine_spouse_father_711
-                data:
-                  given-name: George
-                  surname: Green
-                  birth-date: 1855-03-12
-                spouses: []
-                children:
-                - *14
-                generation: 0
-              mother: &22 !ruby/object:Person
-                id: catherine_spouse_mother_712
-                data:
-                  given-name: Beatrice
-                  surname: Green
-                  birth-date: 1858-07-22
-                spouses: []
-                children:
-                - *14
-                generation: 0
+              - *19
+              - *15
+              non_biological_mothers: []
+              non_biological_fathers: []
+              father: !ruby/object:BiologicalParent
+                person: *12
+              mother: !ruby/object:BiologicalParent
+                person: *20
               generation: 1
-            children:
-            - &25 !ruby/object:Person
-              id: niece_gen2_600
-              data:
-                given-name: Grace
-                surname: White
-                birth-date: 1910-01-01
-                mother: child_gen1_201
-              spouses: []
-              children: []
-              mother: *13
-              generation: 2
-            - *19
-            - *15
-            father: *12
-            mother: *20
-            generation: 1
+            non_biological_mothers: []
+            non_biological_fathers: []
+            generation: 0
+          children:
+          - *4
+          - *13
+          non_biological_mothers: []
+          non_biological_fathers: []
           generation: 0
-        children:
-        - *4
-        - *13
-        generation: 0
-      mother: *20
+      mother: !ruby/object:BiologicalParent
+        person: *20
       generation: 1
     is_primary_representation: true
     offspring_width: 1440

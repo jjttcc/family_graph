@@ -1,14 +1,24 @@
 VERSION = '0.2.5.0.1'
 
 # field names
-FATHER  = 'father'
-MOTHER  = 'mother'
-SPOUSE  = 'spouse'
-SPOUSES = 'spouses'
-GNAME   = 'given-name'
-SURNAME = 'surname'
-BDATE   = 'birth-date'
+FATHER           = 'father'
+MOTHER           = 'mother'
+SPOUSE           = 'spouse'
+SPOUSES          = 'spouses'
+GNAME            = 'given-name'
+SURNAME          = 'surname'
+BDATE            = 'birth-date'
+ADOPTIVE_FATHER  = 'adoptive-father'
+ASSUMED_FATHER   = 'assumed-father'
+ADOPTIVE_MOTHER  = 'adoptive-mother'
+ASSUMED_MOTHER   = 'assumed-mother'
+OTHER_NAMES      = 'other-names'
 PARENTS = [FATHER, MOTHER].freeze
+
+# parent (mother or father) types
+ADOPTIVE    = 'adoptive'
+ASSUMED     = 'assumed'
+BIOLOGICAL  = 'biological'
 
 # spacing
 LEVEL_HEIGHT = 200

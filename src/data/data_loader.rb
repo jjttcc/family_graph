@@ -1,6 +1,8 @@
 require 'yaml'
 require 'ruby_contracts'
 require 'person'
+require 'biological_parent'
+require 'non_biological_parent'
 require 'family_constants'
 
 # Loads genealogical data from YAML files and builds Person object structures.
@@ -28,8 +30,8 @@ class DataLoader
 
   private
 
-  def self.link_relationships(result)
-    result.each_value do |person|
+  def self.link_relationships(person_table)
+    person_table.each_value do |person|
       # Link Spouses
       spouse_info = person.send(:data)[SPOUSE].to_s
       if spouse_info.empty? then
@@ -38,8 +40,8 @@ class DataLoader
       if ! spouse_info.empty? then
         spouse_ids = spouse_info.split(',').map(&:strip)
         spouse_ids.each do |spouse_id|
-          if result.key?(spouse_id) then
-            spouse = result[spouse_id]
+          if person_table.key?(spouse_id) then
+            spouse = person_table[spouse_id]
             # Ensure links are added only once to prevent errors
             if !person.spouses.include?(spouse) then
               person.add_spouse(spouse)
@@ -53,14 +55,30 @@ class DataLoader
       # Link Parents/Children
       PARENTS.each do |parent_type|
         parent_id = person.send(:data)[parent_type]
-        if parent_id && result.key?(parent_id) then
-          parent = result[parent_id]
-          parent.add_child(person)
-          if parent_type == FATHER
-            person.father = parent
+        if parent_id && person_table.key?(parent_id) then
+          parent_person = person_table[parent_id]
+          parent_person.add_child(person)
+          if parent_type == FATHER then
+            person.father = BiologicalParent.new(parent_person)
           else
-            person.mother = parent
+            person.mother = BiologicalParent.new(parent_person)
           end
+        end
+      end
+
+      # Link Non-Biological Parents
+      [
+        [ADOPTIVE_FATHER, ADOPTIVE, :non_biological_fathers],
+        [ASSUMED_FATHER, ASSUMED, :non_biological_fathers],
+        [ADOPTIVE_MOTHER, ADOPTIVE, :non_biological_mothers],
+        [ASSUMED_MOTHER, ASSUMED, :non_biological_mothers]
+      ].each do |field_name, parent_type, collection_sym|
+        parent_id = person.send(:data)[field_name]
+        if parent_id && person_table.key?(parent_id) then
+          parent_person = person_table[parent_id]
+          parent_person.add_child(person)
+          non_bio_parent = NonBiologicalParent.new(parent_person, parent_type)
+          person.send(collection_sym) << non_bio_parent
         end
       end
     end
