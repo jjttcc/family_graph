@@ -7,7 +7,7 @@ require 'line_style_map'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
-  include Contracts::DSL, SVGUtility
+  include Contracts::DSL, SVGUtility, LineStyleMap
 
   public  ###  Initialization
 
@@ -148,7 +148,7 @@ class GraphRenderer
     x2 = right_n.x + offset_x
     y2 = right_n.y + (NODE_HEIGHT / 2) + offset_y
     svg_lines << line(x1, y1, x2, y2, 'black', 1,
-                      LineStyleMap.style_for(SPOUSE))
+                      style_for(SPOUSE))
   end
 
   # Renders lines connecting children to their respective parents.
@@ -169,9 +169,10 @@ class GraphRenderer
             else
               " marker-end=\"url(#arrowhead)\""
             end
-            style_str = LineStyleMap.style_for(parent.type)
+            style_str = style_for(parent.type)
+            stroke_w = (parent.type == ADOPTIVE) ? 3 : 1
             svg_lines << line(x1 + offset_x, y1 + offset_y, x2 + offset_x,
-                              y2 + offset_y, 'black', 1, style_str,
+                              y2 + offset_y, 'black', stroke_w, style_str,
                               marker != "")
           end
         end

@@ -20,7 +20,7 @@ bio_style = LineStyleMap.style_for(BIOLOGICAL)
 raise "Expected empty string for BIOLOGICAL" unless bio_style == ''
 
 adoptive_style = LineStyleMap.style_for(ADOPTIVE)
-raise "Expected stroke-dasharray=\"1, 4\" stroke-linecap=\"round\" for ADOPTIVE" unless adoptive_style == 'stroke-dasharray="1, 4" stroke-linecap="round"'
+raise "Expected stroke-dasharray=\"0, 10\" stroke-linecap=\"round\" for ADOPTIVE" unless adoptive_style == 'stroke-dasharray="0, 10" stroke-linecap="round"'
 
 assumed_style = LineStyleMap.style_for(ASSUMED)
 raise "Expected stroke-dasharray=\"8, 4\" for ASSUMED" unless assumed_style == 'stroke-dasharray="8, 4"'

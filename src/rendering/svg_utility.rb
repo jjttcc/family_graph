@@ -31,7 +31,7 @@ module SVGUtility
         xmlns=\"http://www.w3.org/2000/svg\">
         <rect width=\"100%\" height=\"100%\" fill=\"white\"/>
         <defs>
-          <marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\"
+          <marker id=\"arrowhead\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10\" markerHeight=\"7\"
                   refX=\"#{MARKER_ARROW_REF_X}\"
                   refY=\"#{MARKER_ARROW_REF_Y}\" orient=\"auto\">
             <polygon points=\"0 0, 10 3.5, 0 7\" />
