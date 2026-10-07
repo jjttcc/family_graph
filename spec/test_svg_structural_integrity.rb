@@ -40,7 +40,7 @@ parent_child_lines = svg_content.scan(
 
 # Count spousal lines using LineStyleMap
 spouse_style = LineStyleMap.style_for(SPOUSE)
-spousal_lines = svg_content.scan(/#{spouse_style}/).size
+spousal_lines = svg_content.scan(/#{spouse_style.to_svg_attributes}/).size
 
 puts "Parent-Child lines: #{parent_child_lines}"
 puts "Spousal lines: #{spousal_lines}"

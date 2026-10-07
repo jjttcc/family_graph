@@ -14,16 +14,17 @@ require 'family_constants'
 puts "Verifying LineStyleMap..."
 
 spouse_style = LineStyleMap.style_for(SPOUSE)
-raise "Expected stroke-dasharray=\"8, 4\" for SPOUSE" unless spouse_style == 'stroke-dasharray="8, 4"'
+raise "Expected stroke-width=\"2\" and dash_array=\"4, 2\" for SPOUSE" unless spouse_style.to_svg_attributes == 'stroke-width="2" stroke-dasharray="4, 2"'
 
 bio_style = LineStyleMap.style_for(BIOLOGICAL)
-raise "Expected empty string for BIOLOGICAL" unless bio_style == ''
+raise "Expected stroke-width=\"1\" for BIOLOGICAL" unless bio_style.to_svg_attributes == 'stroke-width="1"'
 
 adoptive_style = LineStyleMap.style_for(ADOPTIVE)
-raise "Expected stroke-dasharray=\"0, 10\" stroke-linecap=\"round\" for ADOPTIVE" unless adoptive_style == 'stroke-dasharray="0, 10" stroke-linecap="round"'
+raise "Expected stroke-width=\"3\" for ADOPTIVE" unless adoptive_style.stroke_width == 3
+raise "Expected correct attributes for ADOPTIVE" unless adoptive_style.to_svg_attributes == 'stroke-width="3" stroke-dasharray="0, 10" stroke-linecap="round"'
 
 assumed_style = LineStyleMap.style_for(ASSUMED)
-raise "Expected stroke-dasharray=\"8, 4\" for ASSUMED" unless assumed_style == 'stroke-dasharray="8, 4"'
+raise "Expected stroke-dasharray=\"8, 4\" for ASSUMED" unless assumed_style.to_svg_attributes == 'stroke-width="1" stroke-dasharray="8, 4"'
 
 puts "LineStyleMap verification PASSED!"
 exit 0

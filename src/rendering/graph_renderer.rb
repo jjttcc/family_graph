@@ -4,10 +4,11 @@ require 'debug_logger'
 require 'family_constants'
 require 'svg_utility'
 require 'line_style_map'
+require 'legend'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
-  include Contracts::DSL, SVGUtility, LineStyleMap
+  include Contracts::DSL, SVGUtility, LineStyleMap, DebugLogger
 
   public  ###  Initialization
 
@@ -40,7 +41,11 @@ class GraphRenderer
         render_couple(couple, svg_lines, svg_nodes, offset_x, offset_y)
       end
       render_parent_child_lines(svg_lines, offset_x, offset_y)
-      svg_template = template(width, height, svg_lines, svg_nodes)
+      legend = Legend.new(STYLE_MAP, width: width)
+      total_height = height + legend.height + 10
+      svg_nodes << legend.render(height)
+
+      svg_template = template(width, total_height, svg_lines, svg_nodes)
       File.write(output_path, svg_template)
       puts "Successfully rendered SVG to #{output_path}"
     end
@@ -147,8 +152,9 @@ class GraphRenderer
     y1 = left_n.y + (NODE_HEIGHT / 2) + offset_y
     x2 = right_n.x + offset_x
     y2 = right_n.y + (NODE_HEIGHT / 2) + offset_y
-    svg_lines << line(x1, y1, x2, y2, 'black', 1,
-                      style_for(SPOUSE))
+    spouse_style = style_for(SPOUSE)
+    svg_lines << line(x1, y1, x2, y2, 'black', spouse_style.stroke_width,
+                      spouse_style.to_svg_attributes)
   end
 
   # Renders lines connecting children to their respective parents.
@@ -169,11 +175,10 @@ class GraphRenderer
             else
               " marker-end=\"url(#arrowhead)\""
             end
-            style_str = style_for(parent.type)
-            stroke_w = (parent.type == ADOPTIVE) ? 3 : 1
+            style = style_for(parent.type)
             svg_lines << line(x1 + offset_x, y1 + offset_y, x2 + offset_x,
-                              y2 + offset_y, 'black', stroke_w, style_str,
-                              marker != "")
+                              y2 + offset_y, 'black', style.stroke_width,
+                              style.to_svg_attributes, marker != "")
           end
         end
       end

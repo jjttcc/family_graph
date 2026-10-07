@@ -10,7 +10,9 @@ module SVGUtility
 
   def line(x1, y1, x2, y2, stroke = 'black', stroke_width = 1,
            style_attrs = nil, marker = nil)
-    attr = "stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\""
+    has_stroke_width = style_attrs && style_attrs.include?('stroke-width')
+    attr = "stroke=\"#{stroke}\""
+    attr += " stroke-width=\"#{stroke_width}\"" unless has_stroke_width
     if style_attrs && !style_attrs.empty? then
       attr += " #{style_attrs}"
     end
