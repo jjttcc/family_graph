@@ -1,0 +1,34 @@
+text fields for family data - person record
+[To-do: Add, when needed: description, field structure]
+
+person_id
+mother
+father
+sex
+birth-date
+death-date
+baptism-date
+birth-location
+death-location
+baptism-location
+wedding-location
+residences
+parish
+adoptive-father
+assumed-father
+adoptive-mother
+assumed-mother
+spouse
+spouses
+surname
+original-surname
+given-name
+middle-name
+nicknames
+other-names
+email-address
+secondary-email-addresses
+occupations
+urls
+friends
+notes

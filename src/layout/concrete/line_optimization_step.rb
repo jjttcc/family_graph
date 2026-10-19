@@ -1,10 +1,9 @@
-# vim: ts=2 sw=2 expandtab
+require 'assertions'
 require 'layout_step'
 require 'line_crossing_analysis'
 require 'line_crossing_resolution'
 require 'node_swap_resolution'
 require 'sibling_reorder_resolution'
-require 'assertions'
 
 # A layout step that analyzes parent-child connection line crossings
 # and optimizes sibling or node ordering to minimize edge intersections
