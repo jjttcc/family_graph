@@ -48,11 +48,6 @@ class Node
     raise "virtual method"
   end
 
-  # The children associated with the node
-  def children
-    raise "virtual method"
-  end
-
   # Sets the initial x and y coordinates for this node
   def initialize_coordinates(new_x, new_y)
     raise "virtual method"
@@ -71,6 +66,13 @@ class Node
     @y = y
   end
 
+  private ### "Hidden" interface
+
+  # The children associated with the node
+  def children
+    raise "virtual method"
+  end
+
 end
 
 # Geometric node for a person
@@ -79,7 +81,7 @@ class PersonNode < Node
 
   public
 
-  attr_reader :person
+  attr_reader :person   # The Person object represented by this node
 
   public  ###  Initialization
 
@@ -135,11 +137,6 @@ class PersonNode < Node
     NODE_WIDTH
   end
 
-  # The children of this person
-  def children
-    person.children
-  end
-
   def is_couple
     false
   end
@@ -169,6 +166,13 @@ class PersonNode < Node
 
   def respond_to_missing?(method_name, include_private = false)
     person.respond_to?(method_name) || super
+  end
+
+  private
+
+  # The children of 'person'
+  def children
+    person.children
   end
 
   private ###  Class invariant
@@ -245,13 +249,6 @@ class CoupleNode < Node
     COUPLE_WIDTH
   end
 
-  # The children belonging to this couple
-  def children
-    person_a.children.select do |child|
-      child.parents.include?(person_a) || child.parents.include?(person_b)
-    end
-  end
-
   def is_couple
     true
   end
@@ -282,6 +279,27 @@ class CoupleNode < Node
   # Does this "couple" contain 'person1' and 'person2'?
   def is_match(person1, person2)
     self.id == joined_id(person1.id, person2.id)
+  end
+
+  private
+
+  # The children belonging to this couple.
+  # A child is included if:
+  # 1. Both partners are parents of the child, OR
+  # 2. The child has only a single parent who is one of the partners in this
+  #    couple.
+  post :children_valid do |result|
+    result.is_a?(Array) && result.all? { |c| c.is_a?(Person) }
+  end
+  def children
+    person_a.children.select do |child|
+      both_parents = child.parents.include?(person_a) &&
+                     child.parents.include?(person_b)
+      single_parent = child.parents.size == 1 &&
+                      (child.parents.include?(person_a) ||
+                       child.parents.include?(person_b))
+      both_parents || single_parent
+    end
   end
 
   private ###  Class invariant

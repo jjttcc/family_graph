@@ -28,9 +28,9 @@ SIBLING_SPACING = 70  # Horizontal separation gap between adjacent sibling nodes
 PARTNER_SPACING = 20
 
 # node dimension constants (in pixels)
-NODE_WIDTH   = 120    # Standard width of an individual PersonNode box
-NODE_HEIGHT  = 60     # Standard height of an individual PersonNode box
-# Total width of a CoupleNode (two persons plus spacing):
+NODE_WIDTH   = 120    # Standard width of an individual person-node box
+NODE_HEIGHT  = 60     # Standard height of an individual person-node box
+# Total width of a couple-node (two persons plus spacing):
 COUPLE_WIDTH = (2 * NODE_WIDTH) + COUPLE_SPACING
 
 # SVG rendering reference points and offsets (in pixels)

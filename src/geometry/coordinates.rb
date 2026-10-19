@@ -170,7 +170,7 @@ class Coordinates
   def child_nodes_for(node)
     result = []
     processed_child_couples = Set.new
-    node.children.each do |child_person|
+    node.send(:children).each do |child_person|
       if child_person.has_spouse then
         child_person.spouses.each do |spouse|
           c_id = CoupleNode.generate_id(child_person, spouse)
