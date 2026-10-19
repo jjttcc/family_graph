@@ -5,7 +5,7 @@ require 'ruby_contracts'
 require 'family_constants'
 require 'assertions'
 
-# Implements Stage 3 bounding-box overlap elimination across all layout units
+# Bounding-box overlap elimination across all layout units
 # (single person nodes and couple nodes) using 2D AABB collision detection
 # with couple-atomic unit shifting.
 class OverlapEliminationStep < LayoutStep
@@ -66,8 +66,8 @@ class OverlapEliminationStep < LayoutStep
     overlap_pairs
   end
 
-  # Resolves a given list of overlapping node pairs by atomically shifting node2
-  # rightwards
+  # Resolves a given list of overlapping node pairs by atomically shifting
+  # node2 rightwards
   def resolve_overlaps(overlap_pairs)
     overlap_pairs.each do |node1, node2|
       required_x = node1.x + node1.width + 20
