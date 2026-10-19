@@ -53,6 +53,16 @@ class Node
     raise "virtual method"
   end
 
+  # Sets the initial x and y coordinates for this node
+  def initialize_coordinates(new_x, new_y)
+    raise "virtual method"
+  end
+
+  # The generation level of this node
+  def generation
+    raise "virtual method"
+  end
+
   public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
@@ -134,6 +144,17 @@ class PersonNode < Node
     false
   end
 
+  # The generation level of this person
+  def generation
+    person.generation
+  end
+
+  # Initializes coordinates for this person node
+  def initialize_coordinates(new_x, new_y)
+    @x = new_x
+    @y = new_y
+  end
+
   def shift!(dx)
     @x += dx
   end
@@ -189,6 +210,11 @@ class CoupleNode < Node
     joined_id(partner_a.id, partner_b.id)
   end
 
+  # The generation level of this couple
+  def generation
+    partner_a.generation
+  end
+
   # The 'partner_a' person
   def person_a
     partner_a.person
@@ -222,12 +248,17 @@ class CoupleNode < Node
   # The children belonging to this couple
   def children
     person_a.children.select do |child|
-      child.parents.include?(person_a) && child.parents.include?(person_b)
+      child.parents.include?(person_a) || child.parents.include?(person_b)
     end
   end
 
   def is_couple
     true
+  end
+
+  # The generation level of this couple
+  def generation
+    partner_a.generation
   end
 
   def shift!(dx)
@@ -242,7 +273,7 @@ class CoupleNode < Node
     @y = new_y
     partner_a.x = new_x
     partner_a.y = new_y
-    partner_b.x = new_x + NODE_WIDTH + 20
+    partner_b.x = new_x + NODE_WIDTH + PARTNER_SPACING
     partner_b.y = new_y
   end
 

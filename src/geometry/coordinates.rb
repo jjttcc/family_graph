@@ -53,7 +53,7 @@ class Coordinates
 
   # Array: All individual person nodes (singles + partners in couples)
   def all_person_nodes
-    @single_nodes.values + @couples.values.flat_map { |c| [c.partner_a,
+    single_nodes.values + couples.values.flat_map { |c| [c.partner_a,
                                                            c.partner_b] }
   end
 
@@ -63,9 +63,9 @@ class Coordinates
     result == nil || result.is_a?(PersonNode)
   end
   def node_by_person_id(id)
-    result = @single_nodes[id]
+    result = single_nodes[id]
     if result == nil then
-      @couples.values.each do |c|
+      couples.values.each do |c|
         if c.partner_a.id == id then
           result = c.partner_a
         elsif c.partner_b.id == id then
@@ -94,7 +94,7 @@ class Coordinates
     result == nil || result.is_a?(CoupleNode)
   end
   def node_for_couple(person1, person2)
-    @couples[CoupleNode.generate_id(person1, person2)]
+    couples[CoupleNode.generate_id(person1, person2)]
   end
 
   # couple for 'id' (the id of an existing CoupleNode)
@@ -114,7 +114,7 @@ class Coordinates
 
   # Check if a person has a registered node.
   def has_node?(id)
-    self.single_nodes.key?(id) || @couples.values.any? do |c|
+    self.single_nodes.key?(id) || couples.values.any? do |c|
       c.person_a.id == id || c.person_b.id == id
     end
   end
@@ -199,13 +199,13 @@ class Coordinates
   end
   def root_nodes
     result = []
-    @single_nodes.each_value do |node|
+    single_nodes.each_value do |node|
       if node.person.is_root then
         result << node
       end
     end
-    @couples.each_value do |couple|
-      if couple.person_a.is_root || couple.person_b.is_root then
+    couples.each_value do |couple|
+      if couple.person_a.is_root && couple.person_b.is_root then
         result << couple
       end
     end
@@ -217,14 +217,14 @@ class Coordinates
   # Copies coordinate x and y values from another Coordinates registry.
   pre :valid_coords do |coords| coords.is_a?(Coordinates) end
   def copy_coordinates_from(other_coordinates)
-    @single_nodes.each do |id, node|
+    single_nodes.each do |id, node|
       other_node = other_coordinates.single_nodes[id]
       if other_node then
         node.x = other_node.x
         node.y = other_node.y
       end
     end
-    @couples.each do |id, couple|
+    couples.each do |id, couple|
       other_couple = other_coordinates.couples[id]
       if other_couple then
         couple.x = other_couple.x

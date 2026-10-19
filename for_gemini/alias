@@ -1,0 +1,7 @@
+# vim: ts=4 sw=4 expandtab
+flush       source-code: flush it from memory and re-read all source-code files
+lg          append current status/info to logs/dialogue_log.md
+cst         re-read and follow the coding standards: for_gemini/detailed_coding_guidelines
+dtch        don't change any code now - until I tell you that you can.
+flst        List all the files, context buffers, and workspace directories you are currently tracking or holding in context.
+gitdf       git diff --no-ext-diff --staged 
