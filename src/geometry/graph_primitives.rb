@@ -48,6 +48,11 @@ class Node
     raise "virtual method"
   end
 
+  # The children associated with the node
+  def children
+    raise "virtual method"
+  end
+
   public  ###  Initialization
 
   pre :xy_valid do |x, y| x != nil && y != nil end
@@ -118,6 +123,11 @@ class PersonNode < Node
   # The width of the node
   def width
     NODE_WIDTH
+  end
+
+  # The children of this person
+  def children
+    person.children
   end
 
   def is_couple
@@ -207,6 +217,13 @@ class CoupleNode < Node
   # The width of the node
   def width
     COUPLE_WIDTH
+  end
+
+  # The children belonging to this couple
+  def children
+    person_a.children.select do |child|
+      child.parents.include?(person_a) && child.parents.include?(person_b)
+    end
   end
 
   def is_couple

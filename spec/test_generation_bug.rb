@@ -45,7 +45,7 @@ File.write(temp_file, yaml_content)
 people = DataLoader.load(temp_file)
 puts "Loaded #{people.size} people."
 
-context = LayoutContext.new(people, [], Coordinates.new, { TRAVERSAL => DESCENDANT })
+context = LayoutContext.new(people, Coordinates.new, { TRAVERSAL => DESCENDANT })
 HierarchyAnalyzerStep.new(context).execute
 
 people.each_value do |p|

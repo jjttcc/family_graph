@@ -1,5 +1,6 @@
 # vim: ts=2 sw=2 expandtab
 require 'ruby_contracts'
+require 'domain_tools'
 
 # Abstract base class representing layout environment and shared configuration.
 class LayoutEnvironment
@@ -12,14 +13,13 @@ class LayoutEnvironment
   public  ###  Initialization
 
   pre :people_type do |people| people.is_a?(Enumerable) end
-  pre :roots_type do |p, roots| roots.is_a?(Enumerable) end
-  pre :coords_type do |p, r, coords| coords.is_a?(Coordinates) end
-  pre :options_type do |p, r, c, options| options.is_a?(Enumerable) end
-  def initialize(people, roots, coordinates, options)
+  pre :coords_type do |ppl, coords| coords.is_a?(Coordinates) end
+  pre :options_type do |ppl, crds, options| options.is_a?(Enumerable) end
+  def initialize(people, coordinates, options)
     @people = people
-    @roots = roots
     @coordinates = coordinates
     @options = options
+    @roots = DomainTools.roots(people, options)
   end
 
   public  ###  Basic queries

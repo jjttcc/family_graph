@@ -42,7 +42,7 @@ class ExperimentRunner
       people = DataLoader.load(yaml_path)
       root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
       coordinates = Coordinates.new
-      context = LayoutContext.new(people, [root_person], coordinates, { TRAVERSAL => DESCENDANT })
+      context = LayoutContext.new(people, coordinates, { TRAVERSAL => DESCENDANT })
 
       # Run hierarchical placement to set up initial layout coordinates
       placement_step = HierarchicalPlacementStep.new(context)

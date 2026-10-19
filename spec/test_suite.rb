@@ -93,7 +93,6 @@ root_person = people.values.find { |p| p.father.nil? && p.mother.nil? }
 assert(root_person != nil, "A root person must exist in the sample data")
 
 context = LayoutContext.new(people,
-                            [root_person],
                             Coordinates.new,
                             { TRAVERSAL => DESCENDANT })
 pipeline = LayoutPipeline.new([

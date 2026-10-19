@@ -45,7 +45,8 @@ rects.txt
 coords*.txt
 labels*.txt
 /util/
-/logs/
+logs/*
+!logs/dialogue_log.md
 *_old.yaml
 .vimrc
 *bck

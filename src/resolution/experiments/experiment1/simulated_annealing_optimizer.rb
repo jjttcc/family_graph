@@ -49,7 +49,7 @@ class SimulatedAnnealingOptimizer
     end
 
     coordinates = Coordinates.new
-    context = LayoutContext.new(people, [root_person], coordinates, { TRAVERSAL => DESCENDANT })
+    context = LayoutContext.new(people, coordinates, { TRAVERSAL => DESCENDANT })
 
     analyzer_step = HierarchyAnalyzerStep.new(context)
     analyzer_step.execute

@@ -1,6 +1,7 @@
 require 'ruby_contracts'
 require 'utilities'
 require 'graph_primitives'
+require 'set'
 
 # Registry of nodes and spousal pairings used to construct the layout.
 class Coordinates
@@ -158,6 +159,57 @@ class Coordinates
   # Update next available x position for a given y level.
   def update_next_x(y, value)
     @next_x[y] = value
+  end
+
+  # Returns child Node objects (PersonNode or CoupleNode)
+  # for a given parent Node.
+  pre :node_valid do |node| node.is_a?(Node) end
+  post :nodes_valid do |result|
+    result.is_a?(Array) && result.all? { |n| n.is_a?(Node) }
+  end
+  def child_nodes_for(node)
+    result = []
+    processed_child_couples = Set.new
+    node.children.each do |child_person|
+      if child_person.has_spouse then
+        child_person.spouses.each do |spouse|
+          c_id = CoupleNode.generate_id(child_person, spouse)
+          if !processed_child_couples.include?(c_id) then
+            couple_node = node_for_couple(child_person, spouse)
+            if couple_node then
+              result << couple_node
+              processed_child_couples.add(c_id)
+            end
+          end
+        end
+      else
+        child_node = node_for_person(child_person)
+        if child_node then
+          result << child_node
+        end
+      end
+    end
+    result
+  end
+
+  # Returns all root Node objects (PersonNode or CoupleNode)
+  # registered in coordinates.
+  post :nodes_valid do |result|
+    result.is_a?(Array) && result.all? { |n| n.is_a?(Node) }
+  end
+  def root_nodes
+    result = []
+    @single_nodes.each_value do |node|
+      if node.person.is_root then
+        result << node
+      end
+    end
+    @couples.each_value do |couple|
+      if couple.person_a.is_root || couple.person_b.is_root then
+        result << couple
+      end
+    end
+    result
   end
 
   public ###  State Copying

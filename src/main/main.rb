@@ -10,6 +10,7 @@ require setup_path
 require 'debug'
 require 'optparse'
 require 'data_loader'
+require 'domain_tools'
 require 'coordinates'
 require 'layout_context'
 require 'layout_orchestrator'
@@ -101,10 +102,8 @@ if options[LIST_ALL] || options[LIST_ROOTS] then
   if options[LIST_ALL] then
     puts people.keys.sort
   elsif options[LIST_ROOTS] then
-    roots = people.select do |_id, p|
-      p.father.nil? && p.mother.nil?
-    end
-    puts roots.keys.sort
+    roots = DomainTools.roots(people, options)
+    puts roots.map(&:id).sort
   end
   exit
 end
@@ -124,21 +123,13 @@ data_paths.each do |path|
   end
 end
 
-if options[ROOT_IDS] then
-  root_ids = options[ROOT_IDS]
-else
-  root_ids = people.values.select { |p| p.is_root }.map { |p| p.id }
-end
+coordinates = Coordinates.new
+context = LayoutContext.new(people, coordinates, options)
 
-roots = root_ids.map { |id| people[id] }
-
-if roots.empty?
+if context.roots.empty?
   puts "Warning: No roots to render."
   exit 0
 end
-
-coordinates = Coordinates.new
-context = LayoutContext.new(people, roots, coordinates, options)
 
 # Build pipeline
 full_pipeline = [

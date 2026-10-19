@@ -1,15 +1,15 @@
 CLUSTER               DEPENDENCY RANK[1]
-construction          4
-data                  4
+construction          5
+data                  5
 domain                3
-geometry              3   # (needs refinement)
-graph_logic           4
-layout/abstract       4
-layout/concrete       5
-main                  8
-management/concrete   5
-management/abstract   4
-obsolete              11
+geometry              4   # (needs refinement)
+graph_logic           5
+layout/abstract       5
+layout/concrete       6
+main                  9
+management/concrete   6
+management/abstract   5
+obsolete              91
 rendering             5
 support               2
 util                  1
