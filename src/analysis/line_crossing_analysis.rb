@@ -19,10 +19,8 @@ class LineCrossingAnalysis
 
   public ###  Analysis Queries
 
-  # Analyzes the coordinate registry and returns an array of crossing
-  # line pairs.
-  # The result of analysis of the coordinate registry:
-  #   Array of "line pairs"
+  # List of all crossing line pairs that occur in 'coordinates'
+  # Result: Array of "line pairs"
   # Each pair is represented as [[parent1, child1], [parent2, child2]].
   def crossing_pairs
     result = []
@@ -91,7 +89,5 @@ class LineCrossingAnalysis
   def counter_clockwise_orientation(a, b, c)
     (c[1] - a[1]) * (b[0] - a[0]) > (b[1] - a[1]) * (c[0] - a[0])
   end
-
-  private
 
 end

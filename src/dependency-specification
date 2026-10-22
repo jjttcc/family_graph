@@ -1,17 +1,19 @@
-CLUSTER               DEPENDENCY RANK[1]
-construction          5
-data                  5
-domain                3
-geometry              4   # (needs refinement)
-graph_logic           5
-layout/abstract       5
-layout/concrete       6
-main                  9
-management/concrete   6
-management/abstract   5
-obsolete              91
-rendering             5
-support               2
-util                  1
+CLUSTER                DEPENDENCY RANK[1]
+data                   5
+domain                 3
+geometry               4
+graph_logic            5
+layout/abstract        5
+layout/concrete        6
+main                   9
+management/concrete    6
+management/abstract    5
+analysis               4
+resolution             4
+rendering              5
+support                2
+util                   1
+resolution/experiments 91
+obsolete               91
 
 [1] Lower means less dependent.
