@@ -3,12 +3,13 @@ require 'ruby_contracts'
 require 'debug_logger'
 require 'family_constants'
 require 'svg_utility'
+require 'svg_tooltip'
 require 'line_style_map'
 require 'legend'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
-  include Contracts::DSL, SVGUtility, LineStyleMap, DebugLogger
+  include Contracts::DSL, SVGUtility, LineStyleMap, DebugLogger, SvgTooltip
 
   public  ###  Initialization
 
@@ -132,8 +133,13 @@ class GraphRenderer
       symbol = node.is_primary_representation ? "*" : "+"
       texts << ["#{nx + NODE_WIDTH - 10}", "#{ny + 15}", symbol, 10]
     end
+    title_text = title(node)
+    data_attrs = data_attributes(node)
+    svg_nodes << "  <g #{data_attrs}>"
+    svg_nodes << "    <title>#{title_text}</title>"
     svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each { |x, y, l, s| svg_nodes << text(x, y, l, s) }
+    svg_nodes << "  </g>"
   end
 
   # Renders a couple, including their individual nodes and the spousal line.
