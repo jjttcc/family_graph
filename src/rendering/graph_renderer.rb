@@ -133,10 +133,10 @@ class GraphRenderer
       symbol = node.is_primary_representation ? "*" : "+"
       texts << ["#{nx + NODE_WIDTH - 10}", "#{ny + 15}", symbol, 10]
     end
-    title_text = title(node)
+    content = tooltip_content(node)
     data_attrs = data_attributes(node)
     svg_nodes << "  <g #{data_attrs}>"
-    svg_nodes << "    <title>#{title_text}</title>"
+    svg_nodes << "    <title>#{content}</title>"
     svg_nodes << rect(nx, ny, NODE_WIDTH, NODE_HEIGHT)
     texts.each { |x, y, l, s| svg_nodes << text(x, y, l, s) }
     svg_nodes << "  </g>"
