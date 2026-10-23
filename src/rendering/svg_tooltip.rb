@@ -143,7 +143,8 @@ module SvgTooltip
               k_str == 'spouse' || k_str == 'spouses'
       next if k_str == 'note' || k_str == 'notes'
       formatted_key = k_str.split('-').map(&:capitalize).join(' ')
-      lines << "#{formatted_key}: #{v}"
+      formatted_val = format_structured_value(v)
+      lines << "#{formatted_key}: #{formatted_val}"
     end
     # 10. Notes (if any, always last)
     note_val = data_hash['note'] || data_hash['notes']
@@ -151,6 +152,36 @@ module SvgTooltip
       lines << "Note: #{note_val}"
     end
     lines.join("\n")
+  end
+
+  private ###  Formatting Helpers
+
+  # Formats structured values (hashes, arrays of hashes) into human-readable strings
+  def format_structured_value(v)
+    if v.is_a?(Array) then
+      v.map do |item|
+        if item.is_a?(Hash) then
+          date_val = item['date'] || item[:date]
+          loc_val = item['location'] || item[:location] ||
+                    item['place'] || item[:place]
+          note_val = item['notes'] || item[:notes]
+          res_str = [date_val, loc_val].compact.join(' - ')
+          if res_str.empty? then
+            res_str = item.map { |k, val| "#{k}: #{val}" }.join(', ')
+          end
+          if note_val then
+            res_str += " (#{note_val})"
+          end
+          res_str
+        else
+          item.to_s
+        end
+      end.join('; ')
+    elsif v.is_a?(Hash) then
+      v.map { |k, val| "#{k}: #{val}" }.join('; ')
+    else
+      v.to_s
+    end
   end
 
   # The data-* attributes string for the node group (<g>).

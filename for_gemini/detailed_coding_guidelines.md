@@ -1,5 +1,6 @@
 # Detailed Coding Standards
-# vim: ts=2 sw=2 expandtab
+<!-- # vim: ts=2 sw=2 expandtab -->
+
 
 This document captures the standards to be maintained in the
 `family_graph` codebase.
@@ -36,10 +37,23 @@ This document captures the standards to be maintained in the
 - **Flow Control**: Avoid mid-method returns. Structure methods to have
   a single exit point or clear, sequential flow.
 
-### Method naming
+### Methods
 
-- **Functions**: Methods that are functions that return a value should be
-  named with a noun. For example, 'position' instead of 'get_position'.
+- **Functions**:
+  - Methods that are functions that return a value should be
+    named with a noun. For example, `position` instead of `get_position`; or
+    `formatted_data` instead of `format_data`.
+  - Functions should use the variable name `result` for the value/object
+    to be returned. For example:
+    ```ruby
+    def func(arg)
+      result = arg + processed(arg)
+      if result.nil? then
+        result = ""
+      end
+      result
+    end
+    ```
 - **Procedures**: Methods that are procedures should be named to indicate
   that they are performing an action that causes a state change - typically
   by naming the procedure as a verb.
