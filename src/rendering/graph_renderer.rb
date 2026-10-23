@@ -9,7 +9,7 @@ require 'legend'
 
 # Renders the calculated node registry into an SVG diagram.
 class GraphRenderer
-  include Contracts::DSL, SVGUtility, LineStyleMap, DebugLogger, SvgTooltip
+  include Contracts::DSL, SVGUtility, LineStyleMap, DebugLogger, SVGTooltip
 
   public  ###  Initialization
 

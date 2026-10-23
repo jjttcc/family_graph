@@ -57,6 +57,9 @@ This document captures the standards to be maintained in the
 - **Procedures**: Methods that are procedures should be named to indicate
   that they are performing an action that causes a state change - typically
   by naming the procedure as a verb.
+- **Length**: Methods should be limited to no more than 40 lines, except in
+  rare cases in which this is not practical; preferably, methods should be
+  even shorter - no more than 30 lines.
 
 ### Classes
 
