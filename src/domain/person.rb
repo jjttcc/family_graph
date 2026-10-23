@@ -15,7 +15,7 @@ class Person
   attr_reader :id, :children
   # biological father and mother (type Parent)
   attr_accessor :father, :mother
-  attr_accessor :spouses, :generation
+  attr_accessor :spouses, :generation, :spouse_metadata
   # All of self's non-biological mothers (array of NonBiologicalParent)
   attr_accessor :non_biological_mothers
   # All of self's non-biological fathers (array of NonBiologicalParent)
@@ -32,6 +32,7 @@ class Person
     @children = []
     @non_biological_mothers = []
     @non_biological_fathers = []
+    @spouse_metadata = {}
   end
 
   public  ###  Access
@@ -111,7 +112,7 @@ class Person
   # (e.g. given_name -> given-name).
   def method_missing(method_name, *args, &block)
     if data.nil? then
-      return super
+      return DATA_NOT_AVAILABLE
     end
     m_str = method_name.to_s
     if data.key?(m_str) then
@@ -121,7 +122,7 @@ class Person
     if data.key?(hyphenated) then
       return data[hyphenated]
     end
-    super
+    DATA_NOT_AVAILABLE
   end
 
   def respond_to_missing?(method_name, include_private = false)
@@ -131,6 +132,16 @@ class Person
     m_str = method_name.to_s
     hyphenated = m_str.gsub('_', '-')
     data.key?(m_str) || data.key?(hyphenated) || super
+  end
+
+  def marshal_dump
+    [@id, @data, @spouses, @children, @non_biological_mothers,
+     @non_biological_fathers, @spouse_metadata, @father, @mother]
+  end
+
+  def marshal_load(array)
+    @id, @data, @spouses, @children, @non_biological_mothers,
+    @non_biological_fathers, @spouse_metadata, @father, @mother = array
   end
 
   private ###  Implementation

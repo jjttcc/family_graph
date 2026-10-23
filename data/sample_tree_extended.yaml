@@ -67,11 +67,30 @@ spouse_2:
 
 # Added test branch for multi_spouse_400 (David Doe)
 test_child_500:
-  given-name: TestChild
   surname: Doe
+  given-name: John
+  nick-name: Johnny
   birth-date: 1925-01-01
   father: multi_spouse_400
   mother: spouse_1
+  spouses: grandchild_740, 1920-03-11, Tiverton, Devon, England;
+  death-date: 1973-05-02
+  death-location: London, England
+  occupations: comedian
+  residences:
+    - date: "1925"
+      location: "New York City, New York, USA"
+      notes: "Found in 1940 Federal Census"
+    - date: "1944"
+      location: "Lindsborg, Kansas"
+    - date: "1968"
+      location: "London, England"
+  notes: |
+    Hated comedies as a child,
+    then became a comedian in his 30s.
+    Hated cities in his youth, but ended up living in London.
+    Was a fan of ironical fiction and satire.
+
 
 # Gen 2
 grandchild_gen2_300:

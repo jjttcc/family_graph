@@ -165,3 +165,12 @@ assert(svg_content.include?("1950-01-01 [bap]"),
        "Baptism person 'Baptism Test' should have '[bap]' indicator")
 
 puts "SVG Renderer verification PASSED!"
+
+# 5. Missing Data Protocol Verification
+puts "Verifying Missing Data Protocol..."
+person = people.values.first
+assert(person != nil, "Should have loaded at least one person")
+missing_result = person.non_existent_attribute_12345
+assert(missing_result == DATA_NOT_AVAILABLE,
+       "Querying non-existent attribute should return DATA_NOT_AVAILABLE")
+puts "Missing Data Protocol verification PASSED!"

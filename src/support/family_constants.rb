@@ -67,3 +67,6 @@ LIST_ROOTS       = :list_roots
 # operational mode and filtering keys
 DATES      = :dates
 ROOT_IDS   = :root_ids
+
+# Missing data protocol sentinel value
+DATA_NOT_AVAILABLE = :data_not_available

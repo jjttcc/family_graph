@@ -38,16 +38,41 @@ class DataLoader
         spouse_info = person.send(:data)[SPOUSES].to_s
       end
       if ! spouse_info.empty? then
-        spouse_ids = spouse_info.split(',').map(&:strip)
-        spouse_ids.each do |spouse_id|
-          if person_table.key?(spouse_id) then
-            spouse = person_table[spouse_id]
-            # Ensure links are added only once to prevent errors
-            if !person.spouses.include?(spouse) then
-              person.add_spouse(spouse)
+        entries = spouse_info.split(';').map(&:strip).reject(&:empty?)
+        entries.each do |entry|
+          parts = entry.split(',').map(&:strip)
+          all_ids = parts.all? { |p| person_table.key?(p) }
+          if all_ids then
+            parts.each do |spouse_id|
+              spouse = person_table[spouse_id]
+              if !person.spouses.include?(spouse) then
+                person.add_spouse(spouse)
+              end
+              if !spouse.spouses.include?(person) then
+                spouse.add_spouse(person)
+              end
             end
-            if !spouse.spouses.include?(person) then
-              spouse.add_spouse(person)
+          else
+            spouse_id = parts[0]
+            spouse_date = parts[1]
+            spouse_place = nil
+            if parts.length > 2 then
+              spouse_place = parts[2..-1].join(', ')
+            end
+
+            if person_table.key?(spouse_id) then
+              spouse = person_table[spouse_id]
+              if !person.spouses.include?(spouse) then
+                person.add_spouse(spouse)
+              end
+              if !spouse.spouses.include?(person) then
+                spouse.add_spouse(person)
+              end
+
+              if spouse_date || (spouse_place && !spouse_place.empty?) then
+                person.spouse_metadata[spouse.id] = { date: spouse_date, place: spouse_place }
+                spouse.spouse_metadata[person.id] = { date: spouse_date, place: spouse_place }
+              end
             end
           end
         end
